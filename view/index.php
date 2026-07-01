@@ -12,14 +12,13 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="icons.css" />
+    <link rel="stylesheet" href="../css/style.css" />
   </head>
   <body>
     <!-- ══════════════ HEADER ══════════════ -->
     <header>
       <div class="header-logo">
-        <img src="img/tiopretonb.png" alt="Tio Preto Barbearia" />
+        <img src="../img/tiopretonb.png" alt="Tio Preto Barbearia" />
         <div class="brand-text">
           <span class="brand-name">Tio Preto</span>
           <span class="brand-sub">Barbearia</span>
