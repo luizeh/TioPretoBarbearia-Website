@@ -1,31 +1,29 @@
 <?php
-include_once('../config/Connection.php');
+include_once('../config/connection.php');
 include_once('../helpers/helpers.php');
 
 // PDO com prepared statement — sem SQL injection
 $pdo = Connection::getConnection();
 
-// print_r($_POST); die;
+$dados = $_POST;
 
-$data = $_POST;
+if($dados['action'] == 'login'){
 
-if($data['action'] == 'login'){
+    $email = $dados['usuario'];
+    $senha = $dados['senha'];
 
-    $email = $data['usuario'];
-    $senha = $data['senha'];
-
-    if(!isset($senha) || !isset($email)){
+    if(empty($senha) || empty($email)){
         helpers::resposta_json(false, 'E-mail e senha são obrigatórios.', null, 400);
     }
 
     $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email AND senha = :senha");
     $stmt->execute([':email' => $email, ':senha' => $senha]);
     
-    $usuario = $stmt->fetch(); // retorna array associativo ou false
+    $usuario = $stmt->fetch();
     
     if ($usuario) {
         // login encontrado
-        helpers::resposta_json(false, $usuario, null, 400);
+        helpers::resposta_json(true, $usuario, null, 400);
     } else {
         print_r("Usuário não encontrado.");
     }
