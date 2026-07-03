@@ -1,26 +1,6 @@
 <?php
-
-
 class helpers{
-/*
- * helpers.php
- * Funções utilitárias usadas em todos os endpoints da API.
- *
- * Como usar:
- *   resposta_json(true, 'Mensagem', $dados);
- *   verificar_login();
- *   verificar_admin();
- */
 
-
-/*
- * Envia uma resposta JSON padronizada e encerra o script.
- *
- * $sucesso  → true ou false
- * $mensagem → texto exibido para o usuário / frontend
- * $dados    → array com os dados retornados (opcional)
- * $status   → código HTTP (200, 201, 401, 404, etc.)
- */
 static function resposta_json($sucesso, $mensagem, $dados = null, $status = 200)
 {
     http_response_code($status);
@@ -34,11 +14,7 @@ static function resposta_json($sucesso, $mensagem, $dados = null, $status = 200)
 }
 
 
-/*
- * Verifica se o usuário está logado.
- * Se não estiver, retorna 401 e encerra.
- */
-function verificar_login()
+public static function verificar_login()
 {
     if (empty($_SESSION['usuario_id'])) {
         helpers::resposta_json(false, 'Você precisa estar logado para acessar esta funcionalidade.', null, 401);
@@ -46,11 +22,7 @@ function verificar_login()
 }
 
 
-/*
- * Verifica se o usuário é administrador.
- * Se não for (ou não estiver logado), retorna 403 e encerra.
- */
-function verificar_admin()
+public static function verificar_admin()
 {
     helpers::verificar_login();
 
@@ -58,4 +30,65 @@ function verificar_admin()
         helpers::resposta_json(false, 'Você não tem permissão para realizar esta ação.', null, 403);
     }
 }
+
+
+// VALIDAÇÕES
+
+public static function validarTexto($texto, $nomeCampo, $min = 2, $max = 50)
+{
+    $texto = preg_replace('/\s+/', ' ', trim($texto));
+
+    if (strlen($texto) < $min || strlen($texto) > $max) {
+        self::resposta_json(false, "O campo {$nomeCampo} deve ter entre {$min} e {$max} caracteres.", null, 400);
+    }
+
+    if (!preg_match('/^[\p{L}\s]+$/u', $texto)) {
+        self::resposta_json(false, "O campo {$nomeCampo} deve conter apenas letras.", null, 400);
+    }
+
+    return $texto;
 }
+
+
+public static function validarEmail($email)
+{
+    $email = trim($email);
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        self::resposta_json(false, 'E-mail inválido.', null, 400);
+    }
+
+    return strtolower($email);
+}
+
+public static function validarTelefone($telefone)
+{
+    $telefone = trim($telefone);
+
+    if (!preg_match('/^\+55\s\(\d{2}\)\s\d{5}-\d{4}$/', $telefone)) {
+        self::resposta_json(false, 'Telefone inválido.', null, 400);
+    }
+
+    return preg_replace('/\D/', '', $telefone);
+}
+
+
+public static function validarSenha($senha)
+{
+    $senha = trim($senha);
+
+    if (strlen($senha) < 8) {
+        self::resposta_json(false, 'A senha deve ter no mínimo 8 caracteres.', null, 400);
+    }
+
+    if (preg_match('/\s/', $senha)) {
+        self::resposta_json(false, 'A senha não pode conter espaços.', null, 400);
+    }
+
+    return $senha;
+}
+
+
+
+}
+

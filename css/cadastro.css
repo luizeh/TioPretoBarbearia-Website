@@ -1,6 +1,16 @@
 /* Card maior para acomodar mais campos */
 .login-card {
   max-width: 520px;
+  padding: 32px 40px 28px;
+}
+
+/* Reduz espaço entre campos no cadastro */
+.login-section .form-group {
+  margin-bottom: 14px;
+}
+
+.login-section .card-header {
+  margin-bottom: 20px;
 }
 
 /* Grid de dois campos lado a lado em telas maiores */
@@ -16,7 +26,7 @@
   text-align: center;
   font-family: "Barlow", sans-serif;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(0, 0, 0, 0.45);
 }
 
 .form-footer-link a {
