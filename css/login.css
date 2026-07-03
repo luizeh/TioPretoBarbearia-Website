@@ -1,11 +1,25 @@
+/* ── RESET DE ALTURA (login/cadastro sem rolagem) ── */
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ── LOGIN WRAPPER ── */
 .login-section {
-  min-height: calc(100vh - 90px);
+  flex: 1;
+  min-height: 0;
   background: var(--dark);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 5vw;
+  padding: 32px 5vw;
   position: relative;
   overflow: hidden;
 }
@@ -38,69 +52,88 @@
   user-select: none;
 }
 
+/* ── LOGO MINI (acima do card) ── */
+.auth-brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.auth-brand img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.auth-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.auth-brand-name {
+  font-family: "Playfair Display", serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+
+.auth-brand-sub {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
 /* ── CARD ── */
 .login-card {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 440px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1.5px solid rgba(201, 150, 58, 0.35);
-  border-radius: 6px;
-  padding: 52px 48px 48px;
-  backdrop-filter: blur(4px);
+  max-width: 400px;
+  background: #F5F4F2;
+  border-radius: 16px;
+  padding: 48px 44px 44px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
 }
 
-/* Linha gold lateral esquerda — mesmo padrão dos product-cards */
-.login-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(to bottom, var(--gold), var(--gold-light));
-  border-radius: 6px 0 0 6px;
+/* ── CABEÇALHO DO CARD (brand centralizada) ── */
+.card-header {
+  text-align: center;
+  margin-bottom: 36px;
 }
 
-/* ── CABEÇALHO DO CARD ── */
-.login-eyebrow {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  display: block;
-  margin-bottom: 12px;
-}
-
-.login-title {
+.card-brand-name {
   font-family: "Playfair Display", serif;
   font-size: 2rem;
   font-weight: 900;
-  color: var(--white);
-  line-height: 1.1;
-  margin-bottom: 8px;
+  color: var(--dark);
+  line-height: 1;
+  margin-bottom: 4px;
 }
 
-.login-title span {
+.card-brand-sub {
+  display: block;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
   color: var(--gold);
+  margin-bottom: 14px;
 }
 
-.login-subtitle {
+.card-access-text {
   font-family: "Barlow", sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 40px;
-}
-
-/* ── DIVISOR ── */
-.login-divider {
-  width: 40px;
-  height: 2px;
-  background: var(--gold);
-  margin-bottom: 40px;
+  color: rgba(0, 0, 0, 0.45);
 }
 
 /* ── CAMPOS ── */
@@ -114,7 +147,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(0, 0, 0, 0.5);
   margin-bottom: 8px;
 }
 
@@ -135,13 +168,13 @@
 
 .form-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(201, 150, 58, 0.25);
-  border-radius: 4px;
-  padding: 13px 16px 13px 44px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1.5px solid rgba(201, 150, 58, 0.3);
+  border-radius: 6px;
+  padding: 13px 16px;
   font-family: "Barlow", sans-serif;
   font-size: 0.95rem;
-  color: var(--white);
+  color: var(--dark);
   outline: none;
   transition:
     border-color 0.25s ease,
@@ -149,7 +182,7 @@
 }
 
 .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.22);
+  color: rgba(0, 0, 0, 0.28);
   font-weight: 300;
 }
 
@@ -228,7 +261,7 @@
 .form-check span {
   font-family: "Barlow", sans-serif;
   font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(0, 0, 0, 0.45);
 }
 
 .forgot-link {
@@ -275,6 +308,30 @@
 .btn-login:active {
   transform: translateY(0);
   opacity: 1;
+}
+
+/* ── LINK "AINDA NÃO TEM CONTA?" ── */
+.form-footer-link {
+  margin-top: 20px;
+  text-align: center;
+  font-family: "Barlow", sans-serif;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.form-footer-link a {
+  color: var(--gold);
+  text-decoration: none;
+  font-family: "Barlow Condensed", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  transition: color 0.2s;
+}
+
+.form-footer-link a:hover {
+  color: var(--gold-light);
+  text-decoration: underline;
 }
 
 /* ── FOOTER SIMPLES ── */

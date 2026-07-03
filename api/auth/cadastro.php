@@ -8,6 +8,7 @@ $pdo = Connection::getConnection();
 $dados = $_POST;
 
 if ($dados['action'] == 'cadastro') {
+
     if (!isset($dados['nome'], $dados['sobrenome'], $dados['telefone'], $dados['cidade'], $dados['email'], $dados['senha'], $dados['confirmar_senha'])) {
         helpers::resposta_json(false, 'Dados incompletos na requisição.', null, 400);
     }
@@ -28,9 +29,24 @@ if ($dados['action'] == 'cadastro') {
         }
     }
 
+    $dados['nome'] = helpers::validarTexto($dados['nome'], 'nome');
+    $dados['sobrenome'] = helpers::validarTexto($dados['sobrenome'], 'sobrenome');
+    $dados['cidade'] = helpers::validarTexto($dados['cidade'], 'cidade');
+    $dados['email'] = helpers::validarEmail($dados['email']);
+    $dados['telefone'] = helpers::validarTelefone($dados['telefone']);
+    $dados['senha'] = helpers::validarSenha($dados['senha']);
+
+
+
     if (trim($dados['senha']) !== trim($dados['confirmar_senha'])) {
         helpers::resposta_json(false, 'As senhas não coincidem.', null, 400);
     }
 
-    cadastrarUsuario($pdo, $dados);
+    $result = cadastrarUsuario($pdo, $dados);
+
+    if ($result['success']) {
+        helpers::resposta_json(true, $result['message'], null, 201);
+    } else {
+        helpers::resposta_json(false, $result['message'], null, 400);
+    }
 }
