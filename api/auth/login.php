@@ -1,6 +1,6 @@
 <?php
-include_once('../config/connection.php');
-include_once('../helpers/helpers.php');
+include_once(__DIR__ . '/../../config/connection.php');
+include_once(__DIR__ . '/../../helpers/helpers.php');
 
 // PDO com prepared statement — sem SQL injection
 $pdo = Connection::getConnection();
@@ -21,8 +21,12 @@ if ($dados['action'] == 'login') {
 
     $usuario = $stmt->fetch();
 
+
     if ($usuario && password_verify($senha, $usuario['senha'])) {
-        helpers::resposta_json(true, 'Login realizado com sucesso.', $usuario, 200);
+        session_start();
+        $_SESSION['usuario_id'] = $usuario['id'];
+        header('Location: ../../view/dashboard.php');
+        exit;
     } else {
         helpers::resposta_json(false, 'E-mail ou senha inválidos.', null, 401);
     }

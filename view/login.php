@@ -12,8 +12,8 @@
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/login.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/login.css" />
 </head>
 
 <body>
@@ -28,7 +28,7 @@
         <p class="card-access-text">Acesso ao Painel</p>
       </div>
 
-      <form action="../api/login.php" method="POST">
+      <form action="../api/auth/login.php" method="POST">
         <input type="hidden" name="action" value="login">
 
         <div class="form-group">
