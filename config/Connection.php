@@ -14,7 +14,6 @@ class Connection
     // Guarda a conexão para não abrir uma nova a cada chamada
     private static $conn = null;
 
-    // Construtor privado: impede criar objetos desta classe (só usamos o método estático)
     private function __construct() {}
 
     public static function getConnection()

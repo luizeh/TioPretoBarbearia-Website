@@ -1,3 +1,7 @@
+<?php
+$activePage = 'dashboard';
+include_once(__DIR__ . '/../controllers/dashboard.controller.php');
+?>
 <!doctype html>
 <html lang="pt-BR">
 
@@ -12,74 +16,17 @@
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../assets/css/dashboard.css" />
 </head>
 
 <body>
 
-    <!-- ══════════════ SIDEBAR ══════════════ -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <img src="../img/tiopretonb.png" alt="Tio Preto Barbearia" />
-        </div>
-
-        <nav class="sidebar-nav">
-            <a href="dashboard.php" class="nav-item active">
-                <i class="fa-solid fa-gauge-high"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-users"></i>
-                <span>Clientes</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-calendar-check"></i>
-                <span>Agendamentos</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-scissors"></i>
-                <span>Serviços</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-box-open"></i>
-                <span>Produtos</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Relatórios</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a href="#" class="nav-item nav-item--settings">
-                <i class="fa-solid fa-gear"></i>
-                <span>Configurações</span>
-            </a>
-            <a href="login.php" class="nav-item nav-item--logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Sair</span>
-            </a>
-        </div>
-    </aside>
+    <?php include __DIR__ . '/partials/sidebar.php'; ?>
 
     <!-- ══════════════ CONTEÚDO PRINCIPAL ══════════════ -->
     <div class="main-wrapper">
 
-        <!-- TOP BAR -->
-        <header class="topbar">
-            <button class="topbar-toggle" id="sidebarToggle" aria-label="Menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="topbar-greeting">
-                <span class="topbar-date" id="topbarDate"></span>
-            </div>
-            <div class="topbar-user">
-                <span class="topbar-user-name">Administrador</span>
-                <div class="topbar-avatar">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-            </div>
-        </header>
+        <?php include __DIR__ . '/partials/topbar.php'; ?>
 
         <!-- PAGE CONTENT -->
         <main class="page-content">
@@ -101,7 +48,7 @@
                     </div>
                     <div class="stat-info">
                         <span class="stat-label">Clientes Cadastrados</span>
-                        <span class="stat-value" id="statClientes">—</span>
+                        <span class="stat-value" id="statClientes">-</span>
                     </div>
                     <div class="stat-trend stat-trend--up">
                         <i class="fa-solid fa-arrow-trend-up"></i> +12%
@@ -158,6 +105,10 @@
                         <h2 class="dashboard-card-title">
                             <i class="fa-solid fa-calendar-check"></i> Próximos Agendamentos
                         </h2>
+                        <div class="table-search-wrap">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input class="table-search" type="text" placeholder="Pesquisar..." />
+                        </div>
                         <a href="#" class="card-link">Ver todos</a>
                     </div>
                     <div class="table-wrapper">
@@ -204,6 +155,19 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Paginação estática -->
+                    <div class="pagination">
+                        <button class="pagination-btn" disabled>
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button class="pagination-page active">1</button>
+                        <button class="pagination-page">2</button>
+                        <button class="pagination-page">3</button>
+                        <button class="pagination-btn">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Ações Rápidas -->
@@ -214,23 +178,23 @@
                         </h2>
                     </div>
                     <div class="quick-actions">
-                        <a href="#" class="quick-action-btn">
+                        <a href="#" class="quick-action-btn" data-modal="modal-agendamento">
                             <i class="fa-solid fa-calendar-plus"></i>
                             <span>Novo Agendamento</span>
                         </a>
-                        <a href="#" class="quick-action-btn">
+                        <a href="#" class="quick-action-btn" data-modal="modal-cliente">
                             <i class="fa-solid fa-user-plus"></i>
                             <span>Cadastrar Cliente</span>
                         </a>
-                        <a href="#" class="quick-action-btn">
+                        <a href="#" class="quick-action-btn" data-modal="modal-servico">
                             <i class="fa-solid fa-scissors"></i>
                             <span>Novo Serviço</span>
                         </a>
-                        <a href="#" class="quick-action-btn">
+                        <a href="#" class="quick-action-btn" data-modal="modal-produto">
                             <i class="fa-solid fa-box-open"></i>
                             <span>Adicionar Produto</span>
                         </a>
-                        <a href="#" class="quick-action-btn">
+                        <a href="#" class="quick-action-btn" data-modal="modal-relatorio">
                             <i class="fa-solid fa-file-invoice-dollar"></i>
                             <span>Gerar Relatório</span>
                         </a>
@@ -242,30 +206,218 @@
         </main>
     </div>
 
-    <script>
-        // Data no topbar
-        const d = new Date();
-        const opts = {
-            weekday: 'long',
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        };
-        document.getElementById('topbarDate').textContent =
-            d.toLocaleDateString('pt-BR', opts)
-            .replace(/^\w/, c => c.toUpperCase());
+    <!-- ══════════════ MODAIS ══════════════ -->
 
-        // Toggle sidebar mobile
-        document.getElementById('sidebarToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('sidebar--open');
-        });
+    <!-- Modal: Novo Agendamento -->
+    <div class="modal-overlay" id="modal-agendamento">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fa-solid fa-calendar-plus"></i> Novo Agendamento</h2>
+                <button class="modal-close" data-close="modal-agendamento"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="modal-form">
+                    <div class="modal-field">
+                        <label class="modal-label">Cliente</label>
+                        <input class="modal-input" type="text" placeholder="Nome do cliente" />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Serviço</label>
+                        <select class="modal-select">
+                            <option value="">Selecione um serviço</option>
+                            <option>Corte Social</option>
+                            <option>Corte + Barba</option>
+                            <option>Barba Degradê</option>
+                            <option>Hidratação</option>
+                        </select>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-field">
+                            <label class="modal-label">Data</label>
+                            <input class="modal-input" type="date" />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label">Horário</label>
+                            <input class="modal-input" type="time" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-secondary" data-close="modal-agendamento">Cancelar</button>
+                <button class="btn-modal-primary">Agendar</button>
+            </div>
+        </div>
+    </div>
 
-        // Placeholders de stats (substituir por fetch real futuramente)
-        document.getElementById('statClientes').textContent = '87';
-        document.getElementById('statAgendamentos').textContent = '12';
-        document.getElementById('statReceita').textContent = 'R$ 4.380';
-        document.getElementById('statNovos').textContent = '9';
-    </script>
+    <!-- Modal: Cadastrar Cliente -->
+    <div class="modal-overlay" id="modal-cliente">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fa-solid fa-user-plus"></i> Cadastrar Cliente</h2>
+                <button class="modal-close" data-close="modal-cliente"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="modal-form">
+                    <div class="modal-row">
+                        <div class="modal-field">
+                            <label class="modal-label">Nome</label>
+                            <input class="modal-input" type="text" placeholder="Nome" />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label">Sobrenome</label>
+                            <input class="modal-input" type="text" placeholder="Sobrenome" />
+                        </div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-field">
+                            <label class="modal-label">Telefone</label>
+                            <input class="modal-input" type="tel" placeholder="(00) 9 0000-0000" />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label">Cidade</label>
+                            <input class="modal-input" type="text" placeholder="Cidade" />
+                        </div>
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">E-mail</label>
+                        <input class="modal-input" type="email" placeholder="seu@email.com" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-secondary" data-close="modal-cliente">Cancelar</button>
+                <button class="btn-modal-primary">Cadastrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Serviço -->
+    <div class="modal-overlay" id="modal-servico">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fa-solid fa-scissors"></i> Novo Serviço</h2>
+                <button class="modal-close" data-close="modal-servico"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="modal-form">
+                    <div class="modal-field">
+                        <label class="modal-label">Nome do Serviço</label>
+                        <input class="modal-input" type="text" placeholder="Ex: Corte Social" />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Descrição</label>
+                        <textarea class="modal-textarea" placeholder="Descreva o serviço..."></textarea>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-field">
+                            <label class="modal-label">Preço (R$)</label>
+                            <input class="modal-input" type="number" min="0" step="0.01" placeholder="0,00" />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label">Duração (min)</label>
+                            <input class="modal-input" type="number" min="5" step="5" placeholder="30" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-secondary" data-close="modal-servico">Cancelar</button>
+                <button class="btn-modal-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Produto -->
+    <div class="modal-overlay" id="modal-produto">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fa-solid fa-box-open"></i> Adicionar Produto</h2>
+                <button class="modal-close" data-close="modal-produto"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="modal-form">
+                    <div class="modal-field">
+                        <label class="modal-label">Nome do Produto</label>
+                        <input class="modal-input" type="text" placeholder="Ex: Pomada Modeladora" />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Categoria</label>
+                        <select class="modal-select">
+                            <option value="">Selecione uma categoria</option>
+                            <option>Finalizador</option>
+                            <option>Shampoo</option>
+                            <option>Condicionador</option>
+                            <option>Óleo para Barba</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-field">
+                            <label class="modal-label">Preço (R$)</label>
+                            <input class="modal-input" type="number" min="0" step="0.01" placeholder="0,00" />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label">Estoque (un)</label>
+                            <input class="modal-input" type="number" min="0" placeholder="0" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-secondary" data-close="modal-produto">Cancelar</button>
+                <button class="btn-modal-primary">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Gerar Relatório -->
+    <div class="modal-overlay" id="modal-relatorio">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fa-solid fa-file-invoice-dollar"></i> Gerar Relatório</h2>
+                <button class="modal-close" data-close="modal-relatorio"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="modal-form">
+                    <div class="modal-field">
+                        <label class="modal-label">Tipo de Relatório</label>
+                        <select class="modal-select">
+                            <option value="">Selecione o tipo</option>
+                            <option>Agendamentos</option>
+                            <option>Receita</option>
+                            <option>Clientes</option>
+                            <option>Serviços Mais Vendidos</option>
+                        </select>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-field">
+                            <label class="modal-label">Data Início</label>
+                            <input class="modal-input" type="date" />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label">Data Fim</label>
+                            <input class="modal-input" type="date" />
+                        </div>
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Formato</label>
+                        <select class="modal-select">
+                            <option>PDF</option>
+                            <option>Excel (.xlsx)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-secondary" data-close="modal-relatorio">Cancelar</button>
+                <button class="btn-modal-primary">Gerar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
 </body>
 
 </html>

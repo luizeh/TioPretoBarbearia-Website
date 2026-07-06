@@ -1,7 +1,7 @@
 <?php
-include_once('../config/connection.php');
-include_once('../helpers/helpers.php');
-include_once('../sql/usuarios.sql.php');
+include_once(__DIR__ . '/../../config/connection.php');
+include_once(__DIR__ . '/../../helpers/helpers.php');
+include_once(__DIR__ . '/../../sql/usuarios.sql.php');
 
 $pdo = Connection::getConnection();
 
@@ -45,7 +45,8 @@ if ($dados['action'] == 'cadastro') {
     $result = cadastrarUsuario($pdo, $dados);
 
     if ($result['success']) {
-        helpers::resposta_json(true, $result['message'], null, 201);
+        header('Location: ../../view/login.php');
+        exit;
     } else {
         helpers::resposta_json(false, $result['message'], null, 400);
     }

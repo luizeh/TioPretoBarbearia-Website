@@ -12,9 +12,9 @@
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/login.css" />
-    <link rel="stylesheet" href="../css/cadastro.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/login.css" />
+    <link rel="stylesheet" href="../assets/css/cadastro.css" />
 
 </head>
 
@@ -30,7 +30,7 @@
                 <p class="card-access-text">Criar sua conta</p>
             </div>
 
-            <form action="../api/cadastro.php" method="POST" autocomplete="off">
+            <form action="../api/auth/cadastro.php" method="POST" autocomplete="off">
                 <input type="hidden" name="action" value="cadastro" />
 
                 <!-- Nome e Sobrenome -->
@@ -121,7 +121,8 @@
         <p>© 2026 Tio Preto Barbearia — Todos os direitos reservados. &nbsp;|&nbsp; Feito por <span>Luizeh</span></p>
     </footer>
 
-    <script src="../js/cadastro.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/cadastro.js"></script>
 </body>
 
 </html>
