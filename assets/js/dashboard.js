@@ -43,18 +43,3 @@ document.addEventListener("keydown", (e) => {
     });
   }
 });
-
-// ── Filtro de tabela (client-side) ──
-document.querySelectorAll("[data-search]").forEach((input) => {
-  const table = document.getElementById(input.dataset.search);
-  if (!table) return;
-
-  input.addEventListener("input", () => {
-    const q = input.value.toLowerCase().trim();
-    table.querySelectorAll("tbody tr").forEach((row) => {
-      row.style.display = row.textContent.toLowerCase().includes(q)
-        ? ""
-        : "none";
-    });
-  });
-});
