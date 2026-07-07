@@ -28,8 +28,8 @@ body {
   overflow-x: hidden;
 }
 
-i{
-    padding-top: 5px;
+i {
+  padding-top: 5px;
 }
 /* ── HEADER ── */
 header {
@@ -145,6 +145,7 @@ nav a:hover::after {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: left;
   padding: 60px 5vw 60px 7vw;
   position: relative;
   z-index: 1;
@@ -522,6 +523,10 @@ footer {
   .hero-image-side {
     display: none;
   }
+  .hero--landing .hero-image-side {
+    display: block;
+    min-height: 280px;
+  }
   .hero-content {
     padding: 56px 6vw;
   }
@@ -562,4 +567,117 @@ footer {
 .fade-in.visible {
   opacity: 1;
   transform: none;
+}
+
+/* ── LANDING PAGE ── */
+.hero--landing {
+  min-height: 100vh;
+}
+
+.hero-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.hero-brand img {
+  height: 300px;
+  width: auto;
+  object-fit: contain;
+}
+
+.hero-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.hero-brand-name {
+  font-family: "Playfair Display", serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--white);
+}
+
+.hero-brand-sub {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 36px;
+  align-items: center;
+}
+
+.btn-hero-primary {
+  padding: 13px 28px;
+  background: var(--gold);
+  color: var(--dark);
+  border: none;
+  border-radius: 4px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-block;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+  cursor: pointer;
+}
+.btn-hero-primary:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+}
+
+.btn-hero-secondary {
+  padding: 12px 28px;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-block;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+  cursor: pointer;
+}
+.btn-hero-secondary:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.btn-hero-ghost {
+  padding: 12px 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-block;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+.btn-hero-ghost:hover {
+  color: var(--gold);
 }

@@ -25,7 +25,7 @@ if ($dados['action'] == 'login') {
     if ($usuario && password_verify($senha, $usuario['senha'])) {
         session_start();
         $_SESSION['usuario_id'] = $usuario['id'];
-        header('Location: ../../view/dashboard.php');
+        header('Location: ../../view/admin/dashboard.php');
         exit;
     } else {
         helpers::resposta_json(false, 'E-mail ou senha inválidos.', null, 401);

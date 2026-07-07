@@ -1,7 +1,7 @@
 <!-- ══════════════ SIDEBAR ══════════════ -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <img src="../assets/img/tiopretonb.png" alt="Tio Preto Barbearia" />
+        <img src="../../assets/img/tiopretonb.png" alt="Tio Preto Barbearia" />
     </div>
 
     <nav class="sidebar-nav">
@@ -13,19 +13,19 @@
             <i class="fa-solid fa-users"></i>
             <span>Clientes</span>
         </a>
-        <a href="#" class="nav-item <?= ($activePage ?? '') === 'agendamentos' ? 'active' : '' ?>">
+        <a href="agendamentos.php" class="nav-item <?= ($activePage ?? '') === 'agendamentos' ? 'active' : '' ?>">
             <i class="fa-solid fa-calendar-check"></i>
             <span>Agendamentos</span>
         </a>
-        <a href="#" class="nav-item <?= ($activePage ?? '') === 'servicos' ? 'active' : '' ?>">
+        <a href="servicos.php" class="nav-item <?= ($activePage ?? '') === 'servicos' ? 'active' : '' ?>">
             <i class="fa-solid fa-scissors"></i>
             <span>Serviços</span>
         </a>
-        <a href="#" class="nav-item <?= ($activePage ?? '') === 'produtos' ? 'active' : '' ?>">
+        <a href="produtos.php" class="nav-item <?= ($activePage ?? '') === 'produtos' ? 'active' : '' ?>">
             <i class="fa-solid fa-box-open"></i>
             <span>Produtos</span>
         </a>
-        <a href="#" class="nav-item <?= ($activePage ?? '') === 'relatorios' ? 'active' : '' ?>">
+        <a href="relatorios.php" class="nav-item <?= ($activePage ?? '') === 'relatorios' ? 'active' : '' ?>">
             <i class="fa-solid fa-chart-line"></i>
             <span>Relatórios</span>
         </a>
@@ -36,7 +36,7 @@
             <i class="fa-solid fa-gear"></i>
             <span>Configurações</span>
         </a>
-        <a href="../api/auth/logout.php" class="nav-item nav-item--logout">
+        <a href="../../api/auth/logout.php" class="nav-item nav-item--logout">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span>Sair</span>
         </a>

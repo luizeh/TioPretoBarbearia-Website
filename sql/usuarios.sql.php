@@ -47,3 +47,5 @@ function cadastrarUsuario($pdo, $dados)
         'message' => 'Usuário cadastrado com sucesso.'
     ];
 }
+
+
