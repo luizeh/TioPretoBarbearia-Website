@@ -15,10 +15,10 @@
         <h4>Localização &amp; Horários</h4>
         <ul>
           <li>
-            <i class="fa-solid fa-location-dot"></i> Rua Exemplo, 123 —
-            Bairro, Cidade
+            <i class="fa-solid fa-location-dot"></i> Rua Joao Vasques, 180 —
+            Ana Laura 2, Douradina-PR
           </li>
-          <li><i class="fa-regular fa-clock"></i> Ter – Sex: 09h às 20h</li>
+          <li><i class="fa-regular fa-clock"></i> Ter – Sex: 8h30 às 19h</li>
           <li><i class="fa-regular fa-clock"></i> Sábado: 08h ao 12h</li>
           <li>
             <i class="fa-regular fa-clock"></i>Domingo e Segunda: Fechado

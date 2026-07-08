@@ -28,6 +28,9 @@
     });
   }
 
+  // Expõe para uso em swal-modals.js (reaplicar dentro de popups Swal)
+  window.aplicarMascaraTelefone = aplicarMascaraTelefone;
+
   document.querySelectorAll('[type="tel"]').forEach(aplicarMascaraTelefone);
 })();
 
@@ -42,27 +45,6 @@ document.querySelectorAll("[data-search]").forEach((input) => {
       row.style.display = row.textContent.toLowerCase().includes(q)
         ? ""
         : "none";
-    });
-  });
-});
-
-// ── Popula campos dos modais a partir de data-* dos botões ──
-document.querySelectorAll(".btn-action[data-modal]").forEach(function (btn) {
-  btn.addEventListener("click", function () {
-    var modal = document.getElementById(btn.dataset.modal);
-    if (!modal) return;
-    Object.keys(btn.dataset).forEach(function (key) {
-      if (key === "modal") return;
-      var target = modal.querySelector('[data-field="' + key + '"]');
-      if (!target) return;
-      var val = btn.dataset[key] || "";
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-        target.value = val;
-      } else if (target.tagName === "SELECT") {
-        target.value = val;
-      } else {
-        target.textContent = val || "—";
-      }
     });
   });
 });

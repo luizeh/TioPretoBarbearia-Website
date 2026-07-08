@@ -2,6 +2,7 @@
 $activePage = 'produtos';
 $pageTitle  = 'Produtos';
 include_once(__DIR__ . '/../../api/auth/session.php');
+include_once(__DIR__ . '/../../controllers/produtos.controller.php');
 $usuario = ['nome' => $_SESSION['nome'] ?? 'Administrador'];
 include __DIR__ . '/../partials/head.php';
 ?>
@@ -14,7 +15,6 @@ include __DIR__ . '/../partials/head.php';
 
   <main class="page-content">
 
-    <!-- Cabeçalho -->
     <div class="page-header">
       <div>
         <p class="page-eyebrow">✦ Estoque</p>
@@ -25,7 +25,6 @@ include __DIR__ . '/../partials/head.php';
       </button>
     </div>
 
-    <!-- Banner total -->
     <div class="clientes-stat-banner" style="max-width:100%;">
       <div class="clientes-stat-banner__icon">
         <i class="fa-solid fa-box-open"></i>
@@ -36,7 +35,6 @@ include __DIR__ . '/../partials/head.php';
       </div>
     </div>
 
-    <!-- Tabela -->
     <div class="dashboard-card">
       <div class="dashboard-card-header">
         <h2 class="dashboard-card-title">
@@ -51,99 +49,172 @@ include __DIR__ . '/../partials/head.php';
         <table class="dash-table" id="tbl-produtos">
           <thead>
             <tr>
-              <th>Produto</th>
-              <th>Categoria</th>
+              <th>Id</th>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Preço</th>
               <th>Estoque</th>
-              <th>Preço Unit.</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($produtos as $produto): ?>
+
+              <tr>
+                <td>
+                  <?= number_format($produto['id']) ?>
+                </td>
+
+                <td>
+                  <span class="client-name">
+                    <?= htmlspecialchars($produto['nome']) ?>
+                  </span>
+                </td>
+
+                <td>
+                  <?= htmlspecialchars(
+                    mb_strlen($produto['descricao']) > 80
+                      ? mb_substr($produto['descricao'], 0, 80) . '…'
+                      : $produto['descricao']
+                  ) ?>
+                </td>
+
+                <td>
+                  <span class="preco-badge">
+                    R$ <?= number_format($produto['preco'], 2, ',', '.') ?>
+                  </span>
+                </td>
+
+                <td>
+                  <?= htmlspecialchars($produto['estoque']) ?> un
+                </td>
+
+                <td>
+                  <div class="action-btns">
+                    <button
+                      class="btn-action btn-action--view"
+                      title="Ver"
+                      data-modal="modal-produto-ver"
+                      data-id="<?= $produto['id'] ?>"
+                      data-nome="<?= htmlspecialchars($produto['nome']) ?>"
+                      data-descricao="<?= htmlspecialchars($produto['descricao']) ?>"
+                      data-estoque="<?= $produto['estoque'] ?>"
+                      data-preco="<?= number_format($produto['preco'], 2, ',', '.') ?>"
+                      data-tags="<?= htmlspecialchars($produto['tags'] ?? '') ?>"
+                      data-foto-url="<?= htmlspecialchars($produto['foto_url'] ?? '') ?>">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+
+                    <button
+                      class="btn-action btn-action--edit"
+                      title="Editar"
+                      data-modal="modal-produto"
+                      data-id="<?= $produto['id'] ?>"
+                      data-nome="<?= htmlspecialchars($produto['nome']) ?>"
+                      data-descricao="<?= htmlspecialchars($produto['descricao']) ?>"
+                      data-estoque="<?= $produto['estoque'] ?>"
+                      data-preco="<?= $produto['preco'] ?>"
+                      data-tags="<?= htmlspecialchars($produto['tags'] ?? '') ?>"
+                      data-foto-url="<?= htmlspecialchars($produto['foto_url'] ?? '') ?>">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+
+                    <button
+                      class="btn-action btn-action--delete"
+                      title="Excluir"
+                      data-modal="modal-produto-excluir"
+                      data-id="<?= $produto['id'] ?>"
+                      data-nome="<?= htmlspecialchars($produto['nome']) ?>">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+
+                  </div>
+                </td>
+
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div><!-- /.table-wrapper -->
+    </div><!-- /.dashboard-card -->
+
+    <!-- ── Tabela de Tags ── -->
+    <div class="dashboard-card" style="margin-top:24px;">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
+          <i class="fa-solid fa-tags"></i> Tags Disponíveis
+        </h2>
+        <button class="btn-primary" style="font-size:0.82rem;padding:8px 16px;" data-modal="modal-tag">
+          <i class="fa-solid fa-plus"></i> Nova Tag
+        </button>
+      </div>
+      <div class="table-wrapper">
+        <table class="dash-table" id="tbl-tags">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><span class="client-name">Pomada Matte</span></td>
-              <td>Finalizadores</td>
-              <td>12 un</td>
-              <td><span class="preco-badge">R$ 45,00</span></td>
+              <td>1</td>
+              <td><span class="client-name">Cabelo</span></td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action btn-action--view" title="Ver" data-modal="modal-produto-ver" data-nome="Pomada Matte" data-categoria="Finalizadores" data-estoque="12" data-preco="R$ 45,00" data-descricao=""><i class="fa-solid fa-eye"></i></button>
-                  <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-produto" data-nome="Pomada Matte" data-categoria="Finalizadores" data-estoque="12" data-preco="45.00" data-descricao=""><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-produto-excluir" data-nome="Pomada Matte"><i class="fa-solid fa-trash"></i></button>
+                  <button class="btn-action btn-action--edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td><span class="client-name">Shampoo Anticaspa</span></td>
-              <td>Shampoos</td>
-              <td>8 un</td>
-              <td><span class="preco-badge">R$ 28,00</span></td>
+              <td>2</td>
+              <td><span class="client-name">Barba</span></td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action btn-action--view" title="Ver" data-modal="modal-produto-ver" data-nome="Shampoo Anticaspa" data-categoria="Shampoos" data-estoque="8" data-preco="R$ 28,00" data-descricao=""><i class="fa-solid fa-eye"></i></button>
-                  <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-produto" data-nome="Shampoo Anticaspa" data-categoria="Shampoos" data-estoque="8" data-preco="28.00" data-descricao=""><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-produto-excluir" data-nome="Shampoo Anticaspa"><i class="fa-solid fa-trash"></i></button>
+                  <button class="btn-action btn-action--edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td><span class="client-name">Óleo para Barba</span></td>
-              <td>Barba</td>
-              <td>15 un</td>
-              <td><span class="preco-badge">R$ 35,00</span></td>
+              <td>3</td>
+              <td><span class="client-name">Promoção</span></td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action btn-action--view" title="Ver" data-modal="modal-produto-ver" data-nome="Óleo para Barba" data-categoria="Barba" data-estoque="15" data-preco="R$ 35,00" data-descricao=""><i class="fa-solid fa-eye"></i></button>
-                  <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-produto" data-nome="Óleo para Barba" data-categoria="Barba" data-estoque="15" data-preco="35.00" data-descricao=""><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-produto-excluir" data-nome="Óleo para Barba"><i class="fa-solid fa-trash"></i></button>
+                  <button class="btn-action btn-action--edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td><span class="client-name">Cera Modeladora</span></td>
-              <td>Finalizadores</td>
-              <td>6 un</td>
-              <td><span class="preco-badge">R$ 38,00</span></td>
+              <td>4</td>
+              <td><span class="client-name">Premium</span></td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action btn-action--view" title="Ver" data-modal="modal-produto-ver" data-nome="Cera Modeladora" data-categoria="Finalizadores" data-estoque="6" data-preco="R$ 38,00" data-descricao=""><i class="fa-solid fa-eye"></i></button>
-                  <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-produto" data-nome="Cera Modeladora" data-categoria="Finalizadores" data-estoque="6" data-preco="38.00" data-descricao=""><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-produto-excluir" data-nome="Cera Modeladora"><i class="fa-solid fa-trash"></i></button>
+                  <button class="btn-action btn-action--edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td><span class="client-name">Condicionador</span></td>
-              <td>Condicionadores</td>
-              <td>10 un</td>
-              <td><span class="preco-badge">R$ 25,00</span></td>
+              <td>5</td>
+              <td><span class="client-name">Finalização</span></td>
               <td>
                 <div class="action-btns">
-                  <button class="btn-action btn-action--view" title="Ver" data-modal="modal-produto-ver" data-nome="Condicionador" data-categoria="Condicionadores" data-estoque="10" data-preco="R$ 25,00" data-descricao=""><i class="fa-solid fa-eye"></i></button>
-                  <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-produto" data-nome="Condicionador" data-categoria="Condicionadores" data-estoque="10" data-preco="25.00" data-descricao=""><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-produto-excluir" data-nome="Condicionador"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td><span class="client-name">Navalha Profissional</span></td>
-              <td>Ferramentas</td>
-              <td><span class="badge badge--low-stock">4 un</span></td>
-              <td><span class="preco-badge">R$ 120,00</span></td>
-              <td>
-                <div class="action-btns">
-                  <button class="btn-action btn-action--view" title="Ver" data-modal="modal-produto-ver" data-nome="Navalha Profissional" data-categoria="Ferramentas" data-estoque="4" data-preco="R$ 120,00" data-descricao=""><i class="fa-solid fa-eye"></i></button>
-                  <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-produto" data-nome="Navalha Profissional" data-categoria="Ferramentas" data-estoque="4" data-preco="120.00" data-descricao=""><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-produto-excluir" data-nome="Navalha Profissional"><i class="fa-solid fa-trash"></i></button>
+                  <button class="btn-action btn-action--edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </div><!-- /.dashboard-card tags -->
 
   </main>
-</div>
+</div><!-- /.main-wrapper -->
 
 <!-- ── Modal: Novo / Editar Produto ── -->
 <div class="modal-overlay" id="modal-produto">
@@ -155,20 +226,33 @@ include __DIR__ . '/../partials/head.php';
     <div class="modal-body">
       <form class="modal-form">
         <div class="modal-field">
+          <label class="modal-label">Foto do Produto</label>
+          <div class="foto-dropzone" id="foto-dropzone">
+            <img class="foto-dropzone__preview" id="foto-preview" src="" alt="Preview" />
+            <div class="foto-dropzone__placeholder" id="foto-placeholder">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Arraste ou clique para enviar</span>
+              <small>JPG, PNG, WebP · máx. 2MB</small>
+            </div>
+            <button type="button" class="foto-dropzone__remove" id="foto-remove" title="Remover foto">✕ Remover</button>
+            <input type="file" id="foto-file-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+            <input type="hidden" data-field="fotoUrl" id="foto-url-hidden" />
+          </div>
+        </div>
+        <div class="modal-field">
           <label class="modal-label">Nome do Produto</label>
           <input class="modal-input" type="text" data-field="nome" placeholder="Ex: Pomada Matte" />
         </div>
         <div class="modal-field">
-          <label class="modal-label">Categoria</label>
-          <select class="modal-select" data-field="categoria">
-            <option value="">Selecione uma categoria</option>
-            <option>Finalizadores</option>
-            <option>Shampoos</option>
-            <option>Condicionadores</option>
-            <option>Barba</option>
-            <option>Ferramentas</option>
-            <option>Outros</option>
-          </select>
+          <label class="modal-label">Tags</label>
+          <div class="tag-picker" id="tag-picker">
+            <button type="button" class="tag-option" data-tag-id="1" data-tag-nome="Cabelo">Cabelo</button>
+            <button type="button" class="tag-option" data-tag-id="2" data-tag-nome="Barba">Barba</button>
+            <button type="button" class="tag-option" data-tag-id="3" data-tag-nome="Promoção">Promoção</button>
+            <button type="button" class="tag-option" data-tag-id="4" data-tag-nome="Premium">Premium</button>
+            <button type="button" class="tag-option" data-tag-id="5" data-tag-nome="Finalização">Finalização</button>
+          </div>
+          <input type="hidden" data-field="tags" id="tag-hidden" name="tags" />
         </div>
         <div class="modal-row">
           <div class="modal-field">
@@ -204,8 +288,16 @@ include __DIR__ . '/../partials/head.php';
       <dl class="modal-info">
         <dt>Produto</dt>
         <dd data-field="nome">—</dd>
-        <dt>Categoria</dt>
-        <dd data-field="categoria">—</dd>
+        <dt>Foto</dt>
+        <dd>
+          <img id="ver-foto-img" src="" alt="Foto do produto"
+            style="max-width:100%;max-height:200px;border-radius:4px;display:none;" />
+          <span id="ver-foto-vazio" style="color:#888;font-size:0.85rem;">Sem foto</span>
+        </dd>
+        <dt>Descrição</dt>
+        <dd data-field="descricao">—</dd>
+        <dt>Tags</dt>
+        <dd data-field="tags">—</dd>
         <dt>Estoque</dt>
         <dd data-field="estoque">—</dd>
         <dt>Preço</dt>
@@ -239,4 +331,5 @@ include __DIR__ . '/../partials/head.php';
   </div>
 </div>
 
+<script src="../../assets/js/produtos.js"></script>
 <?php include __DIR__ . '/../partials/scripts.php'; ?>

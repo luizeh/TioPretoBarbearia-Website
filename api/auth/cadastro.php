@@ -1,9 +1,6 @@
 <?php
-include_once(__DIR__ . '/../../config/connection.php');
 include_once(__DIR__ . '/../../helpers/helpers.php');
-include_once(__DIR__ . '/../../sql/usuarios.sql.php');
-
-$pdo = Connection::getConnection();
+include_once(__DIR__ . '/../../sql/UsuariosSql.php');
 
 $dados = $_POST;
 
@@ -42,7 +39,7 @@ if ($dados['action'] == 'cadastro') {
         helpers::resposta_json(false, 'As senhas não coincidem.', null, 400);
     }
 
-    $result = cadastrarUsuario($pdo, $dados);
+    $result = UsuariosSql::cadastrar($dados);
 
     if ($result['success']) {
         header('Location: ../../view/login.php');
