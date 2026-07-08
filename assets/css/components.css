@@ -752,3 +752,222 @@
   color: var(--dark);
   font-weight: 500;
 }
+
+/* ── FOTO DROPZONE ── */
+.foto-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.foto-dropzone:hover,
+.foto-dropzone.dragover {
+  border-color: var(--gold);
+  background: rgba(201, 150, 58, 0.04);
+}
+
+.foto-dropzone input[type="file"] {
+  display: none;
+}
+
+.foto-dropzone input[type="hidden"] {
+  display: none;
+}
+
+.foto-dropzone__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  padding: 20px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.foto-dropzone__placeholder i {
+  font-size: 1.8rem;
+  color: var(--border);
+}
+
+.foto-dropzone__placeholder span {
+  font-family: var(--font-condensed);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+
+.foto-dropzone__placeholder small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.foto-dropzone__preview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  display: none;
+  padding: 8px;
+}
+
+.foto-dropzone__remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: none;
+}
+
+.foto-dropzone__remove:hover {
+  background: rgba(239, 68, 68, 0.85);
+}
+/* ── TAG PICKER ── */
+.tag-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.tag-option {
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 14px;
+  font-family: var(--font-condensed);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    color 0.2s;
+  user-select: none;
+}
+
+.tag-option:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.tag-option.selected {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--white);
+}
+
+/* ── SWEETALERT2 TEMA BARBEARIA ── */
+.swal-tp {
+  font-family: var(--font-body) !important;
+  border-radius: 8px !important;
+  padding: 0 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+.swal-tp__title {
+  font-family: var(--font-display) !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: var(--dark) !important;
+  padding: 22px 28px 0 !important;
+  text-align: left !important;
+}
+
+.swal-tp__body {
+  text-align: left !important;
+  padding: 14px 28px !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.95rem !important;
+  color: var(--dark) !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+}
+
+.swal-tp__actions {
+  padding: 10px 28px 22px !important;
+  gap: 10px !important;
+  justify-content: flex-end !important;
+}
+
+/* Botões */
+.swal-tp__btn {
+  font-family: var(--font-condensed) !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  padding: 9px 22px !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: background 0.2s !important;
+}
+
+.swal-tp__btn--confirm {
+  background: var(--gold) !important;
+  color: var(--white) !important;
+}
+.swal-tp__btn--confirm:hover {
+  background: var(--gold-light) !important;
+}
+
+.swal-tp__btn--cancel {
+  background: #f0ece6 !important;
+  color: var(--dark) !important;
+}
+.swal-tp__btn--cancel:hover {
+  background: #e0d8cc !important;
+}
+
+.swal-tp__btn--danger {
+  background: #c0392b !important;
+  color: var(--white) !important;
+}
+.swal-tp__btn--danger:hover {
+  background: #a93226 !important;
+}
+
+/* Botão fechar (X) */
+.swal-tp__close {
+  color: var(--gray) !important;
+}
+.swal-tp__close:hover {
+  color: var(--dark) !important;
+}
+
+/* Ícone warning com a cor dourada do projeto */
+.swal-tp .swal2-icon.swal2-warning {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+}
+
+/* Cabeçalho separado por linha quando há título */
+.swal-tp .swal2-title + .swal2-html-container {
+  border-top: 1px solid var(--border);
+  margin-top: 14px;
+  padding-top: 14px;
+}
+
+/* Formulários dentro do Swal usam os mesmos estilos de .modal-form */
+.swal-tp__body .modal-form,
+.swal-tp__body .modal-info,
+.swal-tp__body .modal-delete-warning {
+  margin: 0;
+}

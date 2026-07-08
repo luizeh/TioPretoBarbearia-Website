@@ -1,10 +1,7 @@
 <?php
 
 include_once(__DIR__ . '/../api/auth/session.php');
-include_once(__DIR__ . '/../config/connection.php');
-include_once(__DIR__ . '/../sql/dashboard.sql.php');
-
-$pdo = Connection::getConnection();
+include_once(__DIR__ . '/../sql/DashboardSql.php');
 
 $pagina = isset($_GET['pagina']) ? (int) $_GET['pagina'] : 1;
 
@@ -16,9 +13,9 @@ $limite = 10;
 
 $offset = ($pagina - 1) * $limite;
 
-$usuario  = buscarUsuario($pdo, $_SESSION['usuario_id']);
+$usuario  = DashboardSql::buscarUsuario($_SESSION['usuario_id']);
 
-$totalUsuarios = contarUsuarios($pdo);
+$totalUsuarios = DashboardSql::contarUsuarios();
 $totalPaginas = ceil($totalUsuarios / $limite);
 
-$usuarios = listarUsuarios($pdo, $limite, $offset);
+$usuarios = DashboardSql::listarUsuarios($limite, $offset);

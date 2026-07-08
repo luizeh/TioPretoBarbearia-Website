@@ -12,7 +12,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="../../assets/img/favicon.png" type="image/png" />
-    <title><?= htmlspecialchars($pageTitle) ?> — Tio Preto Barbearia</title>
+    <title><?= htmlspecialchars($pageTitle ?? '') ?> — Tio Preto Barbearia</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@600;700&display=swap"
         rel="stylesheet" />
@@ -20,6 +20,7 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="../../assets/css/dashboard.css" />
+    <link rel="stylesheet" href="../../node_modules/sweetalert2/dist/sweetalert2.min.css" />
 </head>
 
 <body>
