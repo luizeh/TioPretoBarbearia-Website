@@ -2,7 +2,6 @@
 $activePage = 'agendamentos';
 $pageTitle  = 'Agendamentos';
 include_once(__DIR__ . '/../../api/auth/session.php');
-$usuario = ['nome' => $_SESSION['nome'] ?? 'Administrador'];
 include __DIR__ . '/../partials/head.php';
 ?>
 
@@ -106,7 +105,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte Social · 30 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -130,7 +129,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte Social · 30 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +140,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte + Barba · 60 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -153,7 +152,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte + Barba · 60 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -176,7 +175,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Barba Degradê · 45 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -206,7 +205,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte + Barba · 60 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -249,7 +248,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte Social · 30 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -274,7 +273,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte + Barba · 60 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -322,7 +321,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Barba Degradê · 45 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -350,7 +349,7 @@ include __DIR__ . '/../partials/head.php';
                                 <span class="agenda-appt__service">Corte Social · 30 min</span>
                                 <div class="agenda-appt__actions">
                                     <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -439,9 +438,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--confirmed">Confirmado</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -453,9 +452,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--confirmed">Confirmado</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -467,9 +466,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--pending">Pendente</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -481,9 +480,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--confirmed">Confirmado</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -495,9 +494,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--cancelled">Cancelado</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -509,9 +508,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--confirmed">Confirmado</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -523,9 +522,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--confirmed">Confirmado</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -537,9 +536,9 @@ include __DIR__ . '/../partials/head.php';
                                 <td><span class="badge badge--pending">Pendente</span></td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-action btn-action--view" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
                                         <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -552,56 +551,20 @@ include __DIR__ . '/../partials/head.php';
     </main>
 </div>
 
-<!-- Modal: Novo / Editar Agendamento -->
-<div class="modal-overlay" id="modal-agendamento">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-calendar-plus"></i> Agendamento</h2>
-            <button class="modal-close" data-close="modal-agendamento"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <form class="modal-form">
-                <div class="modal-field">
-                    <label class="modal-label">Cliente</label>
-                    <input class="modal-input" type="text" placeholder="Nome do cliente" />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Serviço</label>
-                    <select class="modal-select">
-                        <option value="">Selecione um serviço</option>
-                        <option>Corte Social</option>
-                        <option>Corte + Barba</option>
-                        <option>Barba Degradê</option>
-                        <option>Hidratação</option>
-                        <option>Sobrancelha</option>
-                    </select>
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Data</label>
-                        <input class="modal-input" type="date" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Horário</label>
-                        <input class="modal-input" type="time" />
-                    </div>
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Status</label>
-                    <select class="modal-select">
-                        <option value="confirmado">Confirmado</option>
-                        <option value="pendente">Pendente</option>
-                        <option value="cancelado">Cancelado</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-agendamento">Cancelar</button>
-            <button class="btn-modal-primary">Salvar</button>
-        </div>
-    </div>
-</div>
+<!-- ── Modais ── -->
+<?php
+$modal_show_status  = true;
+include __DIR__ . '/../partials/modais/modal-agendamento.php';
+unset($modal_show_status);
+
+include __DIR__ . '/../partials/modais/modal-agendamento-ver.php';
+
+$modal_id           = 'modal-agendamento-excluir';
+$modal_title        = 'Excluir Agendamento';
+$modal_entity_label = 'este agendamento';
+include __DIR__ . '/../partials/modais/modal-excluir.php';
+unset($modal_id, $modal_title, $modal_entity_label);
+?>
 
 <script>
     // Toggle Lista / Agenda

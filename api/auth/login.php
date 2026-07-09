@@ -1,4 +1,6 @@
 <?php
+ob_start();
+error_reporting(0);
 include_once(__DIR__ . '/../../config/connection.php');
 include_once(__DIR__ . '/../../helpers/helpers.php');
 
@@ -24,10 +26,11 @@ if ($dados['action'] == 'login') {
 
     if ($usuario && password_verify($senha, $usuario['senha'])) {
         session_start();
-        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['usuario_id']   = $usuario['id'];
+        $_SESSION['usuario_nome'] = $usuario['nome'];
         $_SESSION['usuario_admin'] = $usuario['admin'];
-        header('Location: ../../view/user/agendamentos.php');
-        exit;
+        $redirect = $usuario['admin'] ? 'admin/dashboard.php' : 'user/agendamentos.php';
+        helpers::resposta_json(true, 'Login realizado com sucesso.', ['redirect' => $redirect], 200);
     } else {
         helpers::resposta_json(false, 'E-mail ou senha inválidos.', null, 401);
     }

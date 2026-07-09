@@ -179,213 +179,25 @@ include __DIR__ . '/../partials/head.php';
 </div>
 
 <!-- ══════════════ MODAIS ══════════════ -->
+<?php
+$modal_confirm_text = 'Agendar';
+include __DIR__ . '/../partials/modais/modal-agendamento.php';
+unset($modal_confirm_text);
 
-<!-- Modal: Novo Agendamento -->
-<div class="modal-overlay" id="modal-agendamento">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-calendar-plus"></i> Novo Agendamento</h2>
-            <button class="modal-close" data-close="modal-agendamento"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <form class="modal-form">
-                <div class="modal-field">
-                    <label class="modal-label">Cliente</label>
-                    <input class="modal-input" type="text" placeholder="Nome do cliente" />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Serviço</label>
-                    <select class="modal-select">
-                        <option value="">Selecione um serviço</option>
-                        <option>Corte Social</option>
-                        <option>Corte + Barba</option>
-                        <option>Barba Degradê</option>
-                        <option>Hidratação</option>
-                    </select>
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Data</label>
-                        <input class="modal-input" type="date" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Horário</label>
-                        <input class="modal-input" type="time" />
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-agendamento">Cancelar</button>
-            <button class="btn-modal-primary">Agendar</button>
-        </div>
-    </div>
-</div>
+$modal_id           = 'modal-cliente';
+$modal_title        = 'Cadastrar Cliente';
+$modal_confirm_text = 'Cadastrar';
+$modal_use_fields   = false;
+include __DIR__ . '/../partials/modais/modal-cliente-form.php';
+unset($modal_id, $modal_title, $modal_confirm_text, $modal_use_fields);
 
-<!-- Modal: Cadastrar Cliente -->
-<div class="modal-overlay" id="modal-cliente">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-user-plus"></i> Cadastrar Cliente</h2>
-            <button class="modal-close" data-close="modal-cliente"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <form class="modal-form">
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Nome</label>
-                        <input class="modal-input" type="text" placeholder="Nome" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Sobrenome</label>
-                        <input class="modal-input" type="text" placeholder="Sobrenome" />
-                    </div>
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Telefone</label>
-                        <input class="modal-input" type="tel" placeholder="(00) 9 0000-0000" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Cidade</label>
-                        <input class="modal-input" type="text" placeholder="Cidade" />
-                    </div>
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">E-mail</label>
-                    <input class="modal-input" type="email" placeholder="seu@email.com" />
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-cliente">Cancelar</button>
-            <button class="btn-modal-primary">Cadastrar</button>
-        </div>
-    </div>
-</div>
+$modal_id           = 'modal-servico';
+$modal_use_fields   = false;
+include __DIR__ . '/../partials/modais/modal-servico.php';
+unset($modal_id, $modal_use_fields);
 
-<!-- Modal: Novo Serviço -->
-<div class="modal-overlay" id="modal-servico">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-scissors"></i> Novo Serviço</h2>
-            <button class="modal-close" data-close="modal-servico"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <form class="modal-form">
-                <div class="modal-field">
-                    <label class="modal-label">Nome do Serviço</label>
-                    <input class="modal-input" type="text" placeholder="Ex: Corte Social" />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Descrição</label>
-                    <textarea class="modal-textarea" placeholder="Descreva o serviço..."></textarea>
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Preço (R$)</label>
-                        <input class="modal-input" type="number" min="0" step="0.01" placeholder="0,00" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Duração (min)</label>
-                        <input class="modal-input" type="number" min="5" step="5" placeholder="30" />
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-servico">Cancelar</button>
-            <button class="btn-modal-primary">Salvar</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Adicionar Produto -->
-<div class="modal-overlay" id="modal-produto">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-box-open"></i> Adicionar Produto</h2>
-            <button class="modal-close" data-close="modal-produto"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <form class="modal-form">
-                <div class="modal-field">
-                    <label class="modal-label">Nome do Produto</label>
-                    <input class="modal-input" type="text" placeholder="Ex: Pomada Modeladora" />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Categoria</label>
-                    <select class="modal-select">
-                        <option value="">Selecione uma categoria</option>
-                        <option>Finalizador</option>
-                        <option>Shampoo</option>
-                        <option>Condicionador</option>
-                        <option>Óleo para Barba</option>
-                        <option>Outros</option>
-                    </select>
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Preço (R$)</label>
-                        <input class="modal-input" type="number" min="0" step="0.01" placeholder="0,00" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Estoque (un)</label>
-                        <input class="modal-input" type="number" min="0" placeholder="0" />
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-produto">Cancelar</button>
-            <button class="btn-modal-primary">Adicionar</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Gerar Relatório -->
-<div class="modal-overlay" id="modal-relatorio">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-file-invoice-dollar"></i> Gerar Relatório</h2>
-            <button class="modal-close" data-close="modal-relatorio"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <form class="modal-form">
-                <div class="modal-field">
-                    <label class="modal-label">Tipo de Relatório</label>
-                    <select class="modal-select">
-                        <option value="">Selecione o tipo</option>
-                        <option>Agendamentos</option>
-                        <option>Receita</option>
-                        <option>Clientes</option>
-                        <option>Serviços Mais Vendidos</option>
-                    </select>
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Data Início</label>
-                        <input class="modal-input" type="date" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Data Fim</label>
-                        <input class="modal-input" type="date" />
-                    </div>
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Formato</label>
-                    <select class="modal-select">
-                        <option>PDF</option>
-                        <option>Excel (.xlsx)</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-relatorio">Cancelar</button>
-            <button class="btn-modal-primary">Gerar</button>
-        </div>
-    </div>
-</div>
+include __DIR__ . '/../partials/modais/modal-produto-rapido.php';
+include __DIR__ . '/../partials/modais/modal-relatorio.php';
+?>
 
 <?php include __DIR__ . '/../partials/scripts.php'; ?>

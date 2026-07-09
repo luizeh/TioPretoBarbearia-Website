@@ -7,7 +7,7 @@
         <span class="topbar-date" id="topbarDate"></span>
     </div>
     <div class="topbar-user">
-        <span class="topbar-user-name"><?= htmlspecialchars($usuario['nome'] ?? 'Visitante') ?></span>
+        <span class="topbar-user-name"><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Administrador') ?></span>
         <div class="topbar-avatar">
             <i class="fa-solid fa-user"></i>
         </div>

@@ -1,13 +1,23 @@
 /* ── RESET DE ALTURA (login/cadastro sem rolagem) ── */
+
+/* html com fundo escuro: safety net para a área abaixo do body quando o
+   SweetAlert2 injeta swal2-height-auto { height: auto !important } */
 html {
-  height: 100%;
+  background: var(--dark);
 }
 
+/* min-height em vez de height: o SweetAlert2 nunca toca min-height,
+   então mesmo com height:auto!important o body permanece com altura mínima de 100vh */
 body {
-  height: 100%;
+  min-height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* Garante que scroll continue bloqueado quando modal está aberto */
+body.swal2-shown {
+  overflow: hidden !important;
 }
 
 /* ── LOGIN WRAPPER ── */
@@ -98,7 +108,7 @@ body {
   z-index: 1;
   width: 100%;
   max-width: 400px;
-  background: #F5F4F2;
+  background: #f5f4f2;
   border-radius: 16px;
   padding: 48px 44px 44px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);

@@ -712,7 +712,7 @@
   background: #dc2626;
 }
 
-/* ── AVISO DE EXCLUSÃO ── */
+/* ── AVISO DE EXCLUSÃO (legado — mantido para retrocompatibilidade) ── */
 .modal-delete-warning {
   display: flex;
   flex-direction: column;
@@ -729,6 +729,19 @@
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--text);
+}
+
+/* ── TEXTO DE EXCLUSÃO (novo — compacto) ── */
+.modal-delete-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+.modal-delete-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
 }
 
 /* ── MODAL INFO (visualização somente-leitura) ── */

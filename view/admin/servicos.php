@@ -2,7 +2,6 @@
 $activePage = 'servicos';
 $pageTitle  = 'Serviços';
 include_once(__DIR__ . '/../../api/auth/session.php');
-$usuario = ['nome' => $_SESSION['nome'] ?? 'Administrador'];
 include __DIR__ . '/../partials/head.php';
 ?>
 
@@ -132,86 +131,20 @@ include __DIR__ . '/../partials/head.php';
     </main>
 </div>
 
-<!-- Modal: Novo / Editar Serviço -->
-<div class="modal-overlay" id="modal-servico">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-scissors"></i> Serviço</h2>
-            <button class="modal-close" data-close="modal-servico"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <form class="modal-form">
-                <div class="modal-field">
-                    <label class="modal-label">Nome do Serviço</label>
-                    <input class="modal-input" type="text" data-field="nome" placeholder="Ex: Corte Social" />
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Duração (min)</label>
-                        <input class="modal-input" type="number" data-field="duracao" placeholder="30" min="5" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Preço (R$)</label>
-                        <input class="modal-input" type="number" data-field="preco" placeholder="35.00" step="0.01" min="0" />
-                    </div>
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Descrição</label>
-                    <textarea class="modal-textarea" data-field="descricao" placeholder="Descreva o serviço..."></textarea>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-servico">Cancelar</button>
-            <button class="btn-modal-primary">Salvar</button>
-        </div>
-    </div>
-</div>
+<!-- ── Modais ── -->
+<?php
+$modal_id         = 'modal-servico';
+$modal_use_fields = true;
+include __DIR__ . '/../partials/modais/modal-servico.php';
+unset($modal_id, $modal_use_fields);
 
-<!-- ── Modal: Ver Serviço ── -->
-<div class="modal-overlay" id="modal-servico-ver">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-scissors"></i> Detalhes do Serviço</h2>
-            <button class="modal-close" data-close="modal-servico-ver"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <dl class="modal-info">
-                <dt>Serviço</dt>
-                <dd data-field="nome">—</dd>
-                <dt>Duração</dt>
-                <dd data-field="duracao">—</dd>
-                <dt>Preço</dt>
-                <dd data-field="preco">—</dd>
-                <dt>Descrição</dt>
-                <dd data-field="descricao">—</dd>
-            </dl>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-servico-ver">Fechar</button>
-        </div>
-    </div>
-</div>
+include __DIR__ . '/../partials/modais/modal-servico-ver.php';
 
-<!-- ── Modal: Excluir Serviço ── -->
-<div class="modal-overlay" id="modal-servico-excluir">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-trash"></i> Excluir Serviço</h2>
-            <button class="modal-close" data-close="modal-servico-excluir"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="modal-delete-warning">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <p>Tem certeza que deseja excluir <strong data-field="nome">este serviço</strong>?<br />
-                    Esta ação não pode ser desfeita.</p>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-servico-excluir">Cancelar</button>
-            <button class="btn-modal-danger">Excluir</button>
-        </div>
-    </div>
-</div>
+$modal_id           = 'modal-servico-excluir';
+$modal_title        = 'Excluir Serviço';
+$modal_entity_label = 'este serviço';
+include __DIR__ . '/../partials/modais/modal-excluir.php';
+unset($modal_id, $modal_title, $modal_entity_label);
+?>
 
 <?php include __DIR__ . '/../partials/scripts.php'; ?>

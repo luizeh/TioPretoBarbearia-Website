@@ -26,6 +26,7 @@ $pageTitle = $pageTitle ?? 'Tio Preto Barbearia';
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/style.css" />
+    <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/components.css" />
     <link rel="stylesheet" href="<?= $rootPath ?? '' ?>node_modules/sweetalert2/dist/sweetalert2.min.css" />
     <?php foreach ($extraCss ?? [] as $css): ?>
         <link rel="stylesheet" href="<?= $rootPath ?? '' ?><?= htmlspecialchars($css) ?>" />

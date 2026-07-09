@@ -30,21 +30,38 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
     var data = new FormData(form);
 
-    fetch(form.action, { method: "POST", body: data })
+    fetch(form.getAttribute("action"), { method: "POST", body: data })
       .then(function (r) {
-        // Redireciona se o servidor fez redirect (sucesso)
-        if (r.redirected) {
-          window.location.href = r.url;
-          return null;
-        }
-        return r.json();
+        return r.text();
       })
-      .then(function (result) {
+      .then(function (text) {
+        var result;
+        try {
+          result = JSON.parse(text);
+        } catch (parseErr) {
+          SwalTP.fire({
+            icon: "error",
+            title: "Erro",
+            text: "Resposta inválida do servidor. Tente novamente.",
+            confirmButtonText: "Ok",
+          });
+          return;
+        }
         if (!result) return;
         if (result.success) {
-          window.location.href = result.data
-            ? result.data.redirect || "login.php"
-            : "login.php";
+          SwalTP.fire({
+            icon: "success",
+            title: "Cadastro realizado!",
+            text: "Sua conta foi criada com sucesso. Faça login para continuar.",
+            confirmButtonText: "Ir para o login",
+            showCloseButton: false,
+          }).then(function () {
+            var redirect =
+              result.data && result.data.redirect
+                ? result.data.redirect
+                : "login.php";
+            window.location.href = redirect;
+          });
         } else {
           SwalTP.fire({
             icon: "error",
