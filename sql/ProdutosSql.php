@@ -12,7 +12,8 @@ class ProdutosSql
                 p.descricao,
                 p.preco,
                 p.estoque,
-                GROUP_CONCAT(t.nome SEPARATOR ', ') AS tags
+                GROUP_CONCAT(DISTINCT t.nome ORDER BY t.nome SEPARATOR ', ') AS tags,
+                GROUP_CONCAT(DISTINCT t.id   ORDER BY t.id   SEPARATOR ',') AS tag_ids
             FROM produtos p
             LEFT JOIN produto_tags pt ON pt.produto_id = p.id
             LEFT JOIN tags t ON t.id = pt.tag_id
@@ -26,35 +27,27 @@ class ProdutosSql
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function adicionarProdutos($pdo)
+    public static function adicionarProdutos($pdo, array $dados = [])
     {
+        // Suporte a chamada via API (array $dados) ou legado ($_POST)
+        $nome     = $dados['nome']     ?? $_POST['nome']     ?? '';
+        $descricao = $dados['descricao'] ?? $_POST['descricao'] ?? null;
+        $preco    = $dados['preco']    ?? $_POST['preco']    ?? 0;
+        $estoque  = $dados['estoque']  ?? $_POST['estoque']  ?? 0;
+        $foto_url = $dados['foto_url'] ?? $_POST['foto_url'] ?? null;
+
         $sql = "
-            INSERT INTO produtos
-            (
-                nome,
-                descricao,
-                preco,
-                estoque,
-                foto_url
-            )
-            VALUES
-            (
-                :nome,
-                :descricao,
-                :preco,
-                :estoque,
-                :foto_url
-            )
+            INSERT INTO produtos (nome, descricao, preco, estoque, foto_url)
+            VALUES (:nome, :descricao, :preco, :estoque, :foto_url)
         ";
 
         $stmt = $pdo->prepare($sql);
-
         $stmt->execute([
-            ":nome"      => $_POST['nome'],
-            ":descricao" => $_POST['descricao'],
-            ":preco"     => $_POST['preco'],
-            ":estoque"   => $_POST['estoque'],
-            ":foto_url"  => $_POST['foto_url']
+            ':nome'      => $nome,
+            ':descricao' => $descricao,
+            ':preco'     => $preco,
+            ':estoque'   => (int) $estoque,
+            ':foto_url'  => $foto_url,
         ]);
 
         return $pdo->lastInsertId();
@@ -135,8 +128,15 @@ class ProdutosSql
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function editarProduto($pdo, $id)
+    public static function editarProduto($pdo, $id, array $dados = [])
     {
+        $nome     = $dados['nome']     ?? $_POST['nome']     ?? '';
+        $descricao = $dados['descricao'] ?? $_POST['descricao'] ?? null;
+        $preco    = $dados['preco']    ?? $_POST['preco']    ?? 0;
+        $estoque  = $dados['estoque']  ?? $_POST['estoque']  ?? 0;
+        $foto_url = $dados['foto_url'] ?? $_POST['foto_url'] ?? null;
+        $tags     = $dados['tags']     ?? null;
+
         $sql = "
             UPDATE produtos
             SET
@@ -149,32 +149,27 @@ class ProdutosSql
         ";
 
         $stmt = $pdo->prepare($sql);
-
         $stmt->execute([
-            ":nome"      => $_POST['nome'],
-            ":descricao" => $_POST['descricao'],
-            ":preco"     => $_POST['preco'],
-            ":estoque"   => $_POST['estoque'],
-            ":foto_url"  => $_POST['foto_url'],
-            ":id"        => $id
+            ':nome'      => $nome,
+            ':descricao' => $descricao,
+            ':preco'     => $preco,
+            ':estoque'   => (int) $estoque,
+            ':foto_url'  => $foto_url,
+            ':id'        => $id,
         ]);
 
-        $sql = "DELETE FROM produto_tags WHERE produto_id = :id";
+        // Re-sync tags
+        $delStmt = $pdo->prepare("DELETE FROM produto_tags WHERE produto_id = :id");
+        $delStmt->execute([':id' => $id]);
 
-        $stmt = $pdo->prepare($sql);
-
-        $stmt->execute([
-            ":id" => $id
-        ]);
-
-        if (!empty($_POST['tags'])) {
-
-            foreach ($_POST['tags'] as $idTag) {
-
-                self::adicionarTagProduto($pdo, $id, $idTag);
-
+        $tagList = $tags ?? ($_POST['tags'] ?? []);
+        if (!empty($tagList)) {
+            if (is_string($tagList)) {
+                $tagList = array_filter(array_map('trim', explode(',', $tagList)));
             }
-
+            foreach ($tagList as $idTag) {
+                self::adicionarTagProduto($pdo, $id, $idTag);
+            }
         }
     }
 }

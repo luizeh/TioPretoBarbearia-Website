@@ -33,6 +33,12 @@ $activeNav = $activeNav ?? '';
     </nav>
 
     <div class="header-actions">
+        <?php if (!empty($_SESSION['usuario_admin'])): ?>
+            <a href="<?= $linkBase ?>admin/dashboard.php" class="btn-back-dashboard">
+                <i class="fa-solid fa-gauge-high"></i> Painel Admin
+            </a>
+        <?php endif; ?>
+
         <!-- Carrinho -->
         <div class="cart-menu" id="headerCart">
             <button class="cart-menu__trigger" type="button" aria-label="Carrinho">
@@ -60,12 +66,12 @@ $activeNav = $activeNav ?? '';
             <?php if (!empty($_SESSION['usuario_id'])): ?>
                 <div class="user-menu" id="headerUserMenu">
                     <button class="user-menu__trigger" type="button">
-                        <div class="user-avatar"><?= strtoupper(substr($_SESSION['nome'] ?? 'V', 0, 1)) ?></div>
-                        <span class="user-menu__name"><?= htmlspecialchars($_SESSION['nome'] ?? 'Visitante') ?></span>
+                        <div class="user-avatar"><?= strtoupper(substr($_SESSION['usuario_nome'] ?? 'V', 0, 1)) ?></div>
+                        <span class="user-menu__name"><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Visitante') ?></span>
                         <i class="fa-solid fa-chevron-down user-menu__chevron"></i>
                     </button>
                     <div class="user-menu__dropdown">
-                        <a href="#" class="user-menu__item">
+                        <a href="<?= $linkBase ?>user/perfil.php" class="user-menu__item">
                             <i class="fa-solid fa-user"></i> Ver Perfil
                         </a>
                         <a href="<?= $rootPath ?>api/auth/logout.php" class="user-menu__item user-menu__item--danger">

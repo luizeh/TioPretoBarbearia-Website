@@ -1,7 +1,7 @@
 <?php
 $activePage = 'agendamentos';
 $pageTitle  = 'Agendamentos';
-include_once(__DIR__ . '/../../api/auth/session.php');
+include_once(__DIR__ . '/../../controllers/agendamentos.controller.php');
 include __DIR__ . '/../partials/head.php';
 ?>
 
@@ -31,7 +31,7 @@ include __DIR__ . '/../partials/head.php';
                     <i class="fa-solid fa-calendar-day"></i>
                 </div>
                 <div class="agenda-stat-card__info">
-                    <span class="agenda-stat-card__value">4</span>
+                    <span class="agenda-stat-card__value"><?= $stats['hoje'] ?></span>
                     <span class="agenda-stat-card__label">Hoje</span>
                 </div>
             </div>
@@ -40,7 +40,7 @@ include __DIR__ . '/../partials/head.php';
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div class="agenda-stat-card__info">
-                    <span class="agenda-stat-card__value">6</span>
+                    <span class="agenda-stat-card__value"><?= $stats['confirmados'] ?></span>
                     <span class="agenda-stat-card__label">Confirmados</span>
                 </div>
             </div>
@@ -49,7 +49,7 @@ include __DIR__ . '/../partials/head.php';
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="agenda-stat-card__info">
-                    <span class="agenda-stat-card__value">2</span>
+                    <span class="agenda-stat-card__value"><?= $stats['pendentes'] ?></span>
                     <span class="agenda-stat-card__label">Pendentes</span>
                 </div>
             </div>
@@ -58,7 +58,7 @@ include __DIR__ . '/../partials/head.php';
                     <i class="fa-solid fa-circle-xmark"></i>
                 </div>
                 <div class="agenda-stat-card__info">
-                    <span class="agenda-stat-card__value">1</span>
+                    <span class="agenda-stat-card__value"><?= $stats['cancelados'] ?></span>
                     <span class="agenda-stat-card__label">Cancelados</span>
                 </div>
             </div>
@@ -430,118 +430,66 @@ include __DIR__ . '/../partials/head.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><span class="client-name">Carlos Mendes</span></td>
-                                <td>Corte Social</td>
-                                <td>07/07/2026</td>
-                                <td>09:00</td>
-                                <td><span class="badge badge--confirmed">Confirmado</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="client-name">Pedro Alves</span></td>
-                                <td>Corte + Barba</td>
-                                <td>07/07/2026</td>
-                                <td>14:00</td>
-                                <td><span class="badge badge--confirmed">Confirmado</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="client-name">Rafael Silva</span></td>
-                                <td>Barba Degradê</td>
-                                <td>08/07/2026</td>
-                                <td>10:00</td>
-                                <td><span class="badge badge--pending">Pendente</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="client-name">Diego Souza</span></td>
-                                <td>Corte + Barba</td>
-                                <td>09/07/2026</td>
-                                <td>09:00</td>
-                                <td><span class="badge badge--confirmed">Confirmado</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="client-name">Marcos Ferreira</span></td>
-                                <td>Corte Social</td>
-                                <td>09/07/2026</td>
-                                <td>13:00</td>
-                                <td><span class="badge badge--cancelled">Cancelado</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="client-name">Thiago Lima</span></td>
-                                <td>Corte Social</td>
-                                <td>10/07/2026</td>
-                                <td>08:00</td>
-                                <td><span class="badge badge--confirmed">Confirmado</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="client-name">Lucas Ramos</span></td>
-                                <td>Corte + Barba</td>
-                                <td>11/07/2026</td>
-                                <td>11:00</td>
-                                <td><span class="badge badge--confirmed">Confirmado</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="client-name">Felipe Nunes</span></td>
-                                <td>Corte + Barba</td>
-                                <td>12/07/2026</td>
-                                <td>09:00</td>
-                                <td><span class="badge badge--pending">Pendente</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="btn-action btn-action--view" data-modal="modal-agendamento-ver" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                        <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php
+                            $badgeMap = [
+                                'pendente'   => 'badge--pending',
+                                'confirmado' => 'badge--confirmed',
+                                'cancelado'  => 'badge--cancelled',
+                                'finalizado' => 'badge--finalizado',
+                            ];
+                            foreach ($agendamentos as $ag):
+                                $badgeClass = $badgeMap[$ag['status']] ?? 'badge--pending';
+                                $statusLabel = ucfirst($ag['status']);
+                            ?>
+                                <tr>
+                                    <td><span class="client-name"><?= htmlspecialchars($ag['cliente']) ?></span></td>
+                                    <td><?= htmlspecialchars($ag['servico']) ?></td>
+                                    <td><?= htmlspecialchars($ag['data_fmt']) ?></td>
+                                    <td><?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?></td>
+                                    <td><span class="badge <?= $badgeClass ?>"><?= $statusLabel ?></span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action btn-action--view" title="Ver"
+                                                data-modal="modal-agendamento-ver"
+                                                data-cliente="<?= htmlspecialchars($ag['cliente']) ?>"
+                                                data-servico="<?= htmlspecialchars($ag['servico']) ?>"
+                                                data-data="<?= htmlspecialchars($ag['data_fmt']) ?>"
+                                                data-horario="<?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?>"
+                                                data-status="<?= $statusLabel ?>">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-action--edit" title="Editar"
+                                                data-modal="modal-agendamento"
+                                                data-id="<?= $ag['id'] ?>"
+                                                data-cliente="<?= htmlspecialchars($ag['cliente']) ?>"
+                                                data-servico="<?= htmlspecialchars($ag['servico']) ?>"
+                                                data-status="<?= $ag['status'] ?>">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            <button class="btn-action btn-action--whatsapp" title="Lembrete WhatsApp"
+                                                data-cliente="<?= htmlspecialchars($ag['cliente']) ?>"
+                                                data-telefone="<?= htmlspecialchars($ag['telefone'] ?? '') ?>"
+                                                data-servico="<?= htmlspecialchars($ag['servico']) ?>"
+                                                data-data="<?= htmlspecialchars($ag['data_fmt']) ?>"
+                                                data-hora="<?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?>"
+                                                style="color:#25d366">
+                                                <i class="fa-brands fa-whatsapp"></i>
+                                            </button>
+                                            <button class="btn-action btn-action--delete" title="Excluir"
+                                                data-modal="modal-agendamento-excluir"
+                                                data-id="<?= $ag['id'] ?>"
+                                                data-nome="<?= htmlspecialchars($ag['cliente']) ?>">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <?php if (empty($agendamentos)): ?>
+                                <tr>
+                                    <td colspan="6" style="text-align:center;padding:32px;opacity:.5;">Nenhum agendamento encontrado.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -581,4 +529,5 @@ unset($modal_id, $modal_title, $modal_entity_label);
         document.getElementById('btn-agenda').classList.remove('active');
     });
 </script>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
+<?php $pageScripts = ['agendamentos.js'];
+include __DIR__ . '/../partials/scripts.php'; ?>

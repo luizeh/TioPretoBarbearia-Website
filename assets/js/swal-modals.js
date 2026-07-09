@@ -1,8 +1,20 @@
 // swal-modals.js — Sistema de modais via SweetAlert2
 // Substitui o sistema de [data-modal] / .modal-overlay do dashboard.js
 (function () {
-  // IDs tratados por JS de página específica (produtos.js)
-  var SKIP = ["modal-produto", "modal-produto-ver", "modal-produto-excluir"];
+  // IDs tratados por JS de página específica
+  var SKIP = [
+    "modal-produto",
+    "modal-produto-ver",
+    "modal-produto-excluir",
+    "modal-servico",
+    "modal-servico-excluir",
+    "modal-agendamento",
+    "modal-agendamento-excluir",
+    "modal-cliente-editar",
+    "modal-cliente-excluir",
+    "modal-tag",
+    "modal-tag-excluir",
+  ];
 
   // Popula [data-field] dentro do popup a partir do dataset do botão
   function populateFields(popup, dataset) {

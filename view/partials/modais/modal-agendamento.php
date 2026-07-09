@@ -26,13 +26,13 @@ $modal_show_status  = $modal_show_status  ?? false;
                 </div>
                 <div class="modal-field">
                     <label class="modal-label">Serviço</label>
-                    <select class="modal-select">
+                    <select class="modal-select" name="servico_id" data-field="servicoId">
                         <option value="">Selecione um serviço</option>
-                        <option>Corte Social</option>
-                        <option>Corte + Barba</option>
-                        <option>Barba Degradê</option>
-                        <option>Hidratação</option>
-                        <option>Sobrancelha</option>
+                        <?php foreach ($servicos ?? [] as $s): ?>
+                            <option value="<?= $s['id'] ?>" data-duracao="<?= (int) $s['tempo_estimado'] ?>">
+                                <?= htmlspecialchars($s['nome']) ?> — R$ <?= number_format($s['preco'], 2, ',', '.') ?> (<?= (int) $s['tempo_estimado'] ?> min)
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="modal-row">

@@ -1,7 +1,7 @@
 <?php
 $activePage = 'servicos';
 $pageTitle  = 'Serviços';
-include_once(__DIR__ . '/../../api/auth/session.php');
+include_once(__DIR__ . '/../../controllers/servicos.controller.php');
 include __DIR__ . '/../partials/head.php';
 ?>
 
@@ -30,7 +30,7 @@ include __DIR__ . '/../partials/head.php';
                 <i class="fa-solid fa-scissors"></i>
             </div>
             <div class="clientes-stat-banner__info">
-                <span class="clientes-stat-banner__count">5</span>
+                <span class="clientes-stat-banner__count"><?= $totalServicos ?></span>
                 <span class="clientes-stat-banner__label">serviços cadastrados</span>
             </div>
         </div>
@@ -58,71 +58,46 @@ include __DIR__ . '/../partials/head.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><span class="client-name">Corte Social</span></td>
-                            <td>30 min</td>
-                            <td><span class="preco-badge">R$ 35,00</span></td>
-                            <td>Corte clássico com acabamento perfeito.</td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-action btn-action--view" title="Ver" data-modal="modal-servico-ver" data-nome="Corte Social" data-duracao="30" data-preco="R$ 35,00" data-descricao="Corte clássico com acabamento perfeito."><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-servico" data-nome="Corte Social" data-duracao="30" data-preco="35.00" data-descricao="Corte clássico com acabamento perfeito."><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-servico-excluir" data-nome="Corte Social"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="client-name">Corte + Barba</span></td>
-                            <td>60 min</td>
-                            <td><span class="preco-badge">R$ 55,00</span></td>
-                            <td>Corte e modelagem completa da barba.</td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-action btn-action--view" title="Ver" data-modal="modal-servico-ver" data-nome="Corte + Barba" data-duracao="60" data-preco="R$ 55,00" data-descricao="Corte e modelagem completa da barba."><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-servico" data-nome="Corte + Barba" data-duracao="60" data-preco="55.00" data-descricao="Corte e modelagem completa da barba."><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-servico-excluir" data-nome="Corte + Barba"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="client-name">Barba Degradê</span></td>
-                            <td>45 min</td>
-                            <td><span class="preco-badge">R$ 40,00</span></td>
-                            <td>Modelagem com efeito degradê nas laterais.</td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-action btn-action--view" title="Ver" data-modal="modal-servico-ver" data-nome="Barba Degradê" data-duracao="45" data-preco="R$ 40,00" data-descricao="Modelagem com efeito degradê nas laterais."><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-servico" data-nome="Barba Degradê" data-duracao="45" data-preco="40.00" data-descricao="Modelagem com efeito degradê nas laterais."><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-servico-excluir" data-nome="Barba Degradê"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="client-name">Hidratação</span></td>
-                            <td>40 min</td>
-                            <td><span class="preco-badge">R$ 45,00</span></td>
-                            <td>Tratamento profundo de hidratação capilar.</td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-action btn-action--view" title="Ver" data-modal="modal-servico-ver" data-nome="Hidratação" data-duracao="40" data-preco="R$ 45,00" data-descricao="Tratamento profundo de hidratação capilar."><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-servico" data-nome="Hidratação" data-duracao="40" data-preco="45.00" data-descricao="Tratamento profundo de hidratação capilar."><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-servico-excluir" data-nome="Hidratação"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="client-name">Sobrancelha</span></td>
-                            <td>15 min</td>
-                            <td><span class="preco-badge">R$ 20,00</span></td>
-                            <td>Design e alinhamento de sobrancelha masculina.</td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-action btn-action--view" title="Ver" data-modal="modal-servico-ver" data-nome="Sobrancelha" data-duracao="15" data-preco="R$ 20,00" data-descricao="Design e alinhamento de sobrancelha masculina."><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn-action btn-action--edit" title="Editar" data-modal="modal-servico" data-nome="Sobrancelha" data-duracao="15" data-preco="20.00" data-descricao="Design e alinhamento de sobrancelha masculina."><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" title="Excluir" data-modal="modal-servico-excluir" data-nome="Sobrancelha"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
+                        <?php foreach ($servicos as $s): ?>
+                            <tr>
+                                <td><span class="client-name"><?= htmlspecialchars($s['nome']) ?></span></td>
+                                <td><?= (int) $s['tempo_estimado'] ?> min</td>
+                                <td><span class="preco-badge">R$ <?= number_format($s['preco'], 2, ',', '.') ?></span></td>
+                                <td><?= htmlspecialchars(mb_strlen($s['descricao'] ?? '') > 60 ? mb_substr($s['descricao'], 0, 60) . '…' : ($s['descricao'] ?? '—')) ?></td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="btn-action btn-action--view" title="Ver"
+                                            data-modal="modal-servico-ver"
+                                            data-nome="<?= htmlspecialchars($s['nome']) ?>"
+                                            data-duracao="<?= (int) $s['tempo_estimado'] ?>"
+                                            data-preco="R$ <?= number_format($s['preco'], 2, ',', '.') ?>"
+                                            data-descricao="<?= htmlspecialchars($s['descricao'] ?? '') ?>">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="btn-action btn-action--edit" title="Editar"
+                                            data-modal="modal-servico"
+                                            data-id="<?= $s['id'] ?>"
+                                            data-nome="<?= htmlspecialchars($s['nome']) ?>"
+                                            data-duracao="<?= (int) $s['tempo_estimado'] ?>"
+                                            data-preco="<?= $s['preco'] ?>"
+                                            data-descricao="<?= htmlspecialchars($s['descricao'] ?? '') ?>">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="btn-action btn-action--delete" title="Excluir"
+                                            data-modal="modal-servico-excluir"
+                                            data-id="<?= $s['id'] ?>"
+                                            data-nome="<?= htmlspecialchars($s['nome']) ?>">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($servicos)): ?>
+                            <tr>
+                                <td colspan="5" style="text-align:center;padding:32px;opacity:.5;">Nenhum serviço cadastrado.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -147,4 +122,5 @@ include __DIR__ . '/../partials/modais/modal-excluir.php';
 unset($modal_id, $modal_title, $modal_entity_label);
 ?>
 
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
+<?php $pageScripts = ['servicos.js'];
+include __DIR__ . '/../partials/scripts.php'; ?>

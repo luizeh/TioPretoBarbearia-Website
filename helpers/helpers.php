@@ -30,7 +30,7 @@ class helpers
     {
         helpers::verificar_login();
 
-        if (empty($_SESSION['admin']) || $_SESSION['admin'] !== true) {
+        if (empty($_SESSION['usuario_admin']) || $_SESSION['usuario_admin'] != true) {
             helpers::resposta_json(false, 'Você não tem permissão para realizar esta ação.', null, 403);
         }
     }

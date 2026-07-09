@@ -34,5 +34,8 @@ $pageTitle = $pageTitle ?? 'Tio Preto Barbearia';
 </head>
 
 <body<?= isset($bodyClass) ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?>>
+    <script>
+        window.API_BASE = '<?= htmlspecialchars($rootPath ?? '') ?>api/';
+    </script>
     <script src="<?= $rootPath ?? '' ?>node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <script src="<?= $rootPath ?? '' ?>assets/js/swal-theme.js"></script>

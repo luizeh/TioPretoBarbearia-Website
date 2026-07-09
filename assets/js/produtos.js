@@ -159,6 +159,53 @@ document.addEventListener("click", function (e) {
       initDropzone(popup);
       initTagPicker(popup);
     },
+    preConfirm: function () {
+      var popup = document.querySelector(".swal2-popup");
+      var nome = (popup.querySelector('[data-field="nome"]') || {}).value || "";
+      if (!nome.trim()) {
+        Swal.showValidationMessage("O nome do produto é obrigatório.");
+        return false;
+      }
+      var payload = {
+        action: isEdit ? "editar" : "criar",
+        nome: nome.trim(),
+        descricao: (
+          (popup.querySelector('[data-field="descricao"]') || {}).value || ""
+        ).trim(),
+        preco: (popup.querySelector('[data-field="preco"]') || {}).value || "0",
+        estoque:
+          (popup.querySelector('[data-field="estoque"]') || {}).value || "0",
+        foto_url:
+          (popup.querySelector('[data-field="fotoUrl"]') || {}).value || "",
+        tags: (popup.querySelector('[data-field="tagIds"]') || {}).value || "",
+      };
+      if (isEdit) payload.id = btn.dataset.id;
+      return fetch("../../api/admin/produtos.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }).then(function (r) {
+        return r.json();
+      });
+    },
+  }).then(function (result) {
+    if (!result.isConfirmed) return;
+    if (result.value && result.value.success) {
+      SwalTP.fire({
+        icon: "success",
+        title: isEdit ? "Atualizado!" : "Criado!",
+        timer: 1800,
+        showConfirmButton: false,
+      }).then(function () {
+        location.reload();
+      });
+    } else {
+      SwalTP.fire({
+        icon: "error",
+        title: "Erro",
+        text: (result.value && result.value.message) || "Erro ao salvar.",
+      });
+    }
   });
 });
 
@@ -213,7 +260,6 @@ document.addEventListener("click", function (e) {
       "Tem certeza que deseja excluir <strong>" +
       (btn.dataset.nome || "este produto") +
       "</strong>?<br/><small style='color:#888'>Esta ação não pode ser desfeita.</small>",
-    icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Excluir",
     cancelButtonText: "Cancelar",
@@ -226,5 +272,32 @@ document.addEventListener("click", function (e) {
       actions: "swal-tp__actions",
       closeButton: "swal-tp__close",
     },
+    preConfirm: function () {
+      return fetch("../../api/admin/produtos.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "excluir", id: btn.dataset.id }),
+      }).then(function (r) {
+        return r.json();
+      });
+    },
+  }).then(function (result) {
+    if (!result.isConfirmed) return;
+    if (result.value && result.value.success) {
+      SwalTP.fire({
+        icon: "success",
+        title: "Excluído!",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(function () {
+        location.reload();
+      });
+    } else {
+      SwalTP.fire({
+        icon: "error",
+        title: "Erro",
+        text: (result.value && result.value.message) || "Erro ao excluir.",
+      });
+    }
   });
 });

@@ -69,7 +69,7 @@ include_once __DIR__ . '/partials/head_public.php';
                     <label class="form-label" for="senha">Senha</label>
                     <div class="input-wrap">
                         <input class="form-input" type="password" id="senha" name="senha"
-                            placeholder="Mínimo 6 caracteres" required minlength="6"
+                            placeholder="Mínimo 8 caracteres" required minlength="8"
                             autocomplete="new-password" oninput="avaliarSenha(this.value)" />
                     </div>
                     <div class="senha-strength" id="strength-bar">

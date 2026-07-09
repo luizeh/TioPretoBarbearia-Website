@@ -420,6 +420,63 @@ nav a:hover::after {
   text-transform: uppercase;
 }
 
+/* ── Rodapé do card de produto (preço + botão) ── */
+.product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.product-price {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.btn-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--dark);
+  color: var(--white);
+  border: none;
+  border-radius: 3px;
+  padding: 9px 16px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.2s ease;
+}
+
+.btn-cart:hover {
+  background: var(--gold);
+  transform: translateY(-2px);
+}
+
+.btn-cart:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.produtos-vazio {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 56px 0;
+  opacity: 0.45;
+  font-size: 0.95rem;
+}
+
 /* Divider */
 .divider {
   border: none;
@@ -445,7 +502,6 @@ footer {
   height: 60px;
   object-fit: contain;
   margin-bottom: 18px;
-  filter: brightness(0) invert(1);
 }
 
 .footer-brand p {
@@ -820,6 +876,33 @@ nav a.nav-active::after {
 
 .btn-header-login:hover {
   background: var(--gold-light);
+}
+
+/* Botão exclusivo do admin no site público */
+.btn-back-dashboard {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--dark);
+  color: var(--gold);
+  border: 2px solid var(--gold);
+  border-radius: 3px;
+  padding: 7px 18px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.btn-back-dashboard:hover {
+  background: var(--gold);
+  color: var(--dark);
 }
 
 /* ── HEADER: ACTIONS WRAPPER ── */
