@@ -1,4 +1,6 @@
 <?php
+ob_start();
+error_reporting(0);
 include_once(__DIR__ . '/../../helpers/helpers.php');
 include_once(__DIR__ . '/../../sql/UsuariosSql.php');
 
@@ -42,8 +44,7 @@ if ($dados['action'] == 'cadastro') {
     $result = UsuariosSql::cadastrar($dados);
 
     if ($result['success']) {
-        header('Location: ../../view/login.php');
-        exit;
+        helpers::resposta_json(true, 'Cadastro realizado com sucesso!', ['redirect' => 'login.php'], 201);
     } else {
         helpers::resposta_json(false, $result['message'], null, 400);
     }

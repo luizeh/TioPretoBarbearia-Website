@@ -2,7 +2,6 @@
 $activePage = 'relatorios';
 $pageTitle  = 'Relatórios';
 include_once(__DIR__ . '/../../api/auth/session.php');
-$usuario = ['nome' => $_SESSION['nome'] ?? 'Administrador'];
 include __DIR__ . '/../partials/head.php';
 ?>
 

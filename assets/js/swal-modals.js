@@ -1,14 +1,8 @@
 // swal-modals.js — Sistema de modais via SweetAlert2
 // Substitui o sistema de [data-modal] / .modal-overlay do dashboard.js
 (function () {
-  // IDs tratados por JS de página específica
-  var SKIP = [
-    "modal-produto",
-    "modal-produto-ver",
-    "modal-produto-excluir",
-    "modal-novo-agendamento",
-    "modal-tag",
-  ];
+  // IDs tratados por JS de página específica (produtos.js)
+  var SKIP = ["modal-produto", "modal-produto-ver", "modal-produto-excluir"];
 
   // Popula [data-field] dentro do popup a partir do dataset do botão
   function populateFields(popup, dataset) {
@@ -51,7 +45,6 @@
       SwalTP.fire({
         title: title,
         html: bodyHTML,
-        icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Excluir",
         cancelButtonText: "Cancelar",

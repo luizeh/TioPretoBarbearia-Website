@@ -7,16 +7,16 @@ include_once(__DIR__ . '/../sql/ProdutosSql.php');
 $pdo = Connection::getConnection();
 
 $produtos = ProdutosSql::listarProdutos($pdo);
+$tags = ProdutosSql::listarTags($pdo);
 
-// Inserção só ocorre quando o formulário for submetido via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])) {
-    $idproduto = ProdutosSql::adicionarProdutos($pdo);
+    $idProduto = ProdutosSql::adicionarProdutos($pdo);
+
     if (!empty($_POST['tags'])) {
-        foreach (explode(',', $_POST['tags']) as $tag) {
-            $tag = trim($tag);
-            if ($tag !== '') {
-                ProdutosSql::adicionarTagProduto($pdo, $idproduto, $tag);
-            }
+        foreach ($_POST['tags'] as $idTag) {
+            ProdutosSql::adicionarTagProduto($pdo, $idProduto, $idTag);
         }
     }
+    header("Location: ../views/pages/produtos.php");
+    exit;
 }
