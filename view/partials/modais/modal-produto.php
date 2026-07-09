@@ -28,27 +28,22 @@
                     <input class="modal-input" type="text" data-field="nome" placeholder="Ex: Pomada Matte" />
                 </div>
                 <div class="modal-field">
-                    <div class="tag-picker">
+                    <label class="modal-label">Tags</label>
+                    <div class="tag-picker" id="tag-picker">
 
                         <?php foreach ($tags ?? [] as $tag): ?>
 
-                            <label class="tag-option">
-
-                                <input
-                                    type="checkbox"
-                                    name="tags[]"
-                                    value="<?= $tag['id'] ?>"
-                                    hidden>
-
+                            <button type="button"
+                                class="tag-option"
+                                data-tag-id="<?= $tag['id'] ?>">
                                 <?= htmlspecialchars($tag['nome']) ?>
-
-                            </label>
+                            </button>
 
                         <?php endforeach; ?>
 
                     </div>
                 </div>
-                <input type="hidden" data-field="tags" id="tag-hidden" name="tags" />
+                <input type="hidden" data-field="tagIds" id="tag-hidden" name="tags" />
 
                 <div class="modal-row">
                     <div class="modal-field">

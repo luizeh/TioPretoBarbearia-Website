@@ -25,16 +25,12 @@
             <i class="fa-solid fa-box-open"></i>
             <span>Produtos</span>
         </a>
-        <a href="relatorios.php" class="nav-item <?= ($activePage ?? '') === 'relatorios' ? 'active' : '' ?>">
-            <i class="fa-solid fa-chart-line"></i>
-            <span>Relatórios</span>
-        </a>
     </nav>
 
     <div class="sidebar-footer">
-        <a href="#" class="nav-item nav-item--settings">
-            <i class="fa-solid fa-gear"></i>
-            <span>Configurações</span>
+        <a href="../../view/catalogo.php" target="_blank" class="nav-item nav-item--site">
+            <i class="fa-solid fa-globe"></i>
+            <span>Ver Site</span>
         </a>
         <a href="../../api/auth/logout.php" class="nav-item nav-item--logout">
             <i class="fa-solid fa-right-from-bracket"></i>

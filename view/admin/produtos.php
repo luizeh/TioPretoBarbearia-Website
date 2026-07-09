@@ -29,7 +29,7 @@ include __DIR__ . '/../partials/head.php';
         <i class="fa-solid fa-box-open"></i>
       </div>
       <div class="clientes-stat-banner__info">
-        <span class="clientes-stat-banner__count">6</span>
+        <span class="clientes-stat-banner__count"><?= count($produtos) ?></span>
         <span class="clientes-stat-banner__label">produtos cadastrados</span>
       </div>
     </div>
@@ -221,4 +221,5 @@ unset($modal_id, $modal_title, $modal_entity_label);
 ?>
 
 <script src="../../assets/js/produtos.js"></script>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
+<?php $pageScripts = ['produtos.js', 'tags.js'];
+include __DIR__ . '/../partials/scripts.php'; ?>

@@ -76,6 +76,7 @@ include __DIR__ . '/../partials/head.php';
                                         </button>
                                         <button class="btn-action btn-action--edit" title="Editar"
                                             data-modal="modal-cliente-editar"
+                                            data-id="<?= $u['id'] ?>"
                                             data-nome="<?= htmlspecialchars($u['nome']) ?>"
                                             data-sobrenome="<?= htmlspecialchars($u['sobrenome']) ?>"
                                             data-email="<?= htmlspecialchars($u['email']) ?>"
@@ -85,6 +86,7 @@ include __DIR__ . '/../partials/head.php';
                                         </button>
                                         <button class="btn-action btn-action--delete" title="Excluir"
                                             data-modal="modal-cliente-excluir"
+                                            data-id="<?= $u['id'] ?>"
                                             data-nome="<?= htmlspecialchars($u['nome'] . ' ' . $u['sobrenome']) ?>">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
@@ -120,4 +122,5 @@ include __DIR__ . '/../partials/modais/modal-excluir.php';
 unset($modal_id, $modal_title, $modal_entity_label);
 ?>
 
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
+<?php $pageScripts = ['clientes.js'];
+include __DIR__ . '/../partials/scripts.php'; ?>

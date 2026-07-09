@@ -1,329 +1,121 @@
 <?php
 include_once(__DIR__ . '/../../api/auth/session.php');
+include_once(__DIR__ . '/../../config/connection.php');
+include_once(__DIR__ . '/../../sql/ServicosSql.php');
+include_once(__DIR__ . '/../../sql/AgendamentosSql.php');
+
 $rootPath    = '../../';
 $linkBase    = '../';
 $activeNav   = 'agendar';
-$nomeUsuario = htmlspecialchars($_SESSION['nome'] ?? 'Cliente');
+$nomeUsuario = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Cliente');
 $pageTitle   = 'Meus Agendamentos — Tio Preto Barbearia';
-$extraCss    = ['assets/css/components.css', 'assets/css/agenda.css'];
+$extraCss    = ['assets/css/agenda.css'];
 $bodyClass   = 'user-page';
+
+$usuarioId        = (int) $_SESSION['usuario_id'];
+$servicos         = ServicosSql::listar();
+$pagina           = max(1, (int) ($_GET['pagina'] ?? 1));
+$limite           = 8;
+$offset           = ($pagina - 1) * $limite;
+$total            = AgendamentosSql::contarPorUsuario($usuarioId);
+$totalPaginas     = (int) ceil($total / $limite);
+$meusAgendamentos = AgendamentosSql::listarPorUsuarioPaginado($usuarioId, $limite, $offset);
 include_once __DIR__ . '/../partials/head_public.php';
 ?>
-<!-- ══════════════ HEADER ══════════════ -->
 <?php include_once __DIR__ . '/../partials/header_public.php'; ?>
+<div class='page-banner'>
+    <span class='page-banner__eyebrow'>✦ Área do Cliente</span>
+    <h1 class='page-banner__title'>Meus <span>Agendamentos</span></h1>
+    <p class='page-banner__desc'>Olá, <?= $nomeUsuario ?>! Escolha um dia e agende seu horário.</p>
+</div>
+<div class='user-agenda'>
+    <!-- CALENDARIO + SLOTS -->
+    <section class="agenda-calendar-section">
+        <div class="agenda-calendar-header">
+            <h2 class="agenda-calendar-title">
+                <i class="fa-regular fa-calendar"></i> Selecione um Dia
+            </h2>
+            <input type="date" id="agenda-date-picker" class="modal-input"
+                style="max-width:200px;"
+                min="2026-07-09"
+                value="2026-07-09" />
+        </div>
+        <div id="agenda-slots-container" class="agenda-slots-grid">
+            <p class="agenda-slots-loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando...</p>
+        </div>
+    </section>
 
-<!-- ══════════════ BANNER ══════════════ -->
-<div class="page-banner">
-    <span class="page-banner__eyebrow">✦ Área do Cliente</span>
-    <h1 class="page-banner__title">Meus <span>Agendamentos</span></h1>
-    <p class="page-banner__desc">Olá, <?= $nomeUsuario ?>! Acompanhe e gerencie os seus horários.</p>
+    <!-- MEUS AGENDAMENTOS -->
+    <section style="margin-top:40px;">
+        <div class="user-agenda__actions" style="margin-bottom:20px;justify-content:space-between;align-items:center;">
+            <h2 style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;">
+                <i class="fa-solid fa-list" style="color:var(--gold);"></i> Meus Agendamentos
+            </h2>
+        </div>
+        <?php if (empty($meusAgendamentos)): ?>
+            <div class="appt-list__empty">
+                <i class="fa-regular fa-calendar-xmark"></i>
+                <p>Você ainda não possui agendamentos.</p>
+            </div>
+        <?php else: ?>
+            <div class="appt-list">
+                <?php
+                $badgeMap = ['pendente' => 'badge--pending', 'confirmado' => 'badge--confirmed', 'cancelado' => 'badge--cancelled', 'finalizado' => 'badge--finalizado'];
+                foreach ($meusAgendamentos as $ag):
+                    $bc = $badgeMap[$ag['status']] ?? 'badge--pending';
+                    $sl = ucfirst($ag['status']);
+                    $ip = $ag['status'] === 'pendente';
+                ?>
+                    <div class="appt-card appt-card--<?= $ag['status'] ?>">
+                        <div class="appt-card__icon"><i class="fa-solid fa-scissors"></i></div>
+                        <div class="appt-card__info">
+                            <h3 class="appt-card__servico"><?= htmlspecialchars($ag['servico']) ?></h3>
+                            <p class="appt-card__meta">
+                                <span><i class="fa-regular fa-calendar"></i> <?= htmlspecialchars($ag['data_fmt']) ?></span>
+                                <span><i class="fa-regular fa-clock"></i> <?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?> – <?= htmlspecialchars(substr($ag['hora_fim'], 0, 5)) ?></span>
+                                <span><i class="fa-solid fa-circle-dollar-to-slot"></i> R$ <?= number_format($ag['preco_servico'], 2, ',', '.') ?></span>
+                            </p>
+                        </div>
+                        <div class="appt-card__right">
+                            <span class="badge <?= $bc ?>"><?= $sl ?></span>
+                            <?php if ($ip): ?>
+                                <button class="btn-cancelar" data-cancelar-id="<?= $ag['id'] ?>" data-servico="<?= htmlspecialchars($ag['servico']) ?>">
+                                    <i class="fa-solid fa-xmark"></i> Cancelar
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <?php if ($totalPaginas > 1): ?>
+                <div class="pagination" style="margin-top:28px;">
+                    <?php if ($pagina > 1): ?>
+                        <a class="pagination-btn" href="?pagina=<?= $pagina - 1 ?>"><i class="fa-solid fa-chevron-left"></i></a>
+                    <?php else: ?>
+                        <span class="pagination-btn pagination-btn--disabled"><i class="fa-solid fa-chevron-left"></i></span>
+                    <?php endif; ?>
+                    <?php for ($p = 1; $p <= $totalPaginas; $p++): ?>
+                        <a class="pagination-page<?= $p === $pagina ? ' active' : '' ?>" href="?pagina=<?= $p ?>"><?= $p ?></a>
+                    <?php endfor; ?>
+                    <?php if ($pagina < $totalPaginas): ?>
+                        <a class="pagination-btn" href="?pagina=<?= $pagina + 1 ?>"><i class="fa-solid fa-chevron-right"></i></a>
+                    <?php else: ?>
+                        <span class="pagination-btn pagination-btn--disabled"><i class="fa-solid fa-chevron-right"></i></span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </section>
 </div>
 
-<!-- ══════════════ CONTEÚDO ══════════════ -->
-<div class="user-agenda">
-
-    <!-- Ação: Novo Agendamento -->
-    <div class="user-agenda__actions">
-        <button class="btn-new-appt" data-modal="modal-novo-agendamento">
-            <i class="fa-solid fa-plus"></i> Novo Agendamento
-        </button>
-    </div>
-
-    <!-- Grade semanal -->
-    <div class="agenda-wrap">
-        <div class="agenda-nav">
-            <button class="agenda-nav__btn"><i class="fa-solid fa-chevron-left"></i></button>
-            <span class="agenda-nav__label">Semana de 07 – 12 Jul 2026</span>
-            <button class="agenda-nav__btn"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-        <div class="agenda-scroll">
-            <div class="agenda-grid">
-
-                <!-- Cabeçalho dos dias -->
-                <div class="agenda-corner"></div>
-                <div class="agenda-day-head today">Seg <span>07</span></div>
-                <div class="agenda-day-head">Ter <span>08</span></div>
-                <div class="agenda-day-head">Qua <span>09</span></div>
-                <div class="agenda-day-head">Qui <span>10</span></div>
-                <div class="agenda-day-head">Sex <span>11</span></div>
-                <div class="agenda-day-head">Sáb <span>12</span></div>
-
-                <!-- 08:00 -->
-                <div class="agenda-hour">08:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 1">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 08:30 -->
-                <div class="agenda-hour agenda-hour--half">08:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 09:00 -->
-                <div class="agenda-hour">09:00</div>
-                <div class="agenda-cell today">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 1">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 2">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-
-                <!-- 09:30 -->
-                <div class="agenda-hour agenda-hour--half">09:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell agenda-cell--cont-ocupado"></div>
-
-                <!-- 10:00 — Corte + Barba (Qua 09, confirmado, 60 min) -->
-                <div class="agenda-hour">10:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 1.5">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--confirmed" style="--slots: 2">
-                        <span class="agenda-appt__service">Corte + Barba · 60 min</span>
-                        <div class="agenda-appt__actions">
-                            <button class="agenda-appt__cancel-btn" data-modal="modal-cancelar-agendamento" title="Cancelar agendamento">Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 10:30 -->
-                <div class="agenda-hour agenda-hour--half">10:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell agenda-cell--cont-ocupado"></div>
-                <div class="agenda-cell agenda-cell--cont-confirmed"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 11:00 -->
-                <div class="agenda-hour">11:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 2">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-                <div class="agenda-cell"></div>
-
-                <!-- 11:30 -->
-                <div class="agenda-hour agenda-hour--half">11:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell agenda-cell--cont-ocupado"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 12:00 -->
-                <div class="agenda-hour">12:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 12:30 -->
-                <div class="agenda-hour agenda-hour--half">12:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 13:00 -->
-                <div class="agenda-hour">13:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 13:30 -->
-                <div class="agenda-hour agenda-hour--half">13:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 14:00 — Corte Social (Sáb 12, pendente, 30 min) -->
-                <div class="agenda-hour">14:00</div>
-                <div class="agenda-cell today">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 2">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--pending" style="--slots: 1">
-                        <span class="agenda-appt__service">Corte Social · 30 min</span>
-                        <div class="agenda-appt__actions">
-                            <button class="agenda-appt__cancel-btn" data-modal="modal-cancelar-agendamento" title="Cancelar agendamento">Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 14:30 -->
-                <div class="agenda-hour agenda-hour--half">14:30</div>
-                <div class="agenda-cell today agenda-cell--cont-ocupado"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 15:00 -->
-                <div class="agenda-hour">15:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 15:30 -->
-                <div class="agenda-hour agenda-hour--half">15:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 16:00 -->
-                <div class="agenda-hour">16:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 1.5">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 16:30 -->
-                <div class="agenda-hour agenda-hour--half">16:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell agenda-cell--cont-ocupado"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 17:00 -->
-                <div class="agenda-hour">17:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell">
-                    <div class="agenda-appt agenda-appt--ocupado" style="--slots: 1">
-                        <span class="agenda-appt__service">Ocupado</span>
-                    </div>
-                </div>
-                <div class="agenda-cell"></div>
-
-                <!-- 17:30 -->
-                <div class="agenda-hour agenda-hour--half">17:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 18:00 -->
-                <div class="agenda-hour">18:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 18:30 -->
-                <div class="agenda-hour agenda-hour--half">18:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 19:00 -->
-                <div class="agenda-hour">19:00</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-                <!-- 19:30 -->
-                <div class="agenda-hour agenda-hour--half">19:30</div>
-                <div class="agenda-cell today"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-                <div class="agenda-cell"></div>
-
-            </div><!-- /.agenda-grid -->
-        </div><!-- /.agenda-scroll -->
-    </div><!-- /.agenda-wrap -->
-
-</div><!-- /.user-agenda -->
-
 <?php include_once __DIR__ . '/../partials/footer.php'; ?>
-
-<!-- ── Modais ── -->
-<?php
-include __DIR__ . '/../partials/modais/modal-novo-agendamento.php';
-include __DIR__ . '/../partials/modais/modal-cancelar-agendamento.php';
-?>
-
+<?php include __DIR__ . '/../partials/modais/modal-novo-agendamento.php'; ?>
+<?php include __DIR__ . '/../partials/modais/modal-cancelar-agendamento.php'; ?>
+<script src="<?= $rootPath ?>node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+<script src="<?= $rootPath ?>assets/js/swal-theme.js"></script>
+<script src="<?= $rootPath ?>assets/js/public.js"></script>
+<script src="<?= $rootPath ?>assets/js/cart.js"></script>
+<script src="<?= $rootPath ?>assets/js/user-agendamentos.js"></script>
 </body>
 
 </html>
