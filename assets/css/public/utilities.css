@@ -1,0 +1,7 @@
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1.5px solid var(--border);
+  margin: 0;
+}
+

@@ -1,0 +1,74 @@
+:root {
+  --gold: #c9963a;
+  --gold-light: #e8b85a;
+  --dark: #1a1a1a;
+  --mid: #2e2e2e;
+  --white: #ffffff;
+  --off-white: #f5f2ee;
+  --bg: #f5f4f2;
+  --gray: #888;
+  --border: #e0d8cc;
+  /* aliases usados por agenda.css */
+  --font-body: "Barlow", sans-serif;
+  --font-display: "Playfair Display", serif;
+  --font-condensed: "Barlow Condensed", sans-serif;
+  --text-muted: #888;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) var(--off-white);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border: 0;
+  border-radius: 6px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-light);
+}
+
+html:has(body.landing-page) {
+  scrollbar-width: none;
+}
+
+html:has(body.landing-page)::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  font-family: "Barlow", sans-serif;
+  background: var(--white);
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+i {
+  padding-top: 5px;
+}

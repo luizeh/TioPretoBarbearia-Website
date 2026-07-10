@@ -32,7 +32,7 @@ if ($method === 'POST') {
     $action = $body['action'] ?? '';
 
     if ($action === 'editar') {
-        $required = ['nome', 'sobrenome', 'cidade'];
+        $required = ['nome', 'sobrenome', 'cidade', 'email'];
         foreach ($required as $field) {
             if (empty(trim($body[$field] ?? ''))) {
                 helpers::resposta_json(false, "Campo obrigatório: {$field}.", null, 400);
@@ -41,13 +41,35 @@ if ($method === 'POST') {
         $dados = [
             'nome'      => trim($body['nome']),
             'sobrenome' => trim($body['sobrenome']),
-            'telefone'  => trim($body['telefone'] ?? ''),
+            'email'     => helpers::validarEmail($body['email']),
+            'telefone'  => helpers::normalizarTelefone($body['telefone'] ?? ''),
             'cidade'    => trim($body['cidade']),
         ];
+        if (UsuariosSql::emailEmUso($dados['email'], $id)) {
+            helpers::resposta_json(false, 'Este e-mail já está sendo usado por outra conta.', null, 409);
+        }
         UsuariosSql::atualizar($id, $dados);
         // Atualiza o nome na sessão
         $_SESSION['usuario_nome'] = $dados['nome'];
         helpers::resposta_json(true, 'Perfil atualizado com sucesso.', null, 200);
+    }
+
+    if ($action === 'excluir') {
+        try {
+            if (!UsuariosSql::excluirConta($id)) {
+                helpers::resposta_json(false, 'Conta não encontrada.', null, 404);
+            }
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            helpers::resposta_json(false, 'Não foi possível excluir a conta agora.', null, 500);
+        }
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+        }
+        session_destroy();
+        helpers::resposta_json(true, 'Conta excluída com sucesso.', null, 200);
     }
 
     if ($action === 'senha') {

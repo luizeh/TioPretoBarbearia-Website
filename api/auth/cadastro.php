@@ -3,6 +3,7 @@ ob_start();
 error_reporting(0);
 include_once(__DIR__ . '/../../helpers/helpers.php');
 include_once(__DIR__ . '/../../sql/UsuariosSql.php');
+include_once(__DIR__ . '/../../sql/LogsSql.php');
 
 $dados = $_POST;
 
@@ -44,6 +45,7 @@ if ($dados['action'] == 'cadastro') {
     $result = UsuariosSql::cadastrar($dados);
 
     if ($result['success']) {
+        LogsSql::registrar((int) $result['id'], 'conta_criada', 'Conta de cliente criada no sistema.');
         helpers::resposta_json(true, 'Cadastro realizado com sucesso!', ['redirect' => 'login.php'], 201);
     } else {
         helpers::resposta_json(false, $result['message'], null, 400);

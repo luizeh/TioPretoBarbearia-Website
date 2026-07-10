@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__ . '/../../api/auth/require_admin.php');
 $activePage = 'clientes';
 $pageTitle  = 'Clientes';
 include_once(__DIR__ . '/../../controllers/clientes.controller.php');
@@ -21,6 +22,9 @@ include __DIR__ . '/../partials/head.php';
                 <p class="page-eyebrow">✦ Gerenciamento</p>
                 <h1 class="page-title page-title--lg">Clientes</h1>
             </div>
+            <button class="btn-primary" data-modal="modal-cliente-criar">
+                <i class="fa-solid fa-plus"></i> Novo Cliente
+            </button>
         </div>
 
         <!-- Banner total de clientes -->
@@ -107,6 +111,13 @@ include __DIR__ . '/../partials/head.php';
 <!-- ── Modais ── -->
 <?php
 include __DIR__ . '/../partials/modais/modal-cliente-ver.php';
+
+$modal_id           = 'modal-cliente-criar';
+$modal_title        = 'Novo Cliente';
+$modal_confirm_text = 'Cadastrar';
+$modal_use_fields   = true;
+include __DIR__ . '/../partials/modais/modal-cliente-form.php';
+unset($modal_id, $modal_title, $modal_confirm_text, $modal_use_fields);
 
 $modal_id           = 'modal-cliente-editar';
 $modal_title        = 'Editar Cliente';

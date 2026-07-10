@@ -13,9 +13,8 @@
                 <dd data-field="nome">—</dd>
                 <dt>Foto</dt>
                 <dd>
-                    <img id="ver-foto-img" src="" alt="Foto do produto"
-                        style="max-width:100%;max-height:200px;border-radius:4px;display:none;" />
-                    <span id="ver-foto-vazio" style="color:#888;font-size:0.85rem;">Sem foto</span>
+                    <img id="ver-foto-img" class="modal-preview-image modal-preview-image--product" src="" alt="Foto do produto" hidden />
+                    <span id="ver-foto-vazio" class="modal-preview-empty">Sem foto</span>
                 </dd>
                 <dt>Descrição</dt>
                 <dd data-field="descricao">—</dd>

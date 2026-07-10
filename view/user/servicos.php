@@ -20,45 +20,45 @@ $servicos = ServicosSql::listar();
 </div>
 
 <!-- ══════════════ SERVIÇOS ══════════════ -->
+<main>
 <section id="servicos">
     <div class="section-header">
         <span class="section-eyebrow">O que oferecemos</span>
         <h2 class="section-title">Para o seu Estilo</h2>
     </div>
 
-    <div class="services-grid">
+    <div class="products-grid">
 
         <?php foreach ($servicos as $s): ?>
-            <div class="service-card fade-in">
-                <div class="service-icon-wrap">
-                    <div class="service-icon-inner">
-                        <i class="fa-solid fa-scissors"></i>
-                    </div>
-                    <span class="service-badge"><?= (int)$s['tempo_estimado'] ?> min</span>
+            <div class="product-card fade-in">
+                <div class="product-image-wrap">
+                    <?php if (!empty($s['foto_url'])): ?>
+                        <img src="../../<?= htmlspecialchars($s['foto_url']) ?>" alt="<?= htmlspecialchars($s['nome']) ?>" loading="lazy" data-hide-on-error />
+                    <?php else: ?>
+                        <div class="product-image-placeholder"><i class="fa-solid fa-scissors"></i></div>
+                    <?php endif; ?>
+                    <span class="product-badge"><?= (int)$s['tempo_estimado'] ?> min</span>
                 </div>
-                <div class="service-body">
-                    <h3 class="service-name"><?= htmlspecialchars($s['nome']) ?></h3>
-                    <p class="service-desc"><?= htmlspecialchars($s['descricao'] ?? '') ?></p>
-                    <div class="service-meta">
-                        <span class="service-duration">
-                            <i class="fa-regular fa-clock"></i> <?= (int)$s['tempo_estimado'] ?> min
-                        </span>
-                        <span class="service-price">R$ <?= number_format($s['preco'], 2, ',', '.') ?></span>
+                <div class="product-body">
+                    <h3 class="product-name"><?= htmlspecialchars($s['nome']) ?></h3>
+                    <p class="product-desc"><?= htmlspecialchars($s['descricao'] ?? '') ?></p>
+                    <div class="product-tags">
+                        <span class="product-tag"><i class="fa-regular fa-clock"></i> <?= (int)$s['tempo_estimado'] ?> min</span>
                     </div>
-                    <div class="service-cta">
-                        <a href="agendamentos.php" class="btn-service-book">
-                            <i class="fa-solid fa-calendar-plus"></i> Agendar
-                        </a>
+                    <div class="product-footer">
+                        <span class="product-price">R$ <?= number_format($s['preco'], 2, ',', '.') ?></span>
+                        <a href="agendamentos.php" class="btn-cart"><i class="fa-solid fa-calendar-plus"></i> Agendar</a>
                     </div>
                 </div>
             </div>
         <?php endforeach; ?>
         <?php if (empty($servicos)): ?>
-            <p style="text-align:center;opacity:.5;padding:40px 0;">Nenhum serviço disponível no momento.</p>
+            <p class="catalog-empty-state">Nenhum serviço disponível no momento.</p>
         <?php endif; ?>
 
     </div>
 </section>
+</main>
 
 <?php include_once __DIR__ . '/../partials/footer.php'; ?>
 </body>

@@ -39,7 +39,7 @@ $produtos = ProdutosSql::listarProdutos($pdo);
             <img
               src="../<?= htmlspecialchars($p['foto_url']) ?>"
               alt="<?= htmlspecialchars($p['nome']) ?>"
-              onerror="this.style.display='none'" />
+              data-hide-on-error />
           <?php else: ?>
             <div class="product-image-placeholder"></div>
           <?php endif; ?>
@@ -63,9 +63,13 @@ $produtos = ProdutosSql::listarProdutos($pdo);
 
           <div class="product-footer">
             <span class="product-price">R$ <?= number_format($p['preco'], 2, ',', '.') ?></span>
-            <button class="btn-cart" data-add-cart data-product-id="<?= $p['id'] ?>">
-              <i class="fa-solid fa-bag-shopping"></i> Adicionar
-            </button>
+            <?php if ((int) $p['estoque'] > 0): ?>
+              <button class="btn-cart" data-add-cart data-product-id="<?= $p['id'] ?>">
+                <i class="fa-solid fa-bag-shopping"></i> Adicionar
+              </button>
+            <?php else: ?>
+              <span class="product-out-of-stock">Sem estoque</span>
+            <?php endif; ?>
           </div>
         </div>
 
@@ -79,7 +83,6 @@ $produtos = ProdutosSql::listarProdutos($pdo);
 </section>
 
 <?php include_once('partials/footer.php') ?>
-<script src="../assets/js/public.js"></script>
 </body>
 
 </html>

@@ -26,6 +26,20 @@ function _df_s(string $field, bool $use): string
         <div class="modal-body">
             <form class="modal-form">
                 <div class="modal-field">
+                    <label class="modal-label">Foto do Serviço</label>
+                    <div class="foto-dropzone" id="foto-dropzone">
+                        <img class="foto-dropzone__preview" id="foto-preview" src="" alt="Preview" />
+                        <div class="foto-dropzone__placeholder" id="foto-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Arraste ou clique para enviar</span>
+                            <small>JPG, PNG, WebP · máx. 2MB</small>
+                        </div>
+                        <button type="button" class="foto-dropzone__remove" id="foto-remove" title="Remover foto">Remover</button>
+                        <input type="file" id="foto-file-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+                        <input type="hidden" data-field="foto_url" id="foto-url-hidden" />
+                    </div>
+                </div>
+                <div class="modal-field">
                     <label class="modal-label">Nome do Serviço</label>
                     <input class="modal-input" type="text" <?= _df_s('nome', $modal_use_fields) ?> placeholder="Ex: Corte Social" />
                 </div>

@@ -14,9 +14,11 @@ $modal_title        = $modal_title        ?? 'Cliente';
 $modal_confirm_text = $modal_confirm_text ?? 'Salvar';
 $modal_use_fields   = $modal_use_fields   ?? false;
 
-function _df(string $field, bool $use): string
-{
-    return $use ? ' data-field="' . $field . '"' : '';
+if (!function_exists('_df')) {
+    function _df(string $field, bool $use): string
+    {
+        return $use ? ' data-field="' . $field . '"' : '';
+    }
 }
 ?>
 <div class="modal-overlay" id="<?= htmlspecialchars($modal_id) ?>">

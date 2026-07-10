@@ -36,7 +36,11 @@ class UsuariosSql
             ':cidade'    => $dados['cidade'],
         ]);
 
-        return ['success' => true, 'message' => 'Usuário cadastrado com sucesso.'];
+        return [
+            'success' => true,
+            'message' => 'Usuário cadastrado com sucesso.',
+            'id' => (int) $pdo->lastInsertId(),
+        ];
     }
 
     public static function buscarPorId(int $id): array|false
@@ -52,16 +56,49 @@ class UsuariosSql
         $pdo  = Connection::getConnection();
         $stmt = $pdo->prepare("
             UPDATE usuarios
-            SET nome = :nome, sobrenome = :sobrenome, telefone = :telefone, cidade = :cidade
+            SET nome = :nome, sobrenome = :sobrenome, email = :email, telefone = :telefone, cidade = :cidade
             WHERE id = :id
         ");
         $stmt->execute([
             ':nome'      => $dados['nome'],
             ':sobrenome' => $dados['sobrenome'],
+            ':email'     => $dados['email'],
             ':telefone'  => $dados['telefone'],
             ':cidade'    => $dados['cidade'],
             ':id'        => $id,
         ]);
+    }
+
+    public static function emailEmUso(string $email, int $ignorarId): bool
+    {
+        $pdo = Connection::getConnection();
+        $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE email = :email AND id <> :id LIMIT 1');
+        $stmt->execute([':email' => $email, ':id' => $ignorarId]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    public static function excluirConta(int $id): bool
+    {
+        $pdo = Connection::getConnection();
+
+        try {
+            $pdo->beginTransaction();
+            $pdo->prepare('DELETE FROM notificacoes WHERE usuario_id = :id')->execute([':id' => $id]);
+            $pdo->prepare('DELETE FROM carrinho_itens WHERE carrinho_id IN (SELECT id FROM carrinho WHERE usuario_id = :id)')->execute([':id' => $id]);
+            $pdo->prepare('DELETE FROM carrinho WHERE usuario_id = :id')->execute([':id' => $id]);
+            $pdo->prepare('DELETE FROM pedido_itens WHERE pedido_id IN (SELECT id FROM pedidos WHERE usuario_id = :id)')->execute([':id' => $id]);
+            $pdo->prepare('DELETE FROM pedidos WHERE usuario_id = :id')->execute([':id' => $id]);
+            $pdo->prepare('DELETE FROM agendamento_servicos WHERE agendamento_id IN (SELECT id FROM agendamentos WHERE usuario_id = :id)')->execute([':id' => $id]);
+            $pdo->prepare('DELETE FROM agendamentos WHERE usuario_id = :id')->execute([':id' => $id]);
+            $pdo->prepare('DELETE FROM logs WHERE usuario_id = :id')->execute([':id' => $id]);
+            $stmt = $pdo->prepare('DELETE FROM usuarios WHERE id = :id AND admin = 0');
+            $stmt->execute([':id' => $id]);
+            $pdo->commit();
+            return $stmt->rowCount() > 0;
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            throw $e;
+        }
     }
 
     public static function alterarSenha(int $id, string $senhaAtual, string $novaSenha): array

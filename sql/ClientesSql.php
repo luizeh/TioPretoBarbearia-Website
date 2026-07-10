@@ -26,6 +26,24 @@ class ClientesSql
         return (int) $pdo->query("SELECT COUNT(*) FROM usuarios WHERE admin = 0")->fetchColumn();
     }
 
+    public static function criar(array $dados): int
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare("
+            INSERT INTO usuarios (nome, sobrenome, email, telefone, cidade, senha, admin)
+            VALUES (:nome, :sobrenome, :email, :telefone, :cidade, :senha, 0)
+        ");
+        $stmt->execute([
+            ':nome'      => $dados['nome'],
+            ':sobrenome' => $dados['sobrenome'],
+            ':email'     => $dados['email'],
+            ':telefone'  => $dados['telefone'],
+            ':cidade'    => $dados['cidade'],
+            ':senha'     => password_hash($dados['senha'] ?? '12345678', PASSWORD_DEFAULT),
+        ]);
+        return (int) $pdo->lastInsertId();
+    }
+
     public static function editar(int $id, array $dados): void
     {
         $pdo  = Connection::getConnection();

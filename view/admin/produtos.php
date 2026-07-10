@@ -1,7 +1,8 @@
 <?php
+require_once __DIR__ . '/../../api/auth/require_admin.php';
+
 $activePage = 'produtos';
 $pageTitle  = 'Produtos';
-include_once(__DIR__ . '/../../api/auth/session.php');
 include_once(__DIR__ . '/../../controllers/produtos.controller.php');
 include __DIR__ . '/../partials/head.php';
 ?>
@@ -24,7 +25,12 @@ include __DIR__ . '/../partials/head.php';
       </button>
     </div>
 
-    <div class="clientes-stat-banner" style="max-width:100%;">
+    <div class="view-toggle">
+      <a class="view-toggle__btn active" href="produtos.php"><i class="fa-solid fa-box-open"></i> Produtos</a>
+      <a class="view-toggle__btn" href="pedidos.php"><i class="fa-solid fa-receipt"></i> Pedidos</a>
+    </div>
+
+    <div class="clientes-stat-banner clientes-stat-banner--full">
       <div class="clientes-stat-banner__icon">
         <i class="fa-solid fa-box-open"></i>
       </div>
@@ -138,12 +144,12 @@ include __DIR__ . '/../partials/head.php';
     </div><!-- /.dashboard-card -->
 
     <!-- ── Tabela de Tags ── -->
-    <div class="dashboard-card" style="margin-top:24px;">
+    <div class="dashboard-card dashboard-card--spaced">
       <div class="dashboard-card-header">
         <h2 class="dashboard-card-title">
           <i class="fa-solid fa-tags"></i> Tags Disponíveis
         </h2>
-        <button class="btn-primary" style="font-size:0.82rem;padding:8px 16px;" data-modal="modal-tag">
+        <button class="btn-primary btn-primary--compact" data-modal="modal-tag">
           <i class="fa-solid fa-plus"></i> Nova Tag
         </button>
       </div>
@@ -220,6 +226,5 @@ include __DIR__ . '/../partials/modais/modal-excluir.php';
 unset($modal_id, $modal_title, $modal_entity_label);
 ?>
 
-<script src="../../assets/js/produtos.js"></script>
 <?php $pageScripts = ['produtos.js', 'tags.js'];
 include __DIR__ . '/../partials/scripts.php'; ?>

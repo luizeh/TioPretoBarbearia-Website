@@ -17,6 +17,7 @@ if (empty($_SESSION['usuario_id'])) {
 
 require_once __DIR__ . '/../../sql/CarrinhoSql.php';
 require_once __DIR__ . '/../../sql/PedidosSql.php';
+require_once __DIR__ . '/../../sql/LogsSql.php';
 require_once __DIR__ . '/../../helpers/helpers.php';
 
 $usuarioId  = (int) $_SESSION['usuario_id'];
@@ -43,8 +44,13 @@ if ($method === 'POST') {
             helpers::resposta_json(false, 'Seu carrinho está vazio.', null, 400);
         }
 
-        $pedidoId = PedidosSql::criar($usuarioId, $endereco, $itens);
+        try {
+            $pedidoId = PedidosSql::criar($usuarioId, $endereco, $itens);
+        } catch (RuntimeException $e) {
+            helpers::resposta_json(false, $e->getMessage(), null, 409);
+        }
         CarrinhoSql::limpar($carrinhoId);
+        LogsSql::registrar($usuarioId, 'pedido_criado', "Pedido #$pedidoId criado pelo cliente.");
 
         helpers::resposta_json(true, 'Pedido realizado com sucesso! Aguarde a confirmação.', ['pedido_id' => $pedidoId], 201);
     }

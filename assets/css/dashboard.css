@@ -1,10 +1,2 @@
-/* ══════════════════════════════════════════
-   dashboard.css — entry point
-   Importa os módulos CSS em ordem.
-   ══════════════════════════════════════════ */
-
-@import "base.css";
-@import "layout.css";
-@import "components.css";
-@import "agenda.css";
-@import "pages.css";
+/* Compatibility entry point for legacy links. */
+@import "admin/app.css";

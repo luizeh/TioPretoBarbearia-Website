@@ -1,7 +1,7 @@
 <?php
 $rootPath  = '../';
 $pageTitle = 'Cadastro — Tio Preto Barbearia';
-$extraCss  = ['assets/css/login.css', 'assets/css/cadastro.css'];
+$extraCss  = ['assets/css/auth/login.css', 'assets/css/auth/cadastro.css'];
 include_once __DIR__ . '/partials/head_public.php';
 ?>
 <!-- ══════════════ CADASTRO ══════════════ -->
@@ -70,7 +70,7 @@ include_once __DIR__ . '/partials/head_public.php';
                     <div class="input-wrap">
                         <input class="form-input" type="password" id="senha" name="senha"
                             placeholder="Mínimo 8 caracteres" required minlength="8"
-                            autocomplete="new-password" oninput="avaliarSenha(this.value)" />
+                            autocomplete="new-password" />
                     </div>
                     <div class="senha-strength" id="strength-bar">
                         <span id="s1"></span>
@@ -106,8 +106,7 @@ include_once __DIR__ . '/partials/head_public.php';
     <p>© 2026 Tio Preto Barbearia — Todos os direitos reservados. &nbsp;|&nbsp; Feito por <span>Luizeh</span></p>
 </footer>
 
-<script src="../assets/js/utils.js"></script>
-<script src="../assets/js/cadastro.js"></script>
+<script src="../assets/js/auth/cadastro.js" defer></script>
 </body>
 
 </html>

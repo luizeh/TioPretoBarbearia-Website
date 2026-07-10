@@ -17,6 +17,8 @@
                 <dd data-field="preco">—</dd>
                 <dt>Descrição</dt>
                 <dd data-field="descricao">—</dd>
+                <dt>Imagem</dt>
+                <dd><img class="modal-preview-image modal-preview-image--service" data-field="foto_url" src="" alt="Imagem do serviço" hidden /></dd>
             </dl>
         </div>
         <div class="modal-footer">

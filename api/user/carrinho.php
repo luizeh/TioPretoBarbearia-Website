@@ -36,6 +36,7 @@ if ($method === 'POST') {
     $body   = json_decode(file_get_contents('php://input'), true) ?? [];
     $action = $body['action'] ?? '';
 
+    try {
     if ($action === 'adicionar') {
         $produtoId = (int) ($body['produto_id'] ?? 0);
         if (!$produtoId) helpers::resposta_json(false, 'produto_id obrigatório.', null, 400);
@@ -68,6 +69,9 @@ if ($method === 'POST') {
     if ($action === 'limpar') {
         CarrinhoSql::limpar($carrinhoId);
         helpers::resposta_json(true, 'Carrinho limpo.', ['itens' => [], 'total' => 0, 'count' => 0], 200);
+    }
+    } catch (RuntimeException $e) {
+        helpers::resposta_json(false, $e->getMessage(), null, 409);
     }
 }
 

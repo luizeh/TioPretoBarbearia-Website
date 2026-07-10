@@ -1,7 +1,20 @@
 <?php
+require_once(__DIR__ . '/../../api/auth/require_admin.php');
 $activePage = 'agendamentos';
 $pageTitle  = 'Agendamentos';
 include_once(__DIR__ . '/../../controllers/agendamentos.controller.php');
+require_once(__DIR__ . '/../../sql/ClientesSql.php');
+$clientes = ClientesSql::listar(200, 0);
+$weekStart = isset($_GET['data']) ? strtotime($_GET['data']) : strtotime('today');
+$weekStart = strtotime('monday this week', $weekStart);
+$weekDays  = [];
+for ($i = 0; $i < 6; $i++) {
+    $weekDays[] = date('Y-m-d', strtotime('+'.$i.' days', $weekStart));
+}
+$selectedDate = (isset($_GET['dia']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['dia'])) ? $_GET['dia'] : date('Y-m-d');
+$diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+$meses = [1 => 'jan', 2 => 'fev', 3 => 'mar', 4 => 'abr', 5 => 'mai', 6 => 'jun', 7 => 'jul', 8 => 'ago', 9 => 'set', 10 => 'out', 11 => 'nov', 12 => 'dez'];
+$weekLabel = date('d', $weekStart) . ' a ' . date('d', strtotime('+5 days', $weekStart)) . ' de ' . $meses[(int) date('n', strtotime('+5 days', $weekStart))] . ' de ' . date('Y', strtotime('+5 days', $weekStart));
 include __DIR__ . '/../partials/head.php';
 ?>
 
@@ -78,335 +91,74 @@ include __DIR__ . '/../partials/head.php';
         <div id="view-agenda">
             <div class="agenda-wrap">
                 <div class="agenda-nav">
-                    <button class="agenda-nav__btn"><i class="fa-solid fa-chevron-left"></i></button>
-                    <span class="agenda-nav__label">Semana de 07 – 12 Jul 2026</span>
-                    <button class="agenda-nav__btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('-7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-left"></i></a>
+                    <span class="agenda-nav__label">Semana de <?= $weekLabel ?></span>
+                    <div class="agenda-day-actions">
+                        <label for="agenda-lembrete-data">Dia</label>
+                        <input type="date" id="agenda-lembrete-data" lang="pt-BR" value="<?= htmlspecialchars($selectedDate) ?>">
+                        <button type="button" class="btn-agenda-whatsapp-dia" data-date="<?= htmlspecialchars($selectedDate) ?>" title="Enviar lembrete para todos os clientes do dia">
+                            <i class="fa-brands fa-whatsapp"></i> Lembrar clientes
+                        </button>
+                    </div>
+                    <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('+7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-right"></i></a>
                 </div>
+                <p class="agenda-mobile-hint"><i class="fa-solid fa-arrows-left-right"></i> Deslize para ver todos os dias</p>
                 <div class="agenda-scroll">
                     <div class="agenda-grid">
-
-                        <!-- Cabeçalho dos dias -->
                         <div class="agenda-corner"></div>
-                        <div class="agenda-day-head today">Seg <span>07</span></div>
-                        <div class="agenda-day-head">Ter <span>08</span></div>
-                        <div class="agenda-day-head">Qua <span>09</span></div>
-                        <div class="agenda-day-head">Qui <span>10</span></div>
-                        <div class="agenda-day-head">Sex <span>11</span></div>
-                        <div class="agenda-day-head">Sáb <span>12</span></div>
-
-                        <!-- 08:00 -->
-                        <div class="agenda-hour">08:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--confirmed" style="--slots: 1">
-                                <span class="agenda-appt__name">Thiago Lima</span>
-                                <span class="agenda-appt__service">Corte Social · 30 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
+                        <?php foreach ($weekDays as $index => $day): ?>
+                            <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?>">
+                                <?= $diasSemana[$index] ?> <span><?= date('d', strtotime($day)) ?></span>
                             </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
+                        <?php endforeach; ?>
 
-                        <!-- 08:30 -->
-                        <div class="agenda-hour agenda-hour--half">08:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 09:00 -->
-                        <div class="agenda-hour">09:00</div>
-                        <div class="agenda-cell today">
-                            <div class="agenda-appt agenda-appt--confirmed" style="--slots: 1">
-                                <span class="agenda-appt__name">Carlos Mendes</span>
-                                <span class="agenda-appt__service">Corte Social · 30 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--confirmed" style="--slots: 2">
-                                <span class="agenda-appt__name">Diego Souza</span>
-                                <span class="agenda-appt__service">Corte + Barba · 60 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--pending" style="--slots: 2">
-                                <span class="agenda-appt__name">Felipe Nunes</span>
-                                <span class="agenda-appt__service">Corte + Barba · 60 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 09:30 -->
-                        <div class="agenda-hour agenda-hour--half">09:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell agenda-cell--cont-confirmed"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell agenda-cell--cont-pending"></div>
-
-                        <!-- 10:00 -->
-                        <div class="agenda-hour">10:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--pending" style="--slots: 1.5">
-                                <span class="agenda-appt__name">Rafael Silva</span>
-                                <span class="agenda-appt__service">Barba Degradê · 45 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 10:30 -->
-                        <div class="agenda-hour agenda-hour--half">10:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell agenda-cell--cont-pending"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 11:00 -->
-                        <div class="agenda-hour">11:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--confirmed" style="--slots: 2">
-                                <span class="agenda-appt__name">Lucas Ramos</span>
-                                <span class="agenda-appt__service">Corte + Barba · 60 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 11:30 -->
-                        <div class="agenda-hour agenda-hour--half">11:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell agenda-cell--cont-confirmed"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 12:00 -->
-                        <div class="agenda-hour">12:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 12:30 -->
-                        <div class="agenda-hour agenda-hour--half">12:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 13:00 -->
-                        <div class="agenda-hour">13:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--cancelled" style="--slots: 1">
-                                <span class="agenda-appt__name">Marcos Ferreira</span>
-                                <span class="agenda-appt__service">Corte Social · 30 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 13:30 -->
-                        <div class="agenda-hour agenda-hour--half">13:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 14:00 -->
-                        <div class="agenda-hour">14:00</div>
-                        <div class="agenda-cell today">
-                            <div class="agenda-appt agenda-appt--confirmed" style="--slots: 2">
-                                <span class="agenda-appt__name">Pedro Alves</span>
-                                <span class="agenda-appt__service">Corte + Barba · 60 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 14:30 -->
-                        <div class="agenda-hour agenda-hour--half">14:30</div>
-                        <div class="agenda-cell today agenda-cell--cont-confirmed"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 15:00 -->
-                        <div class="agenda-hour">15:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 15:30 -->
-                        <div class="agenda-hour agenda-hour--half">15:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 16:00 -->
-                        <div class="agenda-hour">16:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--pending" style="--slots: 1.5">
-                                <span class="agenda-appt__name">Bruno Costa</span>
-                                <span class="agenda-appt__service">Barba Degradê · 45 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 16:30 -->
-                        <div class="agenda-hour agenda-hour--half">16:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell agenda-cell--cont-pending"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 17:00 -->
-                        <div class="agenda-hour">17:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell">
-                            <div class="agenda-appt agenda-appt--confirmed" style="--slots: 1">
-                                <span class="agenda-appt__name">André Santos</span>
-                                <span class="agenda-appt__service">Corte Social · 30 min</span>
-                                <div class="agenda-appt__actions">
-                                    <button class="btn-action btn-action--edit" data-modal="modal-agendamento" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 17:30 -->
-                        <div class="agenda-hour agenda-hour--half">17:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 18:00 -->
-                        <div class="agenda-hour">18:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 18:30 -->
-                        <div class="agenda-hour agenda-hour--half">18:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 19:00 -->
-                        <div class="agenda-hour">19:00</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                        <!-- 19:30 -->
-                        <div class="agenda-hour agenda-hour--half">19:30</div>
-                        <div class="agenda-cell today"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-                        <div class="agenda-cell"></div>
-
-                    </div><!-- /.agenda-grid -->
-                </div><!-- /.agenda-scroll -->
+                        <?php
+                        $startHour = 8;
+                        $endHour   = 19;
+                        $slots     = [];
+                        for ($hour = $startHour; $hour <= $endHour; $hour++) {
+                            foreach ([0, 30] as $minute) {
+                                $slots[] = sprintf('%02d:%02d', $hour, $minute);
+                            }
+                        }
+                        foreach ($slots as $slotTime):
+                            $isHalf = (int) substr($slotTime, -2) === 30;
+                            echo '<div class="agenda-hour' . ($isHalf ? ' agenda-hour--half' : '') . '">' . $slotTime . '</div>';
+                            foreach ($weekDays as $day):
+                                $cellKey = $day . ' ' . $slotTime;
+                                $cellAppointments = $agendaMap[$day][$slotTime] ?? [];
+                                $inicioAppointments = array_filter($cellAppointments, static fn(array $appointment): bool => empty($appointment['continuacao']));
+                                echo '<div class="agenda-cell' . ($day === date('Y-m-d') ? ' today' : '') . '" data-date="' . $day . '" data-time="' . $slotTime . '">';
+                                if (!empty($inicioAppointments)) {
+                                    foreach ($inicioAppointments as $appointment):
+                                        $durationMinutes = (int) ($appointment['duracao_minutos'] ?? 30);
+                                        $slotsSpan = min(24, max(1, (int) ceil($durationMinutes / 30)));
+                                        $statusClass = $appointment['status'] === 'confirmado' ? 'agenda-appt--confirmed' : ($appointment['status'] === 'pendente' ? 'agenda-appt--pending' : 'agenda-appt--cancelled');
+                                        echo '<div class="agenda-appt ' . $statusClass . ' agenda-appt--slots-' . $slotsSpan . '">';
+                                        echo '<span class="agenda-appt__name">' . htmlspecialchars($appointment['cliente']) . '</span>';
+                                        echo '<span class="agenda-appt__service">' . htmlspecialchars($appointment['servico']) . ' · ' . (int) ($appointment['duracao_minutos'] ?? 30) . ' min</span>';
+                                        echo '<div class="agenda-appt__actions">';
+                                        echo '<button class="btn-action btn-action--edit" data-modal="modal-agendamento" data-id="' . (int) $appointment['id'] . '" data-usuario_id="' . (int) $appointment['usuario_id'] . '" data-cliente="' . htmlspecialchars($appointment['cliente']) . '" data-servico_id="' . (int) ($appointment['servico_id'] ?? 0) . '" data-servicos_ids="' . htmlspecialchars($appointment['servicos_ids'] ?? '') . '" data-data="' . htmlspecialchars($appointment['data']) . '" data-hora="' . htmlspecialchars(substr($appointment['hora_inicio'], 0, 5)) . '" data-status="' . htmlspecialchars($appointment['status']) . '" data-observacoes="' . htmlspecialchars($appointment['observacoes'] ?? '') . '" title="Editar"><i class="fa-solid fa-pen"></i></button>';
+                                        echo '<button class="btn-action btn-action--whatsapp" data-cliente="' . htmlspecialchars($appointment['cliente']) . '" data-telefone="' . htmlspecialchars($appointment['telefone'] ?? '') . '" data-servico="' . htmlspecialchars($appointment['servico']) . '" data-data="' . htmlspecialchars(date('d/m/Y', strtotime($appointment['data']))) . '" data-hora="' . htmlspecialchars(substr($appointment['hora_inicio'], 0, 5)) . '" title="Enviar lembrete no WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>';
+                                        echo '<button class="btn-action btn-action--delete" data-modal="modal-agendamento-excluir" data-id="' . (int) $appointment['id'] . '" data-nome="' . htmlspecialchars($appointment['cliente']) . '" title="Excluir"><i class="fa-solid fa-trash"></i></button>';
+                                        echo '</div></div>';
+                                    endforeach;
+                                } elseif (!empty($cellAppointments)) {
+                                    echo '<div class="agenda-cell__blocked" aria-label="Horário ocupado"></div>';
+                                } else {
+                                    echo '<button class="agenda-cell__add" type="button" data-modal="modal-agendamento" data-date="' . $day . '" data-time="' . $slotTime . '"><span>Disponível</span><small>' . $slotTime . '</small></button>';
+                                }
+                                echo '</div>';
+                            endforeach;
+                        endforeach;
+                        ?>
+                    </div>
+                </div>
             </div><!-- /.agenda-wrap -->
         </div><!-- /#view-agenda -->
 
         <!-- ─────────────── VIEW: LISTA ─────────────── -->
-        <div id="view-lista" style="display:none;">
+        <div id="view-lista" hidden>
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
                     <h2 class="dashboard-card-title">
@@ -416,6 +168,10 @@ include __DIR__ . '/../partials/head.php';
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input class="table-search" type="text" placeholder="Pesquisar..." data-search="tbl-agendamentos" />
                     </div>
+                    <label class="table-date-filter">
+                        <span>Data</span>
+                        <input type="date" lang="pt-BR" data-filter-date="tbl-agendamentos" aria-label="Filtrar agendamentos por data" />
+                    </label>
                 </div>
                 <div class="table-wrapper">
                     <table class="dash-table" id="tbl-agendamentos">
@@ -424,6 +180,7 @@ include __DIR__ . '/../partials/head.php';
                                 <th>Cliente</th>
                                 <th>Serviço</th>
                                 <th>Data</th>
+                                <th>Observação</th>
                                 <th>Horário</th>
                                 <th>Status</th>
                                 <th>Ações</th>
@@ -441,10 +198,11 @@ include __DIR__ . '/../partials/head.php';
                                 $badgeClass = $badgeMap[$ag['status']] ?? 'badge--pending';
                                 $statusLabel = ucfirst($ag['status']);
                             ?>
-                                <tr>
+                                <tr data-date="<?= htmlspecialchars($ag['data']) ?>">
                                     <td><span class="client-name"><?= htmlspecialchars($ag['cliente']) ?></span></td>
                                     <td><?= htmlspecialchars($ag['servico']) ?></td>
                                     <td><?= htmlspecialchars($ag['data_fmt']) ?></td>
+                                    <td><?= htmlspecialchars($ag['observacoes'] ?: 'Nenhuma') ?></td>
                                     <td><?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?></td>
                                     <td><span class="badge <?= $badgeClass ?>"><?= $statusLabel ?></span></td>
                                     <td>
@@ -462,8 +220,12 @@ include __DIR__ . '/../partials/head.php';
                                                 data-modal="modal-agendamento"
                                                 data-id="<?= $ag['id'] ?>"
                                                 data-cliente="<?= htmlspecialchars($ag['cliente']) ?>"
-                                                data-servico="<?= htmlspecialchars($ag['servico']) ?>"
-                                                data-status="<?= $ag['status'] ?>">
+                                                data-servico_id="<?= (int) ($ag['servico_id'] ?? 0) ?>"
+                                                data-servicos_ids="<?= htmlspecialchars($ag['servicos_ids'] ?? '') ?>"
+                                                data-data="<?= htmlspecialchars($ag['data']) ?>"
+                                                data-hora="<?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?>"
+                                                data-status="<?= $ag['status'] ?>"
+                                                data-observacoes="<?= htmlspecialchars($ag['observacoes'] ?? '') ?>">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                             <button class="btn-action btn-action--whatsapp" title="Lembrete WhatsApp"
@@ -472,7 +234,6 @@ include __DIR__ . '/../partials/head.php';
                                                 data-servico="<?= htmlspecialchars($ag['servico']) ?>"
                                                 data-data="<?= htmlspecialchars($ag['data_fmt']) ?>"
                                                 data-hora="<?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?>"
-                                                style="color:#25d366">
                                                 <i class="fa-brands fa-whatsapp"></i>
                                             </button>
                                             <button class="btn-action btn-action--delete" title="Excluir"
@@ -487,7 +248,7 @@ include __DIR__ . '/../partials/head.php';
                             <?php endforeach; ?>
                             <?php if (empty($agendamentos)): ?>
                                 <tr>
-                                    <td colspan="6" style="text-align:center;padding:32px;opacity:.5;">Nenhum agendamento encontrado.</td>
+                                    <td colspan="7" class="table-empty-cell table-empty-cell--large">Nenhum agendamento encontrado.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -514,20 +275,5 @@ include __DIR__ . '/../partials/modais/modal-excluir.php';
 unset($modal_id, $modal_title, $modal_entity_label);
 ?>
 
-<script>
-    // Toggle Lista / Agenda
-    document.getElementById('btn-agenda').addEventListener('click', function() {
-        document.getElementById('view-agenda').style.display = '';
-        document.getElementById('view-lista').style.display = 'none';
-        this.classList.add('active');
-        document.getElementById('btn-lista').classList.remove('active');
-    });
-    document.getElementById('btn-lista').addEventListener('click', function() {
-        document.getElementById('view-lista').style.display = '';
-        document.getElementById('view-agenda').style.display = 'none';
-        this.classList.add('active');
-        document.getElementById('btn-agenda').classList.remove('active');
-    });
-</script>
 <?php $pageScripts = ['agendamentos.js'];
 include __DIR__ . '/../partials/scripts.php'; ?>

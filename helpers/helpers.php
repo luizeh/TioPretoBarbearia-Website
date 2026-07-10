@@ -76,6 +76,17 @@ class helpers
         return preg_replace('/\D/', '', $telefone);
     }
 
+    public static function normalizarTelefone($telefone): string
+    {
+        $telefone = preg_replace('/\D/', '', (string) $telefone);
+        if ($telefone === '') return '';
+        if (!str_starts_with($telefone, '55')) $telefone = '55' . $telefone;
+        if (!preg_match('/^55\d{10,11}$/', $telefone)) {
+            self::resposta_json(false, 'Telefone inválido.', null, 400);
+        }
+        return $telefone;
+    }
+
 
     public static function validarSenha($senha)
     {
