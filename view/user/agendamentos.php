@@ -53,7 +53,7 @@ include_once __DIR__ . '/../partials/head_public.php';
     <h1 class='page-banner__title'>Meus <span>Agendamentos</span></h1>
     <p class='page-banner__desc'>Olá, <?= $nomeUsuario ?>! Escolha um dia e agende seu horário.</p>
 </div>
-<main class="user-agenda">
+<main class="user-agenda user-agenda--calendar">
     <section class="agenda-calendar-section">
         <div class="agenda-calendar-header">
             <h2 class="agenda-calendar-title">
