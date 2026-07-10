@@ -462,6 +462,14 @@
   padding: 40px 20px 80px;
 }
 
+/* A agenda semanal precisa aproveitar melhor telas largas sem afetar outras areas do cliente. */
+.user-agenda--calendar {
+  width: min(100%, 1440px);
+  max-width: none;
+  padding-right: clamp(20px, 4vw, 64px);
+  padding-left: clamp(20px, 4vw, 64px);
+}
+
 .user-agenda__actions {
   display: flex;
   justify-content: flex-end;
