@@ -1,0 +1,373 @@
+/* ── RESET DE ALTURA (login/cadastro sem rolagem) ── */
+
+/* html com fundo escuro: safety net para a área abaixo do body quando o
+   SweetAlert2 injeta swal2-height-auto { height: auto !important } */
+html {
+  background: var(--dark);
+}
+
+/* min-height em vez de height: o SweetAlert2 nunca toca min-height,
+   então mesmo com height:auto!important o body permanece com altura mínima de 100vh */
+body {
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Garante que scroll continue bloqueado quando modal está aberto */
+body.swal2-shown {
+  overflow: hidden !important;
+}
+
+/* ── LOGIN WRAPPER ── */
+.login-section {
+  flex: 1;
+  min-height: 0;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 5vw;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mesmo padrão diagonal do hero */
+.login-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 18px,
+    rgba(201, 150, 58, 0.04) 18px,
+    rgba(201, 150, 58, 0.04) 19px
+  );
+  pointer-events: none;
+}
+
+/* Ornamento dourado de fundo */
+.login-section::after {
+  content: "✂";
+  position: absolute;
+  font-size: 28rem;
+  color: rgba(201, 150, 58, 0.03);
+  right: -4rem;
+  bottom: -6rem;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── LOGO MINI (acima do card) ── */
+.auth-brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.auth-brand img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.auth-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.auth-brand-name {
+  font-family: "Playfair Display", serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+
+.auth-brand-sub {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+/* ── CARD ── */
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  background: #f5f4f2;
+  border-radius: 16px;
+  padding: 48px 44px 44px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+}
+
+/* ── CABEÇALHO DO CARD (brand centralizada) ── */
+.card-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.card-brand-name {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--dark);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.card-brand-sub {
+  display: block;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.card-access-text {
+  font-family: "Barlow", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ── CAMPOS ── */
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-label {
+  display: block;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 8px;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  font-size: 0.88rem;
+  pointer-events: none;
+  padding-top: 0;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1.5px solid rgba(201, 150, 58, 0.3);
+  border-radius: 6px;
+  padding: 13px 16px;
+  font-family: "Barlow", sans-serif;
+  font-size: 0.95rem;
+  color: var(--dark);
+  outline: none;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.form-input::placeholder {
+  color: rgba(0, 0, 0, 0.28);
+  font-weight: 300;
+}
+
+.form-input:focus {
+  border-color: var(--gold);
+  background: rgba(201, 150, 58, 0.06);
+}
+
+/* ── TOGGLE SENHA ── */
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.88rem;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: var(--gold);
+}
+
+/* ── LEMBRAR / ESQUECEU ── */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.form-check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(201, 150, 58, 0.4);
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.form-check input[type="checkbox"]:checked {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.form-check input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid var(--dark);
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.form-check span {
+  font-family: "Barlow", sans-serif;
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.forgot-link {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: var(--gold-light);
+  text-decoration: underline;
+}
+
+/* ── BOTÃO ENTRAR ── */
+.btn-login {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  border: none;
+  border-radius: 4px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dark);
+  cursor: pointer;
+  transition:
+    opacity 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.btn-login:hover {
+  opacity: 0.92;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(201, 150, 58, 0.35);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ── LINK "AINDA NÃO TEM CONTA?" ── */
+.form-footer-link {
+  margin-top: 20px;
+  text-align: center;
+  font-family: "Barlow", sans-serif;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.form-footer-link a {
+  color: var(--gold);
+  text-decoration: none;
+  font-family: "Barlow Condensed", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  transition: color 0.2s;
+}
+
+.form-footer-link a:hover {
+  color: var(--gold-light);
+  text-decoration: underline;
+}
+
+/* ── FOOTER SIMPLES ── */
+.login-footer-simple {
+  text-align: center;
+  padding: 24px 5vw;
+  background: var(--dark);
+  border-top: 1px solid rgba(201, 150, 58, 0.15);
+  font-family: "Barlow", sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.login-footer-simple span {
+  color: var(--gold);
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 520px) {
+  .login-card {
+    padding: 40px 28px 36px;
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
