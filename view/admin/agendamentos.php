@@ -4,17 +4,20 @@ $activePage = 'agendamentos';
 $pageTitle  = 'Agendamentos';
 include_once(__DIR__ . '/../../controllers/agendamentos.controller.php');
 require_once(__DIR__ . '/../../sql/ClientesSql.php');
-$clientes = ClientesSql::listar(200, 0);
+require_once(__DIR__ . '/../../sql/HorariosSql.php');
+$clientes  = ClientesSql::listar(200, 0);
 $weekStart = isset($_GET['data']) ? strtotime($_GET['data']) : strtotime('today');
 $weekStart = strtotime('monday this week', $weekStart);
 $weekDays  = [];
-for ($i = 0; $i < 6; $i++) {
-    $weekDays[] = date('Y-m-d', strtotime('+'.$i.' days', $weekStart));
+for ($i = 0; $i < 7; $i++) {
+    $weekDays[] = date('Y-m-d', strtotime('+' . $i . ' days', $weekStart));
 }
+$horariosMap  = HorariosSql::buscarPorDatas($weekDays);
+$excecoesMap  = HorariosSql::buscarExcecoes($weekDays);
 $selectedDate = (isset($_GET['dia']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['dia'])) ? $_GET['dia'] : date('Y-m-d');
-$diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+$diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 $meses = [1 => 'jan', 2 => 'fev', 3 => 'mar', 4 => 'abr', 5 => 'mai', 6 => 'jun', 7 => 'jul', 8 => 'ago', 9 => 'set', 10 => 'out', 11 => 'nov', 12 => 'dez'];
-$weekLabel = date('d', $weekStart) . ' a ' . date('d', strtotime('+5 days', $weekStart)) . ' de ' . $meses[(int) date('n', strtotime('+5 days', $weekStart))] . ' de ' . date('Y', strtotime('+5 days', $weekStart));
+$weekLabel = date('d', $weekStart) . ' a ' . date('d', strtotime('+6 days', $weekStart)) . ' de ' . $meses[(int) date('n', strtotime('+6 days', $weekStart))] . ' de ' . date('Y', strtotime('+6 days', $weekStart));
 include __DIR__ . '/../partials/head.php';
 ?>
 
@@ -99,6 +102,9 @@ include __DIR__ . '/../partials/head.php';
                         <button type="button" class="btn-agenda-whatsapp-dia" data-date="<?= htmlspecialchars($selectedDate) ?>" title="Enviar lembrete para todos os clientes do dia">
                             <i class="fa-brands fa-whatsapp"></i> Lembrar clientes
                         </button>
+                        <a href="horarios.php" class="btn-agenda-horarios" title="Configurar horários e bloqueios">
+                            <i class="fa-regular fa-clock"></i> Horários
+                        </a>
                     </div>
                     <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('+7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-right"></i></a>
                 </div>
@@ -106,9 +112,28 @@ include __DIR__ . '/../partials/head.php';
                 <div class="agenda-scroll">
                     <div class="agenda-grid">
                         <div class="agenda-corner"></div>
-                        <?php foreach ($weekDays as $index => $day): ?>
-                            <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?>">
-                                <?= $diasSemana[$index] ?> <span><?= date('d', strtotime($day)) ?></span>
+                        <?php foreach ($weekDays as $index => $day):
+                            $hDia       = $horariosMap[$day] ?? null;
+                            $diaFechado = $hDia && $hDia['fechado'];
+                            $temExcecao = isset($excecoesMap[$day]);
+                            $aberturaDay  = $hDia ? substr($hDia['abertura'],   0, 5) : '08:00';
+                            $fechamentoDay = $hDia ? substr($hDia['fechamento'], 0, 5) : '20:00';
+                        ?>
+                            <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?><?= $diaFechado ? ' fechado' : '' ?>">
+                                <span class="agenda-day-head__label"><?= $diasSemana[$index] ?> <span><?= date('d', strtotime($day)) ?></span></span>
+                                <?php if ($diaFechado): ?><small class="agenda-day-head__fechado">Fechado</small><?php endif; ?>
+                                <button
+                                    type="button"
+                                    class="btn-horario-dia<?= $temExcecao ? ' btn-horario-dia--excecao' : '' ?>"
+                                    data-date="<?= htmlspecialchars($day) ?>"
+                                    data-fechado="<?= $diaFechado ? '1' : '0' ?>"
+                                    data-abertura="<?= htmlspecialchars($aberturaDay) ?>"
+                                    data-fechamento="<?= htmlspecialchars($fechamentoDay) ?>"
+                                    data-excecao="<?= $temExcecao ? '1' : '0' ?>"
+                                    title="<?= $temExcecao ? 'Exceção ativa — clique para editar' : 'Editar horário deste dia' ?>">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <?= $temExcecao ? '<i class="fa-solid fa-circle-exclamation btn-horario-dia__dot"></i>' : '' ?>
+                                </button>
                             </div>
                         <?php endforeach; ?>
 
@@ -125,11 +150,26 @@ include __DIR__ . '/../partials/head.php';
                             $isHalf = (int) substr($slotTime, -2) === 30;
                             echo '<div class="agenda-hour' . ($isHalf ? ' agenda-hour--half' : '') . '">' . $slotTime . '</div>';
                             foreach ($weekDays as $day):
-                                $cellKey = $day . ' ' . $slotTime;
+                                $hDia        = $horariosMap[$day] ?? null;
+                                $diaFechado  = $hDia && $hDia['fechado'];
+                                $abertura    = $hDia ? substr($hDia['abertura'],   0, 5) : '08:00';
+                                $fecho       = $hDia ? substr($hDia['fechamento'], 0, 5) : '20:00';
+                                $foraDaHora  = !$diaFechado && ($slotTime < $abertura || $slotTime >= $fecho);
+                                $emBloqueio  = false;
+                                if (!$diaFechado && !$foraDaHora) {
+                                    foreach (($hDia['bloqueios'] ?? []) as $blq) {
+                                        if ($slotTime >= substr($blq['hora_inicio'], 0, 5) && $slotTime < substr($blq['hora_fim'], 0, 5)) {
+                                            $emBloqueio = true;
+                                            break;
+                                        }
+                                    }
+                                }
                                 $cellAppointments = $agendaMap[$day][$slotTime] ?? [];
                                 $inicioAppointments = array_filter($cellAppointments, static fn(array $appointment): bool => empty($appointment['continuacao']));
                                 echo '<div class="agenda-cell' . ($day === date('Y-m-d') ? ' today' : '') . '" data-date="' . $day . '" data-time="' . $slotTime . '">';
-                                if (!empty($inicioAppointments)) {
+                                if ($diaFechado || $foraDaHora || $emBloqueio) {
+                                    echo '<div class="agenda-cell--fora-horario" aria-hidden="true"></div>';
+                                } elseif (!empty($inicioAppointments)) {
                                     foreach ($inicioAppointments as $appointment):
                                         $durationMinutes = (int) ($appointment['duracao_minutos'] ?? 30);
                                         $slotsSpan = min(24, max(1, (int) ceil($durationMinutes / 30)));
@@ -233,7 +273,7 @@ include __DIR__ . '/../partials/head.php';
                                                 data-telefone="<?= htmlspecialchars($ag['telefone'] ?? '') ?>"
                                                 data-servico="<?= htmlspecialchars($ag['servico']) ?>"
                                                 data-data="<?= htmlspecialchars($ag['data_fmt']) ?>"
-                                                data-hora="<?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?>"
+                                                data-hora="<?= htmlspecialchars(substr($ag['hora_inicio'], 0, 5)) ?>">
                                                 <i class="fa-brands fa-whatsapp"></i>
                                             </button>
                                             <button class="btn-action btn-action--delete" title="Excluir"

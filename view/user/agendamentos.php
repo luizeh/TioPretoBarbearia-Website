@@ -3,6 +3,7 @@ include_once(__DIR__ . '/../../api/auth/session.php');
 include_once(__DIR__ . '/../../config/connection.php');
 include_once(__DIR__ . '/../../sql/ServicosSql.php');
 include_once(__DIR__ . '/../../sql/AgendamentosSql.php');
+include_once(__DIR__ . '/../../sql/HorariosSql.php');
 
 $rootPath    = '../../';
 $linkBase    = '../';
@@ -23,13 +24,14 @@ $meusAgendamentos = AgendamentosSql::listarPorUsuarioPaginado($usuarioId, $limit
 $weekStart        = isset($_GET['data']) ? strtotime($_GET['data']) : strtotime('today');
 $weekStart        = strtotime('monday this week', $weekStart);
 $weekDays         = [];
-for ($i = 0; $i < 6; $i++) {
+for ($i = 0; $i < 7; $i++) {
     $weekDays[] = date('Y-m-d', strtotime('+' . $i . ' days', $weekStart));
 }
-$diasSemana       = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+$diasSemana       = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 $meses            = [1 => 'jan', 2 => 'fev', 3 => 'mar', 4 => 'abr', 5 => 'mai', 6 => 'jun', 7 => 'jul', 8 => 'ago', 9 => 'set', 10 => 'out', 11 => 'nov', 12 => 'dez'];
-$weekLabel        = date('d', $weekStart) . ' a ' . date('d', strtotime('+5 days', $weekStart)) . ' de ' . $meses[(int) date('n', strtotime('+5 days', $weekStart))] . ' de ' . date('Y', strtotime('+5 days', $weekStart));
-$agendaData       = AgendamentosSql::listarPorPeriodo(date('Y-m-d', $weekStart), date('Y-m-d', strtotime('+5 days', $weekStart)));
+$weekLabel        = date('d', $weekStart) . ' a ' . date('d', strtotime('+6 days', $weekStart)) . ' de ' . $meses[(int) date('n', strtotime('+6 days', $weekStart))] . ' de ' . date('Y', strtotime('+6 days', $weekStart));
+$agendaData       = AgendamentosSql::listarPorPeriodo(date('Y-m-d', $weekStart), date('Y-m-d', strtotime('+6 days', $weekStart)));
+$horariosMap      = HorariosSql::buscarPorDatas($weekDays);
 $agendaMap        = [];
 foreach ($agendaData as $item) {
     if (($item['status'] ?? '') === 'cancelado') {
@@ -70,9 +72,13 @@ include_once __DIR__ . '/../partials/head_public.php';
             <div class="agenda-scroll">
                 <div class="agenda-grid">
                     <div class="agenda-corner"></div>
-                    <?php foreach ($weekDays as $index => $day): ?>
-                        <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?>">
+                    <?php foreach ($weekDays as $index => $day):
+                        $hDia = $horariosMap[$day] ?? null;
+                        $diaFechado = $hDia && $hDia['fechado'];
+                    ?>
+                        <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?><?= $diaFechado ? ' fechado' : '' ?>">
                             <?= $diasSemana[$index] ?> <span><?= date('d', strtotime($day)) ?></span>
+                            <?php if ($diaFechado): ?><small class="agenda-day-head__fechado">Fechado</small><?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                     <?php
@@ -86,6 +92,20 @@ include_once __DIR__ . '/../partials/head_public.php';
                         $isHalf = (int) substr($slotTime, -2) === 30;
                         echo '<div class="agenda-hour' . ($isHalf ? ' agenda-hour--half' : '') . '">' . $slotTime . '</div>';
                         foreach ($weekDays as $day):
+                            $hDia        = $horariosMap[$day] ?? null;
+                            $diaFechado  = $hDia && $hDia['fechado'];
+                            $abertura    = $hDia ? substr($hDia['abertura'],   0, 5) : '08:00';
+                            $fecho       = $hDia ? substr($hDia['fechamento'], 0, 5) : '20:00';
+                            $foraDaHora  = !$diaFechado && ($slotTime < $abertura || $slotTime >= $fecho);
+                            $emBloqueio  = false;
+                            if (!$diaFechado && !$foraDaHora) {
+                                foreach (($hDia['bloqueios'] ?? []) as $blq) {
+                                    if ($slotTime >= substr($blq['hora_inicio'], 0, 5) && $slotTime < substr($blq['hora_fim'], 0, 5)) {
+                                        $emBloqueio = true;
+                                        break;
+                                    }
+                                }
+                            }
                             $appointments = $agendaMap[$day][$slotTime] ?? [];
                             $ownAppointment = null;
                             $continuaProprio = false;
@@ -99,7 +119,9 @@ include_once __DIR__ . '/../partials/head_public.php';
                                 }
                             }
                             echo '<div class="agenda-cell' . ($day === date('Y-m-d') ? ' today' : '') . '" data-date="' . $day . '" data-time="' . $slotTime . '">';
-                            if ($ownAppointment) {
+                            if ($diaFechado || $foraDaHora || $emBloqueio) {
+                                echo '<div class="agenda-cell--fora-horario" aria-hidden="true"></div>';
+                            } elseif ($ownAppointment) {
                                 $durationMinutes = (int) ($ownAppointment['duracao_minutos'] ?? 30);
                                 $slotsSpan = min(24, max(1, (int) ceil($durationMinutes / 30)));
                                 echo '<button class="agenda-appt agenda-appt--meu agenda-appt--slots-' . $slotsSpan . '" type="button" data-own-id="' . (int) $ownAppointment['id'] . '">';

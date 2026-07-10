@@ -1,6 +1,7 @@
 <?php
 
 include_once __DIR__ . '/../config/connection.php';
+include_once __DIR__ . '/HorariosSql.php';
 
 class AgendamentosSql
 {
@@ -165,9 +166,51 @@ class AgendamentosSql
             throw new InvalidArgumentException('Não é possível agendar em uma data passada.');
         }
         $fim = (clone $inicio)->modify("+$duracao minutes");
-        if ($inicio->format('H:i') < '08:00' || $fim->format('H:i') > '20:00') {
-            throw new InvalidArgumentException('O atendimento deve ocorrer entre 08:00 e 20:00.');
+
+        // Valida contra exceção de data específica (prioridade) ou padrão da semana
+        $excecoes = HorariosSql::buscarExcecoes([$data]);
+        if (isset($excecoes[$data])) {
+            $ex = $excecoes[$data];
+            if ($ex['fechado']) {
+                throw new InvalidArgumentException('A barbearia não atende neste dia.');
+            }
+            $diaSemana = (int) $inicio->format('N');
+            $padrao    = HorariosSql::buscarDia($diaSemana);
+            $abertura   = substr($ex['abertura']   ?? $padrao['abertura'],   0, 5);
+            $fechamento = substr($ex['fechamento'] ?? $padrao['fechamento'], 0, 5);
+        } else {
+            $diaSemana = (int) $inicio->format('N'); // 1=Seg … 7=Dom (ISO-8601)
+            $horario   = HorariosSql::buscarDia($diaSemana);
+            if ($horario['fechado']) {
+                throw new InvalidArgumentException('A barbearia não atende neste dia da semana.');
+            }
+            $abertura   = substr($horario['abertura'],   0, 5);
+            $fechamento = substr($horario['fechamento'], 0, 5);
         }
+
+        if ($inicio->format('H:i') < $abertura || $fim->format('H:i') > $fechamento) {
+            throw new InvalidArgumentException(
+                "O atendimento deve ocorrer entre {$abertura} e {$fechamento}."
+            );
+        }
+
+        // Verifica bloqueios recorrentes (ex: almoço 12:00-13:00)
+        $diaSemanaFinal = (int) $inicio->format('N');
+        foreach (HorariosSql::buscarTodosBloqueios() as $bloqueio) {
+            if ($bloqueio['dia_semana'] !== null && (int) $bloqueio['dia_semana'] !== $diaSemanaFinal) {
+                continue;
+            }
+            $bInicio = substr($bloqueio['hora_inicio'], 0, 5);
+            $bFim    = substr($bloqueio['hora_fim'],    0, 5);
+            // Há sobreposição se o agendamento começa antes do fim do bloqueio E termina depois do início
+            if ($inicio->format('H:i') < $bFim && $fim->format('H:i') > $bInicio) {
+                $desc = $bloqueio['descricao'] ? " ({$bloqueio['descricao']})" : '';
+                throw new InvalidArgumentException(
+                    "Horário indisponível{$desc}: {$bInicio}–{$bFim}."
+                );
+            }
+        }
+
         return [$inicio->format('H:i:s'), $fim->format('H:i:s')];
     }
 
@@ -234,9 +277,13 @@ class AgendamentosSql
                 $stmt = $pdo->prepare("INSERT INTO agendamentos (usuario_id, servico_id, data, hora_inicio, hora_fim, status, observacoes)
                     VALUES (:usuario_id, :servico_id, :data, :hora_inicio, :hora_fim, :status, :observacoes)");
                 $stmt->execute([
-                    ':usuario_id' => (int) $dados['usuario_id'], ':servico_id' => $principal,
-                    ':data' => $data, ':hora_inicio' => $inicio, ':hora_fim' => $fim,
-                    ':status' => $status, ':observacoes' => $observacoes,
+                    ':usuario_id' => (int) $dados['usuario_id'],
+                    ':servico_id' => $principal,
+                    ':data' => $data,
+                    ':hora_inicio' => $inicio,
+                    ':hora_fim' => $fim,
+                    ':status' => $status,
+                    ':observacoes' => $observacoes,
                 ]);
                 $id = (int) $pdo->lastInsertId();
             } else {
@@ -254,8 +301,11 @@ class AgendamentosSql
                 $stmt = $pdo->prepare("UPDATE agendamentos SET servico_id = :servico_id, data = :data, hora_inicio = :hora_inicio,
                     hora_fim = :hora_fim, observacoes = :observacoes" . ($status !== null ? ', status = :status' : '') . " WHERE $where");
                 $params = array_merge($params, [
-                    ':servico_id' => $principal, ':data' => $data, ':hora_inicio' => $inicio,
-                    ':hora_fim' => $fim, ':observacoes' => $observacoes,
+                    ':servico_id' => $principal,
+                    ':data' => $data,
+                    ':hora_inicio' => $inicio,
+                    ':hora_fim' => $fim,
+                    ':observacoes' => $observacoes,
                 ]);
                 if ($status !== null) $params[':status'] = $status;
                 $stmt->execute($params);

@@ -25,6 +25,14 @@
             <i class="fa-solid fa-box-open"></i>
             <span>Produtos</span>
         </a>
+        <a href="site-editor.php" class="nav-item <?= ($activePage ?? '') === 'site-editor' ? 'active' : '' ?>">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>Editor do Site</span>
+        </a>
+        <a href="horarios.php" class="nav-item <?= ($activePage ?? '') === 'horarios' ? 'active' : '' ?>">
+            <i class="fa-regular fa-clock"></i>
+            <span>Horários</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">

@@ -73,12 +73,12 @@ if ($action === 'enviar_dia') {
             continue;
         }
 
-        $mensagem = 'Ola, ' . $agendamento['cliente'] . "!\n\n"
-            . 'Lembramos que voce tem um agendamento na Tio Preto Barbearia:\n\n'
-            . 'Servico: ' . $agendamento['servico'] . "\n"
-            . 'Data: ' . $agendamento['data_fmt'] . "\n"
-            . 'Horario: ' . substr($agendamento['hora_inicio'], 0, 5) . ' as ' . substr($agendamento['hora_fim'], 0, 5) . "\n\n"
-            . 'Aguardamos voce!';
+        $mensagem = 'Olá, ' . $agendamento['cliente'] . "! 👋\n\n"
+            . "Lembramos que você tem um agendamento na *Tio Preto Barbearia*:\n\n"
+            . '📋 *Serviço:* ' . $agendamento['servico'] . "\n"
+            . '📅 *Data:* ' . $agendamento['data_fmt'] . "\n"
+            . '⏰ *Horário:* ' . substr($agendamento['hora_inicio'], 0, 5) . "\n\n"
+            . "Aguardamos você! 💈\nTio Preto Barbearia 🧔🏿";
         $resultado = enviarMensagemWhatsApp($agendamento['telefone'], $mensagem);
         if ($resultado['success']) {
             $enviados++;

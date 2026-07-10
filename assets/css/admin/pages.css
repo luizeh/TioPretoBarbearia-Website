@@ -2,6 +2,430 @@
    pages.css — estilos específicos por página
    ════════════════════════════════════════════ */
 
+/* ── BOTÃO HORÁRIOS NA BARRA DA AGENDA ── */
+.btn-agenda-horarios {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  padding: 7px 12px;
+  background: rgba(201, 150, 58, 0.08);
+  color: var(--gold);
+  font-family: var(--font-condensed);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.btn-agenda-horarios:hover {
+  background: var(--gold);
+  color: var(--dark);
+}
+
+/* ── BOTÃO DE EDIÇÃO DE HORÁRIO NO CABEÇALHO DA GRADE ── */
+.agenda-day-head {
+  position: relative;
+}
+
+.agenda-day-head__label {
+  display: block;
+}
+
+.btn-horario-dia {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: .65rem;
+  padding: 0;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.btn-horario-dia__txt { display: none; }
+
+.btn-horario-dia:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+}
+
+.btn-horario-dia--excecao {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.btn-horario-dia--excecao:hover {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #fff;
+}
+
+.btn-horario-dia__dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.55rem;
+  color: #f59e0b;
+  pointer-events: none;
+}
+
+/* ── MODAL DE HORÁRIO DO DIA ── */
+.horario-dia-modal__data {
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+.horario-dia-modal__aviso {
+  font-size: 0.78rem;
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.horario-dia-modal__toggle {
+  margin-bottom: 16px;
+}
+
+.horario-dia-modal__horas {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.horario-dia-modal__horas label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-condensed);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.horario-dia-modal__restaurar {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── FORMULÁRIO DE BLOQUEIOS ── */
+.bloqueio-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── BLOQUEIOS — layout reestruturado ── */
+.bloqueio-section {
+  padding: 0 24px 28px;
+}
+
+.bloqueio-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin: 16px 0 20px;
+  line-height: 1.6;
+}
+
+.bloqueio-form-box {
+  background: #fafaf9;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px 24px;
+  margin-bottom: 28px;
+}
+
+.bloqueio-form-title {
+  font-family: var(--font-condensed);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dark);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bloqueio-form-title i {
+  color: var(--gold);
+}
+
+.bloqueio-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.bloqueio-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bloqueio-form-field--wide {
+  grid-column: span 2;
+}
+
+.bloqueio-form-label {
+  font-family: var(--font-condensed);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.bloqueio-select {
+  width: 100% !important;
+}
+
+/* ── BOTÃO CRIAR BLOQUEIO — destaque total ── */
+.btn-bloqueio-criar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 28px;
+  background: var(--gold);
+  color: var(--dark);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-condensed);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.1s;
+  box-shadow: 0 3px 10px rgba(201, 150, 58, 0.35);
+}
+
+.btn-bloqueio-criar:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(201, 150, 58, 0.45);
+}
+
+.btn-bloqueio-criar:active {
+  transform: translateY(0);
+}
+
+.bloqueio-lista-titulo {
+  font-family: var(--font-condensed);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ── HORÁRIOS DE FUNCIONAMENTO ── */
+.horarios-card {
+  margin-bottom: 28px;
+}
+
+.horarios-table-wrap {
+  padding: 0 0 16px;
+}
+
+.horarios-table .horario-input {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  color: var(--text);
+  width: 110px;
+}
+
+.horarios-table .horario-input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.horarios-table .horario-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.horario-row--fechado td {
+  opacity: 0.6;
+}
+.horario-row--fechado .horario-dia-nome {
+  opacity: 1;
+}
+
+/* Toggle switch */
+.horario-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.horario-toggle input {
+  display: none;
+}
+
+.horario-toggle__track {
+  width: 38px;
+  height: 20px;
+  border-radius: 20px;
+  background: var(--border);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.horario-toggle__track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.horario-toggle input:checked ~ .horario-toggle__track {
+  background: #ef4444;
+}
+
+.horario-toggle input:checked ~ .horario-toggle__track::after {
+  transform: translateX(18px);
+}
+
+.horario-toggle__label {
+  font-family: var(--font-condensed);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  min-width: 52px;
+}
+
+/* ── BTN SECONDARY ── */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── EDITOR DO SITE ── */
+.site-editor-card {
+  margin-bottom: 28px;
+}
+
+.site-editor-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  padding: 24px;
+}
+
+.site-editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.site-editor-label {
+  font-family: var(--font-condensed);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.site-editor-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--text);
+  resize: vertical;
+  transition: border-color 0.2s;
+  line-height: 1.5;
+}
+
+.site-editor-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.site-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
 /* ── CLIENTES ── */
 .page-title--lg {
   font-size: 2.8rem;
@@ -156,18 +580,40 @@
   border-radius: 3px;
 }
 
-.bar-chart__bar--45 { --h: 45%; }
-.bar-chart__bar--47 { --h: 47%; }
-.bar-chart__bar--52 { --h: 52%; }
-.bar-chart__bar--60 { --h: 60%; }
-.bar-chart__bar--70 { --h: 70%; }
-.bar-chart__bar--light { background: var(--gold-light); }
+.bar-chart__bar--45 {
+  --h: 45%;
+}
+.bar-chart__bar--47 {
+  --h: 47%;
+}
+.bar-chart__bar--52 {
+  --h: 52%;
+}
+.bar-chart__bar--60 {
+  --h: 60%;
+}
+.bar-chart__bar--70 {
+  --h: 70%;
+}
+.bar-chart__bar--light {
+  background: var(--gold-light);
+}
 
-.service-breakdown__bar--4 { --w: 4%; }
-.service-breakdown__bar--10 { --w: 10%; }
-.service-breakdown__bar--20 { --w: 20%; }
-.service-breakdown__bar--28 { --w: 28%; }
-.service-breakdown__bar--38 { --w: 38%; }
+.service-breakdown__bar--4 {
+  --w: 4%;
+}
+.service-breakdown__bar--10 {
+  --w: 10%;
+}
+.service-breakdown__bar--20 {
+  --w: 20%;
+}
+.service-breakdown__bar--28 {
+  --w: 28%;
+}
+.service-breakdown__bar--38 {
+  --w: 38%;
+}
 
 /* ── RESPONSIVO — relatórios ── */
 @media (max-width: 900px) {

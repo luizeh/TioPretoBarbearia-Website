@@ -14,9 +14,9 @@ $clientes         = ClientesSql::listar(200, 0);
 $rangeStart = $_GET['data'] ?? date('Y-m-d');
 $rangeStart = strtotime($rangeStart);
 $weekStart  = strtotime('monday this week', $rangeStart);
-$weekEnd    = strtotime('+5 days', $weekStart);
+$weekEnd    = strtotime('+6 days', $weekStart);
 $weekDates  = [];
-for ($i = 0; $i < 6; $i++) {
+for ($i = 0; $i < 7; $i++) {
     $weekDates[] = date('Y-m-d', strtotime('+' . $i . ' days', $weekStart));
 }
 $agendaData = AgendamentosSql::listarPorPeriodo(date('Y-m-d', $weekStart), date('Y-m-d', $weekEnd));

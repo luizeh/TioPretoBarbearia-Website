@@ -2,6 +2,37 @@
    agenda.css — calendário de agendamentos
    ════════════════════════════════════════════ */
 
+/* ── DIA FECHADO — header ── */
+.agenda-day-head.fechado {
+  opacity: 0.5;
+  background: #f5f3f0;
+}
+
+.agenda-day-head__fechado {
+  display: block;
+  font-family: var(--font-condensed);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ef4444;
+  margin-top: 2px;
+}
+
+/* ── FORA DO HORÁRIO / DIA FECHADO — célula ── */
+.agenda-cell--fora-horario {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    #f0ede8,
+    #f0ede8 4px,
+    transparent 4px,
+    transparent 10px
+  );
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* ── STATS ROW ── */
 .agenda-stats {
   display: grid;
@@ -127,8 +158,8 @@
 
 .agenda-day-actions label {
   font-family: var(--font-condensed);
-  font-size: .72rem;
-  letter-spacing: .08em;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -140,7 +171,7 @@
   color: var(--dark);
   background: var(--white);
   font: inherit;
-  font-size: .78rem;
+  font-size: 0.78rem;
 }
 
 .btn-agenda-whatsapp-dia {
@@ -150,12 +181,12 @@
   border: 1px solid #25d366;
   border-radius: 5px;
   padding: 7px 10px;
-  background: rgba(37, 211, 102, .08);
+  background: rgba(37, 211, 102, 0.08);
   color: #178b43;
   font-family: var(--font-condensed);
-  font-size: .72rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: .06em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -166,7 +197,7 @@
 }
 
 .agenda-scroll {
-  overflow-x: hidden;
+  overflow-x: auto; /* era hidden — habilita scroll lateral em telas estreitas */
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-color: var(--gold) transparent;
@@ -181,30 +212,33 @@
   background: #fafaf9;
   border-bottom: 1px solid var(--border);
   font-family: var(--font-condensed);
-  font-size: .72rem;
+  font-size: 0.72rem;
   text-align: center;
-  letter-spacing: .04em;
+  letter-spacing: 0.04em;
 }
 
 .agenda-grid {
   display: grid;
-  grid-template-columns: 54px repeat(6, minmax(0, 1fr));
+  grid-template-columns: 54px repeat(7, minmax(110px, 1fr));
+  grid-template-rows: auto; /* 1ª linha (cabeçalho) tem altura automática */
+  grid-auto-rows: 44px; /* demais linhas (slots) fixas em 44px */
   width: 100%;
   min-width: 0;
-  grid-auto-rows: 44px;
 }
 
 .agenda-corner {
   background: #fafaf9;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  min-height: 62px;
 }
 
 .agenda-day-head {
   background: #fafaf9;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 10px 8px;
+  padding: 10px 30px 10px 8px; /* padding-right reserva espaço para o botão */
+  min-height: 62px;
   text-align: center;
   font-family: var(--font-condensed);
   font-size: 0.78rem;
@@ -327,11 +361,14 @@
   justify-content: center;
   gap: 1px;
   cursor: pointer;
-  transition: background .2s, border-color .2s, color .2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 .agenda-cell__add small {
   color: var(--text-muted);
-  font-size: .68rem;
+  font-size: 0.68rem;
 }
 .agenda-cell__add:hover {
   background: rgba(201, 150, 58, 0.14);
@@ -377,12 +414,12 @@
 }
 
 .btn-action--whatsapp {
-  background: rgba(37, 211, 102, .1);
+  background: rgba(37, 211, 102, 0.1);
   color: #178b43;
 }
 
 .btn-action--whatsapp:hover {
-  background: rgba(37, 211, 102, .22);
+  background: rgba(37, 211, 102, 0.22);
 }
 
 /* ── RESPONSIVO — agenda ── */
@@ -596,13 +633,45 @@
   color: var(--text-muted);
 }
 
-.agendamento-servicos { display: grid; gap: 8px; }
-.agendamento-servico-opcao { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; align-items: center; cursor: pointer; padding: 9px 10px; border: 1px solid var(--border); background: var(--off-white); border-radius: 5px; transition: border-color .2s, background .2s; }
-.agendamento-servico-opcao input { grid-row: span 2; accent-color: var(--gold); }
-.agendamento-servico-opcao small { grid-column: 2; color: #aaa; }
-.agendamento-servico-opcao:has(input:checked) { border-color: var(--gold); background: rgba(201, 150, 58, .1); }
-.agenda-appt { border: 0; text-align: left; width: 100%; cursor: pointer; }
-.agenda-appt--ocupado { cursor: default; }
+.agendamento-servicos {
+  display: grid;
+  gap: 8px;
+}
+.agendamento-servico-opcao {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 8px;
+  align-items: center;
+  cursor: pointer;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  background: var(--off-white);
+  border-radius: 5px;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.agendamento-servico-opcao input {
+  grid-row: span 2;
+  accent-color: var(--gold);
+}
+.agendamento-servico-opcao small {
+  grid-column: 2;
+  color: #aaa;
+}
+.agendamento-servico-opcao:has(input:checked) {
+  border-color: var(--gold);
+  background: rgba(201, 150, 58, 0.1);
+}
+.agenda-appt {
+  border: 0;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+.agenda-appt--ocupado {
+  cursor: default;
+}
 
 .appt-card__meta i {
   color: var(--gold);
@@ -690,7 +759,9 @@
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .agenda-slot--livre {
@@ -772,27 +843,75 @@
   border: 0;
 }
 
-.agenda-appt--slots-1 { --slots: 1; }
-.agenda-appt--slots-2 { --slots: 2; }
-.agenda-appt--slots-3 { --slots: 3; }
-.agenda-appt--slots-4 { --slots: 4; }
-.agenda-appt--slots-5 { --slots: 5; }
-.agenda-appt--slots-6 { --slots: 6; }
-.agenda-appt--slots-7 { --slots: 7; }
-.agenda-appt--slots-8 { --slots: 8; }
-.agenda-appt--slots-9 { --slots: 9; }
-.agenda-appt--slots-10 { --slots: 10; }
-.agenda-appt--slots-11 { --slots: 11; }
-.agenda-appt--slots-12 { --slots: 12; }
-.agenda-appt--slots-13 { --slots: 13; }
-.agenda-appt--slots-14 { --slots: 14; }
-.agenda-appt--slots-15 { --slots: 15; }
-.agenda-appt--slots-16 { --slots: 16; }
-.agenda-appt--slots-17 { --slots: 17; }
-.agenda-appt--slots-18 { --slots: 18; }
-.agenda-appt--slots-19 { --slots: 19; }
-.agenda-appt--slots-20 { --slots: 20; }
-.agenda-appt--slots-21 { --slots: 21; }
-.agenda-appt--slots-22 { --slots: 22; }
-.agenda-appt--slots-23 { --slots: 23; }
-.agenda-appt--slots-24 { --slots: 24; }
+.agenda-appt--slots-1 {
+  --slots: 1;
+}
+.agenda-appt--slots-2 {
+  --slots: 2;
+}
+.agenda-appt--slots-3 {
+  --slots: 3;
+}
+.agenda-appt--slots-4 {
+  --slots: 4;
+}
+.agenda-appt--slots-5 {
+  --slots: 5;
+}
+.agenda-appt--slots-6 {
+  --slots: 6;
+}
+.agenda-appt--slots-7 {
+  --slots: 7;
+}
+.agenda-appt--slots-8 {
+  --slots: 8;
+}
+.agenda-appt--slots-9 {
+  --slots: 9;
+}
+.agenda-appt--slots-10 {
+  --slots: 10;
+}
+.agenda-appt--slots-11 {
+  --slots: 11;
+}
+.agenda-appt--slots-12 {
+  --slots: 12;
+}
+.agenda-appt--slots-13 {
+  --slots: 13;
+}
+.agenda-appt--slots-14 {
+  --slots: 14;
+}
+.agenda-appt--slots-15 {
+  --slots: 15;
+}
+.agenda-appt--slots-16 {
+  --slots: 16;
+}
+.agenda-appt--slots-17 {
+  --slots: 17;
+}
+.agenda-appt--slots-18 {
+  --slots: 18;
+}
+.agenda-appt--slots-19 {
+  --slots: 19;
+}
+.agenda-appt--slots-20 {
+  --slots: 20;
+}
+.agenda-appt--slots-21 {
+  --slots: 21;
+}
+.agenda-appt--slots-22 {
+  --slots: 22;
+}
+.agenda-appt--slots-23 {
+  --slots: 23;
+}
+.agenda-appt--slots-24 {
+  --slots: 24;
+}
