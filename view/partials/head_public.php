@@ -25,17 +25,16 @@ $pageTitle = $pageTitle ?? 'Tio Preto Barbearia';
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/style.css" />
-    <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/components.css" />
+    <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/public/app.css" />
+    <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/shared/components.css" />
     <link rel="stylesheet" href="<?= $rootPath ?? '' ?>node_modules/sweetalert2/dist/sweetalert2.min.css" />
     <?php foreach ($extraCss ?? [] as $css): ?>
         <link rel="stylesheet" href="<?= $rootPath ?? '' ?><?= htmlspecialchars($css) ?>" />
     <?php endforeach; ?>
 </head>
 
-<body<?= isset($bodyClass) ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?>>
-    <script>
-        window.API_BASE = '<?= htmlspecialchars($rootPath ?? '') ?>api/';
-    </script>
-    <script src="<?= $rootPath ?? '' ?>node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
-    <script src="<?= $rootPath ?? '' ?>assets/js/swal-theme.js"></script>
+<body<?= isset($bodyClass) ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?> data-api-base="<?= htmlspecialchars($rootPath ?? '', ENT_QUOTES, 'UTF-8') ?>api/">
+    <script src="<?= $rootPath ?? '' ?>assets/js/public/app.js" defer></script>
+    <script src="<?= $rootPath ?? '' ?>assets/js/shared/form-utils.js" defer></script>
+    <script src="<?= $rootPath ?? '' ?>node_modules/sweetalert2/dist/sweetalert2.all.min.js" defer></script>
+    <script src="<?= $rootPath ?? '' ?>assets/js/shared/swal-theme.js" defer></script>

@@ -1,46 +1,39 @@
-<?php
-
-/** Modal de novo agendamento — área do cliente. Requer $servicos no escopo. */ ?>
+<?php /** Modal de agendamento do cliente. Requer $servicos no escopo. */ ?>
 <div class="modal-overlay" id="modal-novo-agendamento">
     <div class="modal">
         <div class="modal-header">
-            <h2 class="modal-title"><i class="fa-solid fa-calendar-plus"></i> Novo Agendamento</h2>
+            <h2 class="modal-title"><i class="fa-solid fa-calendar-plus"></i> Agendamento</h2>
             <button class="modal-close" data-close="modal-novo-agendamento"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="modal-body">
             <form class="modal-form">
+                <input type="hidden" name="data">
+                <input type="hidden" name="hora_inicio">
                 <div class="modal-field">
-                    <label class="modal-label">Serviço</label>
-                    <select class="modal-select" name="servico_id" id="novoag-servico">
-                        <option value="">Selecione um serviço</option>
+                    <label class="modal-label">Horário escolhido</label>
+                    <p class="modal-input modal-selected-time__value" data-agendamento-horario></p>
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Serviços</label>
+                    <div class="agendamento-servicos" data-agendamento-servicos>
                         <?php foreach ($servicos ?? [] as $s): ?>
-                            <option value="<?= $s['id'] ?>" data-duracao="<?= (int) $s['tempo_estimado'] ?>">
-                                <?= htmlspecialchars($s['nome']) ?> — R$ <?= number_format($s['preco'], 2, ',', '.') ?> (<?= (int) $s['tempo_estimado'] ?> min)
-                            </option>
+                            <label class="agendamento-servico-opcao">
+                                <input type="checkbox" name="servicos_ids" value="<?= (int) $s['id'] ?>" data-preco="<?= htmlspecialchars((string) $s['preco']) ?>" data-duracao="<?= (int) $s['tempo_estimado'] ?>">
+                                <span><?= htmlspecialchars($s['nome']) ?></span>
+                                <small>R$ <?= number_format($s['preco'], 2, ',', '.') ?> · <?= (int) $s['tempo_estimado'] ?> min</small>
+                            </label>
                         <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="modal-row">
-                    <div class="modal-field">
-                        <label class="modal-label">Data</label>
-                        <input class="modal-input" type="date" name="data" id="novoag-data" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Horário de Início</label>
-                        <input class="modal-input" type="time" name="hora_inicio" id="novoag-hora-inicio" step="1800" />
                     </div>
                 </div>
-                <input type="hidden" name="hora_fim" id="novoag-hora-fim" />
-                <div class="modal-field" id="novoag-duracao-info" style="display:none;">
-                    <small style="color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;">
-                        <i class="fa-regular fa-clock"></i> Término estimado: <strong id="novoag-hora-fim-display">—</strong>
-                    </small>
+                <div class="modal-field modal-summary" data-agendamento-resumo hidden>
+                    <p class="modal-label modal-label--compact">Resumo</p>
+                    <small class="modal-summary__details"><span data-agendamento-lista></span><br>Total: <strong data-agendamento-total></strong> · Duração: <strong data-agendamento-duracao></strong> · Término: <strong data-agendamento-fim></strong></small>
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Observações <small>(opcional)</small></label>
+                    <textarea class="modal-textarea" name="observacoes" rows="3" maxlength="1000" placeholder="Alguma preferência ou informação importante?"></textarea>
                 </div>
             </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-modal-secondary" data-close="modal-novo-agendamento">Cancelar</button>
-            <button class="btn-modal-primary" id="novoag-submit">Confirmar Agendamento</button>
         </div>
     </div>
 </div>

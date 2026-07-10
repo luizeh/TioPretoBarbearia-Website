@@ -1,7 +1,7 @@
 <?php
 $rootPath  = '../';
 $pageTitle = 'Login — Tio Preto Barbearia';
-$extraCss  = ['assets/css/login.css'];
+$extraCss  = ['assets/css/auth/login.css'];
 include_once __DIR__ . '/partials/head_public.php';
 ?>
 <!-- ══════════════ LOGIN ══════════════ -->
@@ -60,7 +60,7 @@ include_once __DIR__ . '/partials/head_public.php';
 <footer class="login-footer-simple">
   <p>© 2026 Tio Preto Barbearia — Todos os direitos reservados. &nbsp;|&nbsp; Feito por <span>Luizeh</span></p>
 </footer>
-<script src="../assets/js/login.js"></script>
+<script src="../assets/js/auth/login.js" defer></script>
 </body>
 
 </html>

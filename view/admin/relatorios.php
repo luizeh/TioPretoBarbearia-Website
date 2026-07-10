@@ -1,7 +1,8 @@
 <?php
+require_once __DIR__ . '/../../api/auth/require_admin.php';
+
 $activePage = 'relatorios';
 $pageTitle  = 'Relatórios';
-include_once(__DIR__ . '/../../api/auth/session.php');
 include __DIR__ . '/../partials/head.php';
 ?>
 
@@ -84,42 +85,42 @@ include __DIR__ . '/../partials/head.php';
                 <div class="bar-chart">
                     <div class="bar-chart__item">
                         <div class="bar-chart__bar-wrap">
-                            <div class="bar-chart__bar" style="--h: 45%"></div>
+                            <div class="bar-chart__bar bar-chart__bar--45"></div>
                         </div>
                         <span class="bar-chart__label">Fev</span>
                         <span class="bar-chart__value">R$1.8k</span>
                     </div>
                     <div class="bar-chart__item">
                         <div class="bar-chart__bar-wrap">
-                            <div class="bar-chart__bar" style="--h: 52%"></div>
+                            <div class="bar-chart__bar bar-chart__bar--52"></div>
                         </div>
                         <span class="bar-chart__label">Mar</span>
                         <span class="bar-chart__value">R$2.1k</span>
                     </div>
                     <div class="bar-chart__item">
                         <div class="bar-chart__bar-wrap">
-                            <div class="bar-chart__bar" style="--h: 47%"></div>
+                            <div class="bar-chart__bar bar-chart__bar--47"></div>
                         </div>
                         <span class="bar-chart__label">Abr</span>
                         <span class="bar-chart__value">R$1.9k</span>
                     </div>
                     <div class="bar-chart__item">
                         <div class="bar-chart__bar-wrap">
-                            <div class="bar-chart__bar" style="--h: 60%"></div>
+                            <div class="bar-chart__bar bar-chart__bar--60"></div>
                         </div>
                         <span class="bar-chart__label">Mai</span>
                         <span class="bar-chart__value">R$2.4k</span>
                     </div>
                     <div class="bar-chart__item">
                         <div class="bar-chart__bar-wrap">
-                            <div class="bar-chart__bar" style="--h: 70%"></div>
+                            <div class="bar-chart__bar bar-chart__bar--70"></div>
                         </div>
                         <span class="bar-chart__label">Jun</span>
                         <span class="bar-chart__value">R$2.8k</span>
                     </div>
                     <div class="bar-chart__item">
                         <div class="bar-chart__bar-wrap">
-                            <div class="bar-chart__bar" style="--h: 60%; background: var(--gold-light);"></div>
+                            <div class="bar-chart__bar bar-chart__bar--60 bar-chart__bar--light"></div>
                         </div>
                         <span class="bar-chart__label">Jul</span>
                         <span class="bar-chart__value">R$2.4k</span>
@@ -139,7 +140,7 @@ include __DIR__ . '/../partials/head.php';
                             <span class="service-breakdown__pct">38%</span>
                         </div>
                         <div class="service-breakdown__track">
-                            <div class="service-breakdown__bar" style="--w: 38%"></div>
+                            <div class="service-breakdown__bar service-breakdown__bar--38"></div>
                         </div>
                     </div>
                     <div class="service-breakdown__item">
@@ -148,7 +149,7 @@ include __DIR__ . '/../partials/head.php';
                             <span class="service-breakdown__pct">28%</span>
                         </div>
                         <div class="service-breakdown__track">
-                            <div class="service-breakdown__bar" style="--w: 28%"></div>
+                            <div class="service-breakdown__bar service-breakdown__bar--28"></div>
                         </div>
                     </div>
                     <div class="service-breakdown__item">
@@ -157,7 +158,7 @@ include __DIR__ . '/../partials/head.php';
                             <span class="service-breakdown__pct">20%</span>
                         </div>
                         <div class="service-breakdown__track">
-                            <div class="service-breakdown__bar" style="--w: 20%"></div>
+                            <div class="service-breakdown__bar service-breakdown__bar--20"></div>
                         </div>
                     </div>
                     <div class="service-breakdown__item">
@@ -166,7 +167,7 @@ include __DIR__ . '/../partials/head.php';
                             <span class="service-breakdown__pct">10%</span>
                         </div>
                         <div class="service-breakdown__track">
-                            <div class="service-breakdown__bar" style="--w: 10%"></div>
+                            <div class="service-breakdown__bar service-breakdown__bar--10"></div>
                         </div>
                     </div>
                     <div class="service-breakdown__item">
@@ -175,7 +176,7 @@ include __DIR__ . '/../partials/head.php';
                             <span class="service-breakdown__pct">4%</span>
                         </div>
                         <div class="service-breakdown__track">
-                            <div class="service-breakdown__bar" style="--w: 4%"></div>
+                            <div class="service-breakdown__bar service-breakdown__bar--4"></div>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__ . '/../../api/auth/require_admin.php');
 $activePage = 'servicos';
 $pageTitle  = 'Serviços';
 include_once(__DIR__ . '/../../controllers/servicos.controller.php');
@@ -25,7 +26,7 @@ include __DIR__ . '/../partials/head.php';
         </div>
 
         <!-- Banner total -->
-        <div class="clientes-stat-banner" style="max-width:100%;">
+        <div class="clientes-stat-banner clientes-stat-banner--full">
             <div class="clientes-stat-banner__icon">
                 <i class="fa-solid fa-scissors"></i>
             </div>
@@ -71,7 +72,8 @@ include __DIR__ . '/../partials/head.php';
                                             data-nome="<?= htmlspecialchars($s['nome']) ?>"
                                             data-duracao="<?= (int) $s['tempo_estimado'] ?>"
                                             data-preco="R$ <?= number_format($s['preco'], 2, ',', '.') ?>"
-                                            data-descricao="<?= htmlspecialchars($s['descricao'] ?? '') ?>">
+                                            data-descricao="<?= htmlspecialchars($s['descricao'] ?? '') ?>"
+                                            data-foto_url="<?= htmlspecialchars($s['foto_url'] ?? '') ?>">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
                                         <button class="btn-action btn-action--edit" title="Editar"
@@ -80,7 +82,8 @@ include __DIR__ . '/../partials/head.php';
                                             data-nome="<?= htmlspecialchars($s['nome']) ?>"
                                             data-duracao="<?= (int) $s['tempo_estimado'] ?>"
                                             data-preco="<?= $s['preco'] ?>"
-                                            data-descricao="<?= htmlspecialchars($s['descricao'] ?? '') ?>">
+                                            data-descricao="<?= htmlspecialchars($s['descricao'] ?? '') ?>"
+                                            data-foto_url="<?= htmlspecialchars($s['foto_url'] ?? '') ?>">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <button class="btn-action btn-action--delete" title="Excluir"
@@ -95,7 +98,7 @@ include __DIR__ . '/../partials/head.php';
                         <?php endforeach; ?>
                         <?php if (empty($servicos)): ?>
                             <tr>
-                                <td colspan="5" style="text-align:center;padding:32px;opacity:.5;">Nenhum serviço cadastrado.</td>
+                                <td colspan="5" class="table-empty-cell table-empty-cell--large">Nenhum serviço cadastrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

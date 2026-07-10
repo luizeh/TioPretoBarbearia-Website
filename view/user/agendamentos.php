@@ -9,7 +9,7 @@ $linkBase    = '../';
 $activeNav   = 'agendar';
 $nomeUsuario = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Cliente');
 $pageTitle   = 'Meus Agendamentos — Tio Preto Barbearia';
-$extraCss    = ['assets/css/agenda.css'];
+$extraCss    = ['assets/css/shared/agenda.css'];
 $bodyClass   = 'user-page';
 
 $usuarioId        = (int) $_SESSION['usuario_id'];
@@ -20,6 +20,31 @@ $offset           = ($pagina - 1) * $limite;
 $total            = AgendamentosSql::contarPorUsuario($usuarioId);
 $totalPaginas     = (int) ceil($total / $limite);
 $meusAgendamentos = AgendamentosSql::listarPorUsuarioPaginado($usuarioId, $limite, $offset);
+$weekStart        = isset($_GET['data']) ? strtotime($_GET['data']) : strtotime('today');
+$weekStart        = strtotime('monday this week', $weekStart);
+$weekDays         = [];
+for ($i = 0; $i < 6; $i++) {
+    $weekDays[] = date('Y-m-d', strtotime('+' . $i . ' days', $weekStart));
+}
+$diasSemana       = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+$meses            = [1 => 'jan', 2 => 'fev', 3 => 'mar', 4 => 'abr', 5 => 'mai', 6 => 'jun', 7 => 'jul', 8 => 'ago', 9 => 'set', 10 => 'out', 11 => 'nov', 12 => 'dez'];
+$weekLabel        = date('d', $weekStart) . ' a ' . date('d', strtotime('+5 days', $weekStart)) . ' de ' . $meses[(int) date('n', strtotime('+5 days', $weekStart))] . ' de ' . date('Y', strtotime('+5 days', $weekStart));
+$agendaData       = AgendamentosSql::listarPorPeriodo(date('Y-m-d', $weekStart), date('Y-m-d', strtotime('+5 days', $weekStart)));
+$agendaMap        = [];
+foreach ($agendaData as $item) {
+    if (($item['status'] ?? '') === 'cancelado') {
+        continue;
+    }
+    $slotKey = substr($item['hora_inicio'], 0, 5);
+    $agendaMap[$item['data']][$slotKey][] = $item;
+
+    $inicio = ((int) substr($item['hora_inicio'], 0, 2) * 60) + (int) substr($item['hora_inicio'], 3, 2);
+    $fim = ((int) substr($item['hora_fim'], 0, 2) * 60) + (int) substr($item['hora_fim'], 3, 2);
+    for ($minuto = $inicio + 30; $minuto < $fim; $minuto += 30) {
+        $hora = sprintf('%02d:%02d', intdiv($minuto, 60), $minuto % 60);
+        $agendaMap[$item['data']][$hora][] = ['continuacao' => true, 'usuario_id' => (int) $item['usuario_id']];
+    }
+}
 include_once __DIR__ . '/../partials/head_public.php';
 ?>
 <?php include_once __DIR__ . '/../partials/header_public.php'; ?>
@@ -28,28 +53,80 @@ include_once __DIR__ . '/../partials/head_public.php';
     <h1 class='page-banner__title'>Meus <span>Agendamentos</span></h1>
     <p class='page-banner__desc'>Olá, <?= $nomeUsuario ?>! Escolha um dia e agende seu horário.</p>
 </div>
-<div class='user-agenda'>
-    <!-- CALENDARIO + SLOTS -->
+<main class="user-agenda">
     <section class="agenda-calendar-section">
         <div class="agenda-calendar-header">
             <h2 class="agenda-calendar-title">
-                <i class="fa-regular fa-calendar"></i> Selecione um Dia
+                <i class="fa-regular fa-calendar"></i> Minha Semana
             </h2>
-            <input type="date" id="agenda-date-picker" class="modal-input"
-                style="max-width:200px;"
-                min="2026-07-09"
-                value="2026-07-09" />
+            <div class="agenda-nav agenda-nav--compact">
+                <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('-7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-left"></i></a>
+                <span class="agenda-nav__label"><?= $weekLabel ?></span>
+                <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('+7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-right"></i></a>
+            </div>
         </div>
-        <div id="agenda-slots-container" class="agenda-slots-grid">
-            <p class="agenda-slots-loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando...</p>
+        <p class="agenda-mobile-hint"><i class="fa-solid fa-arrows-left-right"></i> Deslize para ver todos os dias</p>
+        <div class="agenda-wrap">
+            <div class="agenda-scroll">
+                <div class="agenda-grid">
+                    <div class="agenda-corner"></div>
+                    <?php foreach ($weekDays as $index => $day): ?>
+                        <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?>">
+                            <?= $diasSemana[$index] ?> <span><?= date('d', strtotime($day)) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php
+                    $slots = [];
+                    for ($hour = 8; $hour <= 19; $hour++) {
+                        foreach ([0, 30] as $minute) {
+                            $slots[] = sprintf('%02d:%02d', $hour, $minute);
+                        }
+                    }
+                    foreach ($slots as $slotTime):
+                        $isHalf = (int) substr($slotTime, -2) === 30;
+                        echo '<div class="agenda-hour' . ($isHalf ? ' agenda-hour--half' : '') . '">' . $slotTime . '</div>';
+                        foreach ($weekDays as $day):
+                            $appointments = $agendaMap[$day][$slotTime] ?? [];
+                            $ownAppointment = null;
+                            $continuaProprio = false;
+                            foreach ($appointments as $appointment) {
+                                if (empty($appointment['continuacao']) && (int) $appointment['usuario_id'] === $usuarioId) {
+                                    $ownAppointment = $appointment;
+                                    break;
+                                }
+                                if (!empty($appointment['continuacao']) && (int) ($appointment['usuario_id'] ?? 0) === $usuarioId) {
+                                    $continuaProprio = true;
+                                }
+                            }
+                            echo '<div class="agenda-cell' . ($day === date('Y-m-d') ? ' today' : '') . '" data-date="' . $day . '" data-time="' . $slotTime . '">';
+                            if ($ownAppointment) {
+                                $durationMinutes = (int) ($ownAppointment['duracao_minutos'] ?? 30);
+                                $slotsSpan = min(24, max(1, (int) ceil($durationMinutes / 30)));
+                                echo '<button class="agenda-appt agenda-appt--meu agenda-appt--slots-' . $slotsSpan . '" type="button" data-own-id="' . (int) $ownAppointment['id'] . '">';
+                                echo '<span class="agenda-appt__name">Seu agendamento</span>';
+                                echo '<span class="agenda-appt__service">' . htmlspecialchars($ownAppointment['servico']) . ' · ' . $durationMinutes . ' min</span>';
+                                echo '</button>';
+                            } elseif ($continuaProprio) {
+                                echo '<div class="agenda-cell__blocked" aria-hidden="true"></div>';
+                            } elseif (!empty($appointments)) {
+                                echo '<div class="agenda-appt agenda-appt--ocupado agenda-appt--slots-1"><span class="agenda-appt__name">Ocupado</span><span class="agenda-appt__service">Indisponível</span></div>';
+                            } else {
+                                echo '<button class="agenda-cell__add" type="button" data-date="' . $day . '" data-time="' . $slotTime . '"><span>Disponível</span><small>' . $slotTime . '</small></button>';
+                            }
+                            echo '</div>';
+                        endforeach;
+                    endforeach;
+                    ?>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- MEUS AGENDAMENTOS -->
-    <section style="margin-top:40px;">
-        <div class="user-agenda__actions" style="margin-bottom:20px;justify-content:space-between;align-items:center;">
-            <h2 style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;">
-                <i class="fa-solid fa-list" style="color:var(--gold);"></i> Meus Agendamentos
+    <section class="user-agenda-section">
+        <div class="user-agenda__actions user-agenda__actions--list">
+            <h2 class="user-agenda__heading">
+                <i class="fa-solid fa-list user-agenda__heading-icon"></i> Meus Agendamentos
             </h2>
         </div>
         <?php if (empty($meusAgendamentos)): ?>
@@ -64,9 +141,9 @@ include_once __DIR__ . '/../partials/head_public.php';
                 foreach ($meusAgendamentos as $ag):
                     $bc = $badgeMap[$ag['status']] ?? 'badge--pending';
                     $sl = ucfirst($ag['status']);
-                    $ip = $ag['status'] === 'pendente';
+                    $ip = !in_array($ag['status'], ['cancelado', 'finalizado'], true);
                 ?>
-                    <div class="appt-card appt-card--<?= $ag['status'] ?>">
+                    <div class="appt-card appt-card--<?= $ag['status'] ?>" data-own-id="<?= (int) $ag['id'] ?>">
                         <div class="appt-card__icon"><i class="fa-solid fa-scissors"></i></div>
                         <div class="appt-card__info">
                             <h3 class="appt-card__servico"><?= htmlspecialchars($ag['servico']) ?></h3>
@@ -88,7 +165,7 @@ include_once __DIR__ . '/../partials/head_public.php';
                 <?php endforeach; ?>
             </div>
             <?php if ($totalPaginas > 1): ?>
-                <div class="pagination" style="margin-top:28px;">
+                <div class="pagination pagination--spaced">
                     <?php if ($pagina > 1): ?>
                         <a class="pagination-btn" href="?pagina=<?= $pagina - 1 ?>"><i class="fa-solid fa-chevron-left"></i></a>
                     <?php else: ?>
@@ -106,16 +183,11 @@ include_once __DIR__ . '/../partials/head_public.php';
             <?php endif; ?>
         <?php endif; ?>
     </section>
-</div>
+</main>
 
 <?php include_once __DIR__ . '/../partials/footer.php'; ?>
 <?php include __DIR__ . '/../partials/modais/modal-novo-agendamento.php'; ?>
-<?php include __DIR__ . '/../partials/modais/modal-cancelar-agendamento.php'; ?>
-<script src="<?= $rootPath ?>node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
-<script src="<?= $rootPath ?>assets/js/swal-theme.js"></script>
-<script src="<?= $rootPath ?>assets/js/public.js"></script>
-<script src="<?= $rootPath ?>assets/js/cart.js"></script>
-<script src="<?= $rootPath ?>assets/js/user-agendamentos.js"></script>
+<script src="<?= $rootPath ?>assets/js/public/agendamentos.js" defer></script>
 </body>
 
 </html>

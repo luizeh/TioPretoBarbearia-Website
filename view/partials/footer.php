@@ -5,7 +5,7 @@
       <img
         src="<?= $rootPath ?? '../' ?>assets/img/tiopretonb.png"
         alt="Tio Preto Barbearia"
-        onerror="this.style.display = 'none'" />
+        data-hide-on-error />
       <p>
         Tradição, estilo e cuidado em cada detalhe. A Tio Preto Barbearia é
         o seu espaço de confiança para sair sempre com o melhor visual.
