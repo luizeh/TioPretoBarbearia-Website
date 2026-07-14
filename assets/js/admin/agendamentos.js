@@ -657,3 +657,12 @@
     agendaButton.classList.remove("active");
   });
 })();
+
+// ── Navegação por data: pula para a semana da data escolhida ──
+(function () {
+  var input = document.querySelector(".agenda-goto-input");
+  if (!input) return;
+  input.addEventListener("change", function () {
+    if (input.value) window.location.href = "?data=" + input.value;
+  });
+})();

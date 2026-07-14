@@ -13,6 +13,7 @@ $modal_id           = $modal_id           ?? 'modal-cliente';
 $modal_title        = $modal_title        ?? 'Cliente';
 $modal_confirm_text = $modal_confirm_text ?? 'Salvar';
 $modal_use_fields   = $modal_use_fields   ?? false;
+$modal_show_senha   = $modal_show_senha   ?? false;
 
 if (!function_exists('_df')) {
     function _df(string $field, bool $use): string
@@ -53,6 +54,16 @@ if (!function_exists('_df')) {
                         <input class="modal-input" type="text" <?= _df('cidade', $modal_use_fields) ?> placeholder="Cidade" />
                     </div>
                 </div>
+                <?php if ($modal_show_senha): ?>
+                    <div class="modal-field" style="margin-top:8px">
+                        <label class="modal-label">Senha de acesso</label>
+                        <label style="display:flex;align-items:center;gap:8px;font-size:.875rem;color:var(--text-secondary,#94a3b8);margin-bottom:6px;cursor:pointer">
+                            <input type="checkbox" data-field="senha-padrao" checked style="width:16px;height:16px;cursor:pointer" />
+                            Usar senha padrão <code style="background:var(--surface-2,#1e293b);padding:1px 6px;border-radius:4px">12345678</code>
+                        </label>
+                        <input class="modal-input" type="password" <?= _df('senha', $modal_use_fields) ?> placeholder="Digite a senha personalizada" style="display:none" />
+                    </div>
+                <?php endif; ?>
             </form>
         </div>
         <div class="modal-footer">

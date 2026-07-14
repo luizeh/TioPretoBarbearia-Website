@@ -123,6 +123,47 @@
     });
   });
 
+  // ── Toggle de visibilidade (visível no site / só admin) ──
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest(".btn-action--visibilidade");
+    if (!button) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    var novoVisivel = button.dataset.visivel === "1" ? 0 : 1;
+    button.disabled = true;
+
+    post({ action: "visibilidade", id: button.dataset.id, visivel: novoVisivel }).then(function (result) {
+      button.disabled = false;
+      if (!result || !result.success) {
+        window.SwalTP.fire({
+          icon: "error",
+          title: "Erro",
+          text: (result && result.message) || "Não foi possível alterar a visibilidade.",
+        });
+        return;
+      }
+
+      button.dataset.visivel = String(novoVisivel);
+      var icon = button.querySelector("i");
+      if (icon) icon.className = "fa-solid " + (novoVisivel ? "fa-eye" : "fa-eye-slash");
+      button.title = novoVisivel
+        ? "Visível no site — clique para ocultar (só admin)"
+        : "Oculto (só admin) — clique para exibir no site";
+
+      var row = button.closest("tr");
+      if (row) row.classList.toggle("produto-oculto", !novoVisivel);
+
+      window.SwalTP.fire({
+        icon: "success",
+        title: novoVisivel ? "Produto visível no site" : "Produto oculto (só admin)",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+    });
+  });
+
   document.addEventListener("click", function (event) {
     var button = event.target.closest('[data-modal="modal-produto-ver"]');
     if (!button) return;

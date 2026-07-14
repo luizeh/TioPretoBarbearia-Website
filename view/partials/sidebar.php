@@ -46,3 +46,5 @@
         </a>
     </div>
 </aside>
+<!-- Overlay do menu mobile (fecha a sidebar ao clicar fora) -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>

@@ -116,8 +116,9 @@ $modal_id           = 'modal-cliente-criar';
 $modal_title        = 'Novo Cliente';
 $modal_confirm_text = 'Cadastrar';
 $modal_use_fields   = true;
+$modal_show_senha   = true;
 include __DIR__ . '/../partials/modais/modal-cliente-form.php';
-unset($modal_id, $modal_title, $modal_confirm_text, $modal_use_fields);
+unset($modal_id, $modal_title, $modal_confirm_text, $modal_use_fields, $modal_show_senha);
 
 $modal_id           = 'modal-cliente-editar';
 $modal_title        = 'Editar Cliente';

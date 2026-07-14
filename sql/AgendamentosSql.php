@@ -155,38 +155,35 @@ class AgendamentosSql
         return ['ids' => $ids, 'duracao' => $duracao, 'servicos' => $servicos];
     }
 
-    private static function validarPeriodo(string $data, string $horaInicio, int $duracao): array
+    private static function validarPeriodo(string $data, string $horaInicio, int $duracao, bool $bloquearPassado = false): array
     {
         $inicio = DateTime::createFromFormat('Y-m-d H:i', "$data $horaInicio");
         $erros = DateTime::getLastErrors();
         if (!$inicio || ($erros !== false && ($erros['warning_count'] || $erros['error_count']))) {
             throw new InvalidArgumentException('Data ou horário inválidos.');
         }
-        if ($inicio < new DateTime('today')) {
+        if ($bloquearPassado) {
+            // Cliente: não pode agendar em um horário que já passou (inclui horários de hoje).
+            if ($inicio < new DateTime()) {
+                throw new InvalidArgumentException('Não é possível agendar em um horário que já passou. Escolha um horário futuro.');
+            }
+        } elseif ($inicio < new DateTime('today')) {
             throw new InvalidArgumentException('Não é possível agendar em uma data passada.');
         }
         $fim = (clone $inicio)->modify("+$duracao minutes");
 
-        // Valida contra exceção de data específica (prioridade) ou padrão da semana
-        $excecoes = HorariosSql::buscarExcecoes([$data]);
-        if (isset($excecoes[$data])) {
-            $ex = $excecoes[$data];
-            if ($ex['fechado']) {
-                throw new InvalidArgumentException('A barbearia não atende neste dia.');
-            }
-            $diaSemana = (int) $inicio->format('N');
-            $padrao    = HorariosSql::buscarDia($diaSemana);
-            $abertura   = substr($ex['abertura']   ?? $padrao['abertura'],   0, 5);
-            $fechamento = substr($ex['fechamento'] ?? $padrao['fechamento'], 0, 5);
-        } else {
-            $diaSemana = (int) $inicio->format('N'); // 1=Seg … 7=Dom (ISO-8601)
-            $horario   = HorariosSql::buscarDia($diaSemana);
-            if ($horario['fechado']) {
-                throw new InvalidArgumentException('A barbearia não atende neste dia da semana.');
-            }
-            $abertura   = substr($horario['abertura'],   0, 5);
-            $fechamento = substr($horario['fechamento'], 0, 5);
+        // Resolve o horário efetivo da data com a prioridade
+        // exceção por data > período (dia inteiro) > padrão semanal.
+        $dia = HorariosSql::resolverDia($data);
+        if ($dia['fechado']) {
+            throw new InvalidArgumentException(
+                $dia['motivo']
+                    ? "A barbearia está fechada neste dia ({$dia['motivo']})."
+                    : 'A barbearia não atende neste dia.'
+            );
         }
+        $abertura   = substr($dia['abertura'],   0, 5);
+        $fechamento = substr($dia['fechamento'], 0, 5);
 
         if ($inicio->format('H:i') < $abertura || $fim->format('H:i') > $fechamento) {
             throw new InvalidArgumentException(
@@ -194,12 +191,8 @@ class AgendamentosSql
             );
         }
 
-        // Verifica bloqueios recorrentes (ex: almoço 12:00-13:00)
-        $diaSemanaFinal = (int) $inicio->format('N');
-        foreach (HorariosSql::buscarTodosBloqueios() as $bloqueio) {
-            if ($bloqueio['dia_semana'] !== null && (int) $bloqueio['dia_semana'] !== $diaSemanaFinal) {
-                continue;
-            }
+        // Bloqueios (recorrentes + faixas de período) já resolvidos para esta data.
+        foreach ($dia['bloqueios'] as $bloqueio) {
             $bInicio = substr($bloqueio['hora_inicio'], 0, 5);
             $bFim    = substr($bloqueio['hora_fim'],    0, 5);
             // Há sobreposição se o agendamento começa antes do fim do bloqueio E termina depois do início
@@ -246,7 +239,7 @@ class AgendamentosSql
         }
     }
 
-    public static function salvarComServicos(array $dados, ?int $id = null, ?int $usuarioId = null): int
+    public static function salvarComServicos(array $dados, ?int $id = null, ?int $usuarioId = null, bool $bloquearPassado = false): int
     {
         $data = trim((string) ($dados['data'] ?? ''));
         $horaInicio = trim((string) ($dados['hora_inicio'] ?? ''));
@@ -255,7 +248,7 @@ class AgendamentosSql
             $idsServicos = [(int) $dados['servico_id']];
         }
         $servicos = self::calcularDadosServicos($idsServicos);
-        [$inicio, $fim] = self::validarPeriodo($data, $horaInicio, $servicos['duracao']);
+        [$inicio, $fim] = self::validarPeriodo($data, $horaInicio, $servicos['duracao'], $bloquearPassado);
         $status = null;
         if ($id === null) {
             if ((int) ($dados['usuario_id'] ?? 0) <= 0) {

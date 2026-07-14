@@ -54,6 +54,20 @@ if ($method === 'POST') {
         ProdutosSql::excluirProduto($pdo, (int) $body['id']);
         helpers::resposta_json(true, 'Produto excluído com sucesso.', null, 200);
     }
+
+    if ($action === 'visibilidade') {
+        if (empty($body['id'])) {
+            helpers::resposta_json(false, 'ID do produto é obrigatório.', null, 400);
+        }
+        $visivel = !empty($body['visivel']);
+        ProdutosSql::definirVisibilidade($pdo, (int) $body['id'], $visivel);
+        helpers::resposta_json(
+            true,
+            $visivel ? 'Produto agora está visível no site.' : 'Produto oculto — visível apenas para admins.',
+            ['id' => (int) $body['id'], 'visivel' => $visivel ? 1 : 0],
+            200
+        );
+    }
 }
 
 helpers::resposta_json(false, 'Método ou ação não reconhecidos.', null, 400);

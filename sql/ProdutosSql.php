@@ -2,8 +2,13 @@
 
 class ProdutosSql
 {
-    public static function listarProdutos($pdo): array
+    /**
+     * Lista produtos. Se $apenasVisiveis for true, retorna só os marcados
+     * como visíveis no site (usado pelo catálogo público).
+     */
+    public static function listarProdutos($pdo, bool $apenasVisiveis = false): array
     {
+        $where = $apenasVisiveis ? 'WHERE p.visivel = 1' : '';
         $sql = "
             SELECT
                 p.id,
@@ -12,11 +17,13 @@ class ProdutosSql
                 p.descricao,
                 p.preco,
                 p.estoque,
+                p.visivel,
                 GROUP_CONCAT(DISTINCT t.nome ORDER BY t.nome SEPARATOR ', ') AS tags,
                 GROUP_CONCAT(DISTINCT t.id   ORDER BY t.id   SEPARATOR ',') AS tag_ids
             FROM produtos p
             LEFT JOIN produto_tags pt ON pt.produto_id = p.id
             LEFT JOIN tags t ON t.id = pt.tag_id
+            $where
             GROUP BY p.id
             ORDER BY p.nome
         ";
@@ -25,6 +32,15 @@ class ProdutosSql
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Define se um produto aparece no site (1) ou fica só para admins (0).
+     */
+    public static function definirVisibilidade($pdo, int $id, bool $visivel): void
+    {
+        $stmt = $pdo->prepare("UPDATE produtos SET visivel = :visivel WHERE id = :id");
+        $stmt->execute([':visivel' => $visivel ? 1 : 0, ':id' => $id]);
     }
 
     public static function adicionarProdutos($pdo, array $dados = [])

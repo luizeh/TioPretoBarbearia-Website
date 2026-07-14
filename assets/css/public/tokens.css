@@ -1,3 +1,6 @@
+/* ── BREAKPOINTS PADRÃO DO PROJETO (mobile-first) ──
+   xs ≤480 · sm ≤768 · md ≤1024 · lg ≤1280 · xl >1280 */
+
 :root {
   --gold: #c9963a;
   --gold-light: #e8b85a;

@@ -174,3 +174,71 @@ nav a.nav-active::after {
   gap: 4px;
 }
 
+/* ── HEADER: MENU MOBILE (hamburger) ── */
+.header-burger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.35rem;
+  color: var(--dark);
+  cursor: pointer;
+  padding: 8px;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .header-burger {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Nav vira um painel suspenso abaixo do header */
+  header nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    background: var(--white);
+    border-bottom: 2px solid var(--gold-light);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
+    padding: 6px 0;
+    max-height: calc(100vh - 76px);
+    overflow-y: auto;
+  }
+
+  header.nav-open nav {
+    display: flex;
+  }
+
+  header nav a {
+    padding: 15px 6vw;
+    font-size: 1.02rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header nav a:last-child {
+    border-bottom: none;
+  }
+
+  header nav a::after {
+    display: none;
+  }
+
+  /* Esconde o nome do usuário no mobile (mantém o avatar) para ganhar espaço */
+  .user-menu__name {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-logo .brand-text {
+    display: none;
+  }
+  .header-logo img {
+    height: 52px;
+  }
+}
+

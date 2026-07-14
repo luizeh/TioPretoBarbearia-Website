@@ -33,6 +33,61 @@
   pointer-events: none;
 }
 
+/* ── FECHADO / BLOQUEIO — célula estilo "Disponível" mas indisponível ── */
+.agenda-cell__fechado {
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.09);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2px 4px;
+  cursor: not-allowed;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* variação âmbar para bloqueios com nota do admin */
+.agenda-cell__fechado--bloqueio {
+  border-color: rgba(201, 150, 58, 0.4);
+  background: rgba(201, 150, 58, 0.13);
+  color: #8a6520;
+}
+
+/* ── DIA FECHADO — caixa única cobrindo toda a coluna ── */
+.agenda-cell--dia-fechado-col {
+  background: rgba(0, 0, 0, 0.055);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.agenda-cell--dia-fechado-col > span {
+  font-family: var(--font-display, serif);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.18);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  user-select: none;
+}
+
 /* ── STATS ROW ── */
 .agenda-stats {
   display: grid;
@@ -146,6 +201,55 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--dark);
+}
+
+/* ── Navegação por data (ir direto para uma semana) ── */
+.agenda-goto {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.agenda-goto > i {
+  font-size: 0.9rem;
+}
+
+.agenda-goto-input {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--dark);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.agenda-goto-input:hover {
+  border-color: var(--gold);
+}
+
+.agenda-goto-hoje {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-condensed);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.agenda-goto-hoje:hover {
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .agenda-day-actions {
@@ -459,8 +563,8 @@
   }
 
   .agenda-grid {
-    grid-template-columns: 52px repeat(6, 112px);
-    min-width: 724px;
+    grid-template-columns: 52px repeat(7, 112px);
+    min-width: 836px;
   }
 
   .agenda-corner,
@@ -914,4 +1018,18 @@
 }
 .agenda-appt--slots-24 {
   --slots: 24;
+}
+
+/* ── Agenda do cliente: nº de colunas conforme os dias abertos ──
+   Dias totalmente fechados são ocultados (não viram coluna), então o total de
+   colunas é dinâmico via --agenda-dias. O admin continua usando .agenda-grid (7 dias). */
+.agenda-grid--cliente {
+  grid-template-columns: 54px repeat(var(--agenda-dias, 7), minmax(110px, 1fr));
+}
+
+@media (max-width: 640px) {
+  .agenda-grid--cliente {
+    grid-template-columns: 52px repeat(var(--agenda-dias, 7), 112px);
+    min-width: calc(52px + var(--agenda-dias, 7) * 112px);
+  }
 }

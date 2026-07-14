@@ -96,6 +96,11 @@ include __DIR__ . '/../partials/head.php';
                 <div class="agenda-nav">
                     <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('-7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-left"></i></a>
                     <span class="agenda-nav__label">Semana de <?= $weekLabel ?></span>
+                    <div class="agenda-goto">
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <input type="date" class="agenda-goto-input" lang="pt-BR" value="<?= date('Y-m-d', $weekStart) ?>" title="Escolha uma data para ir direto à semana dela" aria-label="Ir para uma data">
+                        <a class="agenda-goto-hoje" href="?data=<?= date('Y-m-d') ?>">Hoje</a>
+                    </div>
                     <div class="agenda-day-actions">
                         <label for="agenda-lembrete-data">Dia</label>
                         <input type="date" id="agenda-lembrete-data" lang="pt-BR" value="<?= htmlspecialchars($selectedDate) ?>">
@@ -146,29 +151,68 @@ include __DIR__ . '/../partials/head.php';
                                 $slots[] = sprintf('%02d:%02d', $hour, $minute);
                             }
                         }
+                        // ── Overlay de indisponibilidade (caixa única) ──
+                        // Mesma formatação para "dia fechado" e "fora do expediente":
+                        // dia inteiro fechado vira uma coluna cheia; nos dias abertos, os
+                        // trechos antes da abertura e depois do fechamento recebem a mesma
+                        // caixa. O miolo (dentro do expediente) fica normal.
+                        $totalSlots = count($slots);
+                        foreach ($weekDays as $_dIdx => $_dDay):
+                            $_hD  = $horariosMap[$_dDay] ?? null;
+                            $_col = $_dIdx + 2;
+                            if ($_hD && $_hD['fechado']) {
+                                $_rotulo = !empty($_hD['motivo']) ? htmlspecialchars($_hD['motivo']) : 'Fechado';
+                                echo '<div class="agenda-cell--dia-fechado-col" style="grid-column:' . $_col . ';grid-row:2/span ' . $totalSlots . '"><span>' . $_rotulo . '</span></div>';
+                                continue;
+                            }
+                            $_abertura = $_hD ? substr($_hD['abertura'],   0, 5) : '08:00';
+                            $_fecho    = $_hD ? substr($_hD['fechamento'], 0, 5) : '20:00';
+                            // Trecho antes da abertura
+                            $_antes = 0;
+                            foreach ($slots as $_s) {
+                                if ($_s < $_abertura) $_antes++;
+                                else break;
+                            }
+                            if ($_antes > 0) {
+                                $_lbl = $_antes >= 3 ? '<span>Fechado</span>' : '';
+                                echo '<div class="agenda-cell--dia-fechado-col" style="grid-column:' . $_col . ';grid-row:2/span ' . $_antes . '">' . $_lbl . '</div>';
+                            }
+                            // Trecho depois do fechamento
+                            $_inicioDepois = null;
+                            foreach ($slots as $_i => $_s) {
+                                if ($_s >= $_fecho) { $_inicioDepois = $_i; break; }
+                            }
+                            if ($_inicioDepois !== null) {
+                                $_depois = $totalSlots - $_inicioDepois;
+                                $_lbl = $_depois >= 3 ? '<span>Fechado</span>' : '';
+                                echo '<div class="agenda-cell--dia-fechado-col" style="grid-column:' . $_col . ';grid-row:' . ($_inicioDepois + 2) . '/span ' . $_depois . '">' . $_lbl . '</div>';
+                            }
+                        endforeach;
                         foreach ($slots as $slotTime):
                             $isHalf = (int) substr($slotTime, -2) === 30;
                             echo '<div class="agenda-hour' . ($isHalf ? ' agenda-hour--half' : '') . '">' . $slotTime . '</div>';
                             foreach ($weekDays as $day):
                                 $hDia        = $horariosMap[$day] ?? null;
                                 $diaFechado  = $hDia && $hDia['fechado'];
+                                if ($diaFechado) continue; // overlay explícito cobre a coluna
                                 $abertura    = $hDia ? substr($hDia['abertura'],   0, 5) : '08:00';
                                 $fecho       = $hDia ? substr($hDia['fechamento'], 0, 5) : '20:00';
-                                $foraDaHora  = !$diaFechado && ($slotTime < $abertura || $slotTime >= $fecho);
+                                if ($slotTime < $abertura || $slotTime >= $fecho) continue; // overlay fora-de-expediente cobre a célula
                                 $emBloqueio  = false;
-                                if (!$diaFechado && !$foraDaHora) {
-                                    foreach (($hDia['bloqueios'] ?? []) as $blq) {
-                                        if ($slotTime >= substr($blq['hora_inicio'], 0, 5) && $slotTime < substr($blq['hora_fim'], 0, 5)) {
-                                            $emBloqueio = true;
-                                            break;
-                                        }
+                                $bloqueioDesc = '';
+                                foreach (($hDia['bloqueios'] ?? []) as $blq) {
+                                    if ($slotTime >= substr($blq['hora_inicio'], 0, 5) && $slotTime < substr($blq['hora_fim'], 0, 5)) {
+                                        $emBloqueio  = true;
+                                        $bloqueioDesc = $blq['descricao'] ?? '';
+                                        break;
                                     }
                                 }
                                 $cellAppointments = $agendaMap[$day][$slotTime] ?? [];
                                 $inicioAppointments = array_filter($cellAppointments, static fn(array $appointment): bool => empty($appointment['continuacao']));
                                 echo '<div class="agenda-cell' . ($day === date('Y-m-d') ? ' today' : '') . '" data-date="' . $day . '" data-time="' . $slotTime . '">';
-                                if ($diaFechado || $foraDaHora || $emBloqueio) {
-                                    echo '<div class="agenda-cell--fora-horario" aria-hidden="true"></div>';
+                                if ($emBloqueio) {
+                                    $label = htmlspecialchars($bloqueioDesc ?: 'Indisponível');
+                                    echo '<div class="agenda-cell__fechado agenda-cell__fechado--bloqueio" aria-hidden="true">' . $label . '</div>';
                                 } elseif (!empty($inicioAppointments)) {
                                     foreach ($inicioAppointments as $appointment):
                                         $durationMinutes = (int) ($appointment['duracao_minutos'] ?? 30);

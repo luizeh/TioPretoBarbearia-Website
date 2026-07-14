@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS produtos (
     preco     DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
     estoque   INT            NOT NULL DEFAULT 0,
     foto_url  VARCHAR(500)   NULL,
+    visivel   TINYINT(1)     NOT NULL DEFAULT 1 COMMENT '1 = visível no site; 0 = só admin',
 
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -317,14 +318,38 @@ CREATE TABLE IF NOT EXISTS horarios_excecoes (
 --     dia_semana NULL = aplica a todos os dias da semana
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS horarios_bloqueios (
-    id          INT          NOT NULL AUTO_INCREMENT,
-    dia_semana  TINYINT      NULL     COMMENT 'NULL = todo dia; 1=Seg … 7=Dom (ISO-8601)',
-    hora_inicio TIME         NOT NULL,
-    hora_fim    TIME         NOT NULL,
-    descricao   VARCHAR(100) NULL,
+    id           INT          NOT NULL AUTO_INCREMENT,
+    dia_semana   TINYINT      NULL     COMMENT 'NULL = todo dia; 1=Seg … 7=Dom (ISO-8601)',
+    dias_excecao VARCHAR(20)  NULL     COMMENT 'Dias ISO excluídos quando dia_semana IS NULL, ex: "6" ou "6,7"',
+    hora_inicio  TIME         NOT NULL,
+    hora_fim     TIME         NOT NULL,
+    descricao    VARCHAR(100) NULL,
 
     PRIMARY KEY (id),
     INDEX idx_bloqueios_dia (dia_semana)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+-- 18. horarios_periodos
+--     Bloqueios por período (intervalo de datas) — ex.: férias.
+--     hora_inicio/hora_fim NULL  = fecha o dia inteiro em todo o intervalo.
+--     hora_inicio/hora_fim setados = fecha apenas essa faixa em cada dia do intervalo.
+--     Prioridade de resolução por data:
+--       horarios_excecoes (data específica) > horarios_periodos > horarios_funcionamento.
+--     Assim uma exceção por data pode reabrir um dia dentro de um período fechado.
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS horarios_periodos (
+    id          INT          NOT NULL AUTO_INCREMENT,
+    data_inicio DATE         NOT NULL,
+    data_fim    DATE         NOT NULL,
+    hora_inicio TIME         NULL     COMMENT 'NULL = dia inteiro fechado; senão fecha só esta faixa',
+    hora_fim    TIME         NULL,
+    descricao   VARCHAR(150) NULL,
+
+    PRIMARY KEY (id),
+    INDEX idx_periodos_datas (data_inicio, data_fim)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
+
+

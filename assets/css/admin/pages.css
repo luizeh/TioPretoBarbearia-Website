@@ -52,12 +52,17 @@
   justify-content: center;
   cursor: pointer;
   color: var(--text-muted);
-  font-size: .65rem;
+  font-size: 0.65rem;
   padding: 0;
-  transition: background .15s, color .15s, border-color .15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
-.btn-horario-dia__txt { display: none; }
+.btn-horario-dia__txt {
+  display: none;
+}
 
 .btn-horario-dia:hover {
   background: var(--gold);
@@ -163,6 +168,41 @@
   margin-bottom: 28px;
 }
 
+/* Chips de dias (exceção em "todos os dias") */
+.bloqueio-dias-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.dia-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--white);
+  font-family: var(--font-condensed);
+  font-size: 0.82rem;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.dia-chip input {
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.dia-chip:has(input:checked) {
+  border-color: var(--gold);
+  background: rgba(201, 150, 58, 0.1);
+}
+
 .bloqueio-form-title {
   font-family: var(--font-condensed);
   font-size: 1rem;
@@ -262,6 +302,7 @@
 
 .horarios-table-wrap {
   padding: 0 0 16px;
+  overflow-x: auto;
 }
 
 .horarios-table .horario-input {
@@ -285,11 +326,30 @@
   cursor: not-allowed;
 }
 
+.horario-row--fechado {
+  background: rgba(0, 0, 0, 0.045);
+}
 .horario-row--fechado td {
-  opacity: 0.6;
+  opacity: 1;
 }
 .horario-row--fechado .horario-dia-nome {
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 500;
   opacity: 1;
+}
+.horario-row--fechado .horario-input {
+  opacity: 0.18;
+  background: transparent;
+  border-color: transparent;
+  color: var(--text);
+}
+.horario-row--fechado .horario-toggle__label {
+  font-family: var(--font-condensed, sans-serif);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.38);
 }
 
 /* Toggle switch */
@@ -619,5 +679,183 @@
 @media (max-width: 900px) {
   .report-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ── VISIBILIDADE DE PRODUTO (toggle) ── */
+.btn-action--visibilidade[data-visivel="1"] {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+.btn-action--visibilidade[data-visivel="0"] {
+  background: rgba(107, 114, 128, 0.14);
+  color: #6b7280;
+}
+.btn-action--visibilidade:hover {
+  filter: brightness(0.95);
+}
+
+/* Linha de produto oculto fica esmaecida (menos a coluna de ações) */
+.produto-oculto td {
+  opacity: 0.55;
+}
+.produto-oculto td:last-child {
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════════
+   RESPONSIVO — painel admin (tabelas e páginas)
+   ════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Cabeçalho do card: título + busca/ações empilham */
+  .dashboard-card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  /* Campo de busca e filtro de data ocupam a largura toda */
+  .table-search-wrap {
+    width: 100%;
+  }
+  .table-search {
+    width: 100%;
+  }
+  .table-date-filter {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Tabelas: rolagem lateral suave + células mais compactas */
+  .table-wrapper {
+    -webkit-overflow-scrolling: touch;
+  }
+  .dash-table thead th,
+  .dash-table tbody td {
+    padding: 12px 14px;
+    font-size: 0.82rem;
+  }
+
+  /* Alvo de toque maior nos botões de ação */
+  .btn-action {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* Banner de estatística compacto */
+  .clientes-stat-banner {
+    padding: 14px 18px;
+    gap: 12px;
+  }
+  .clientes-stat-banner__count {
+    font-size: 1.8rem;
+  }
+
+  /* Título grande de página */
+  .page-title--lg {
+    font-size: 1.7rem;
+  }
+
+  /* Editor do site em 1 coluna, sem estourar */
+  .site-editor-fields {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+  .site-editor-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Horários / bloqueios ocupam a largura */
+  .bloqueio-section {
+    padding: 0 16px 20px;
+  }
+  .bloqueio-form-box {
+    padding: 16px;
+  }
+  .bloqueio-form-field--wide {
+    grid-column: 1 / -1;
+  }
+  .horarios-table .horario-input {
+    width: 100%;
+    min-width: 88px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-table thead th,
+  .dash-table tbody td {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+
+  /* Alternador de visão (Lista/Agenda, Produtos/Pedidos) ocupa a linha */
+  .view-toggle {
+    width: 100%;
+  }
+  .view-toggle__btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+  }
+
+  .clientes-stat-banner__count {
+    font-size: 1.6rem;
+  }
+  .clientes-stat-banner__label {
+    font-size: 0.78rem;
+  }
+}
+
+/* ── HORÁRIOS: no celular a tabela semanal vira cartões ──
+   Evita rolagem lateral e garante que o toggle Aberto/Fechado apareça. */
+@media (max-width: 640px) {
+  #tbl-horarios thead {
+    display: none;
+  }
+  #tbl-horarios tbody,
+  #tbl-horarios tr,
+  #tbl-horarios td {
+    display: block;
+    width: 100%;
+  }
+  #tbl-horarios tr {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  #tbl-horarios td {
+    padding: 7px 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #tbl-horarios td[data-label]::before {
+    content: attr(data-label);
+    font-family: var(--font-condensed);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  #tbl-horarios .horario-dia-nome {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding-bottom: 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  #tbl-horarios .horario-input {
+    width: 132px;
+  }
+  #tbl-horarios .horario-salvar {
+    width: 100%;
+    justify-content: center;
   }
 }

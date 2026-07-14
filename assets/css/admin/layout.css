@@ -9,6 +9,7 @@
   left: 0;
   width: var(--sidebar-w);
   height: 100vh;
+  height: 100dvh; /* usa a altura visível real no mobile (não corta o rodapé/Sair) */
   background: var(--dark);
   display: flex;
   flex-direction: column;
@@ -112,6 +113,7 @@
 .main-wrapper {
   margin-left: var(--sidebar-w);
   flex: 1;
+  min-width: 0; /* permite o wrapper encolher no flex; evita rolagem lateral da página */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -208,6 +210,29 @@
   line-height: 1.1;
 }
 
+/* ── OVERLAY do menu mobile ── */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150; /* abaixo da sidebar (200), acima do conteúdo/topbar */
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.sidebar-overlay--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Trava o scroll do fundo enquanto o menu mobile está aberto */
+body.sidebar-lock {
+  overflow: hidden;
+}
+
 /* ── RESPONSIVO — layout ── */
 @media (max-width: 768px) {
   .sidebar {
@@ -216,6 +241,7 @@
 
   .sidebar--open {
     transform: translateX(0);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
   }
 
   .main-wrapper {
@@ -232,5 +258,31 @@
 
   .page-content {
     padding: 20px 16px 40px;
+    max-width: 100%;
+  }
+
+  /* Logo da sidebar mais compacta no mobile (cabe tudo, sem cortar o rodapé) */
+  .sidebar-logo {
+    padding: 18px 16px;
+  }
+  .sidebar-logo img {
+    height: 76px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .page-title,
+  .page-title--lg {
+    font-size: 1.6rem;
+  }
+}
+
+/* No desktop o overlay nunca deve aparecer (a sidebar é fixa) */
+@media (min-width: 769px) {
+  .sidebar-overlay {
+    display: none;
   }
 }

@@ -111,3 +111,55 @@
   color: var(--gold);
 }
 
+/* ── LANDING: hero no mobile ──
+   No celular a imagem da barbearia vira o FUNDO do hero (não fica jogada
+   embaixo), com um overlay escuro para o texto continuar legível — mantendo
+   a mesma presença visual do desktop. */
+@media (max-width: 900px) {
+  .hero--landing {
+    position: relative;
+  }
+
+  .hero--landing .hero-image-side {
+    display: block;
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    z-index: 0;
+  }
+
+  .hero--landing .hero-image-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero--landing .hero-image-side .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(26, 26, 26, 0.82),
+      rgba(26, 26, 26, 0.72)
+    );
+  }
+
+  .hero--landing .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-brand img {
+    height: 170px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-brand img {
+    height: 130px;
+  }
+  .hero-brand {
+    margin-bottom: 18px;
+  }
+}
+

@@ -119,6 +119,10 @@ $notificacoesNaoLidas = count(array_filter($notificacoesHeader, static fn(array 
                 <a href="<?= $linkBase ?>login.php" class="btn-header-login">Entrar</a>
             <?php endif; ?>
         </div>
+
+        <button class="header-burger" id="mobileMenuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+            <i class="fa-solid fa-bars"></i>
+        </button>
     </div>
 </header>
 <script src="<?= $rootPath ?>assets/js/public/cart-menu.js" defer></script>

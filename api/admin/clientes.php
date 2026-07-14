@@ -47,6 +47,7 @@ if ($method === 'POST') {
         }
         if (isset($body['telefone'])) $body['telefone'] = helpers::normalizarTelefone($body['telefone']);
         ClientesSql::editar((int) $body['id'], $body);
+        LogsSql::registrar((int) $_SESSION['usuario_id'], 'conta_editada', "Dados do cliente #{$body['id']} editados pelo administrador.");
         helpers::resposta_json(true, 'Cliente atualizado com sucesso.', null, 200);
     }
 
@@ -54,7 +55,9 @@ if ($method === 'POST') {
         if (empty($body['id'])) {
             helpers::resposta_json(false, 'ID do cliente é obrigatório.', null, 400);
         }
-        ClientesSql::excluir((int) $body['id']);
+        $clienteId = (int) $body['id'];
+        ClientesSql::excluir($clienteId);
+        LogsSql::registrar((int) $_SESSION['usuario_id'], 'conta_excluida', "Conta do cliente #{$clienteId} excluída pelo administrador.");
         helpers::resposta_json(true, 'Cliente excluído com sucesso.', null, 200);
     }
 }

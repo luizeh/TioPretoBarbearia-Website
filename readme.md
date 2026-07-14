@@ -1,487 +1,227 @@
-# Sistema CRUD para Barbearia – Documento de Visão Geral do Projeto
+<div align="center">
 
-## Visão Geral
+# 💈 Tio Preto Barbearia
 
-O projeto consiste no desenvolvimento de um sistema web completo para gerenciamento de uma barbearia. O objetivo é facilitar tanto a experiência dos clientes quanto a administração do estabelecimento, centralizando agendamentos, vendas de produtos, gerenciamento de serviços, horários de funcionamento e comunicação com os clientes.
+### Sistema web full-stack para gestão de uma barbearia real — agendamentos, loja e painel administrativo.
 
-O sistema possuirá dois tipos de usuários:
+![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-* Cliente
-* Administrador
-
-Cada perfil terá permissões específicas, garantindo segurança e organização das funcionalidades.
-
----
-
-# Fluxo Geral do Sistema
-
-## Primeiro acesso
-
-Ao acessar o endereço da aplicação, o visitante visualizará a página inicial da barbearia.
-
-A página apresentará:
-
-* Nome da barbearia
-* Banner principal
-* Fotos do estabelecimento
-* Pequena apresentação
-* Horário de funcionamento
-* Botões para Login e Cadastro
-
-Caso o usuário ainda não possua uma conta, poderá realizar seu cadastro.
+</div>
 
 ---
 
-# Cadastro
+## 📑 Índice
 
-Para criar uma conta serão solicitados os seguintes dados:
-
-* Nome
-* Sobrenome
-* Número de telefone
-* E-mail
-* Senha
-* Cidade onde mora
-
-Após concluir o cadastro:
-
-* os dados serão validados;
-* a senha será criptografada antes de ser armazenada;
-* o usuário receberá automaticamente a permissão de Cliente;
-* uma sessão será iniciada e o usuário poderá utilizar o sistema.
+- [Sobre o projeto](#-sobre-o-projeto)
+- [Funcionalidades](#-funcionalidades)
+- [Tecnologias](#-tecnologias)
+- [Arquitetura](#-arquitetura)
+- [Estrutura de pastas](#-estrutura-de-pastas)
+- [Banco de dados](#-banco-de-dados)
+- [Regras de negócio em destaque](#-regras-de-negócio-em-destaque)
+- [Como rodar localmente](#-como-rodar-localmente)
+- [Convenções do projeto](#-convenções-do-projeto)
+- [Licença](#-licença)
 
 ---
 
-# Login
+## 📖 Sobre o projeto
 
-O login será realizado utilizando:
+**Tio Preto Barbearia** (Douradina‑PR) é um sistema web que centraliza toda a operação de uma barbearia:
 
-* E-mail
-* Senha
+- ✂️ **Agendamento de serviços** pelos clientes, com agenda semanal visual
+- 🛒 **Loja de produtos** com carrinho e pedidos
+- 🛠️ **Painel administrativo** completo (clientes, serviços, produtos, agenda, horários)
+- 💬 **Lembretes via WhatsApp** (API externa)
+- 📝 **Editor de conteúdo** da landing page e do rodapé
 
-Após autenticação:
-
-Se for Cliente:
-
-* será direcionado para a área do cliente.
-
-Se for Administrador:
-
-* será direcionado para o Dashboard Administrativo.
-
-Todo o controle de permissões será realizado através da sessão do usuário.
+> ⚠️ **Não há integração de pagamento** — os pedidos ficam aguardando confirmação manual do administrador.
 
 ---
 
-# Área do Cliente
+## ✨ Funcionalidades
 
-Após entrar no sistema, o cliente terá acesso ao menu principal.
+### 👤 Área do cliente
+- Cadastro e login com senha criptografada (`bcrypt`)
+- Agenda semanal com horários **disponíveis / indisponíveis / fechados**
+- Criação, edição e cancelamento dos próprios agendamentos (multi‑serviço)
+- Bloqueio de horários que já passaram e de dias fechados
+- Carrinho de compras e finalização de pedidos
+- Notificações e edição de perfil
 
-As funcionalidades disponíveis serão:
-
-* Página Inicial
-* Agenda
-* Produtos
-* Carrinho
-* Meus Agendamentos
-* Meus Pedidos
-* Meu Perfil
-* Logout
-
----
-
-# Perfil do Cliente
-
-O cliente poderá visualizar e editar:
-
-* Nome
-* Sobrenome
-* Cidade
-* Telefone
-* Senha
-
-O e-mail continuará sendo utilizado como identificador da conta.
+### 🛠️ Área administrativa
+- **Dashboard** com estatísticas (clientes, agendamentos do dia, receita, etc.)
+- **Agenda semanal** com visão de calendário + lista, e envio de lembretes
+- **CRUD** de clientes, serviços, produtos (com upload de imagem) e tags
+- **Gestão de horários de funcionamento** por dia da semana
+- **Bloqueios recorrentes** (ex.: almoço) — inclusive *"todos os dias, exceto X"*
+- **Bloqueios por período** (ex.: férias) — dia inteiro ou faixa de horário, com exceções por data
+- **Editor do site** (textos da landing page e rodapé)
 
 ---
 
-# Sistema de Serviços
+## 🧰 Tecnologias
 
-Todos os serviços serão cadastrados exclusivamente pelo administrador.
-
-Cada serviço possuirá:
-
-* Nome
-* Foto
-* Descrição
-* Preço
-* Tempo estimado em minutos
-
-Exemplos:
-
-* Corte Masculino
-* Barba
-* Corte + Barba
-* Hidratação
-* Pigmentação
-
-Esses serviços ficarão disponíveis para seleção durante o agendamento.
+| Camada              | Tecnologia                                                       |
+| ------------------- | ---------------------------------------------------------------- |
+| Backend             | **PHP** (sem framework, MVC simplificado)                        |
+| Banco de dados      | **MySQL 8** via **PDO** (prepared statements)                    |
+| Servidor local      | **XAMPP** (MySQL na porta **3307**)                              |
+| Frontend            | **HTML5**, **CSS3**, **JavaScript vanilla**                      |
+| Alertas / modais    | **SweetAlert2 v11** (via npm)                                    |
+| Ícones              | **Font Awesome 6.5**                                             |
+| Fontes              | Google Fonts — Playfair Display, Barlow, Barlow Condensed        |
+| Mensagens           | API WhatsApp (r4dev)                                             |
 
 ---
 
-# Sistema de Agenda
+## 🏛️ Arquitetura
 
-Esta será a principal funcionalidade do sistema.
+Arquitetura **MVC simplificada, sem framework**:
 
-O cliente poderá navegar por um calendário e visualizar os dias disponíveis.
+```
+Browser ──▶ view/**.php          (páginas renderizadas no servidor)
+              │  └─ guard de sessão (require_admin.php / session.php)
+              │  └─ controllers/*.controller.php  (prepara dados)
+              │        └─ sql/*Sql.php (DAOs) ──▶ config/Connection.php (PDO singleton)
+              │
+              └─ JS (fetch) ──▶ api/**.php  ──▶ DAOs ──▶ helpers::resposta_json()
+```
 
-Ao selecionar uma data, o sistema consultará:
+- **`config/Connection.php`** — conexão PDO (padrão *Singleton*)
+- **`sql/*Sql.php`** — DAOs, uma classe por entidade
+- **`controllers/*`** — carregam dados e expõem variáveis para as views
+- **`api/*`** — endpoints HTTP que **sempre** retornam o mesmo envelope JSON:
 
-* horário de funcionamento da barbearia;
-* agendamentos existentes;
-* duração dos serviços.
-
-A partir dessas informações serão exibidos apenas horários disponíveis.
-
-Exemplo:
-
-Horário da barbearia:
-
-08:00 às 18:00
-
-Serviço escolhido:
-
-Corte + Barba
-
-Tempo:
-
-60 minutos
-
-Horários disponíveis:
-
-* 08:00
-* 09:00
-* 10:00
-* 11:00
-
-Caso outro cliente reserve às 09:00, o sistema bloqueará automaticamente o período correspondente.
-
-Se a barbearia estiver fechada em determinado dia, toda a agenda exibirá "Fechado".
+```json
+{ "success": true, "message": "Texto ao usuário", "data": null }
+```
 
 ---
 
-# Meus Agendamentos
+## 📂 Estrutura de pastas
 
-O cliente poderá visualizar:
-
-* serviço escolhido;
-* data;
-* horário;
-* status;
-* duração.
-
-Status possíveis:
-
-* Pendente
-* Confirmado
-* Cancelado
-* Finalizado
-
-Caso permitido pela regra da barbearia, o cliente poderá cancelar um agendamento antes do horário marcado.
-
----
-
-# Loja de Produtos
-
-O sistema também possuirá uma pequena loja virtual.
-
-O administrador poderá cadastrar produtos.
-
-Cada produto terá:
-
-* Nome
-* Foto
-* Descrição
-* Preço
-* Estoque
-* Tags
-
-Exemplos de tags:
-
-* Pomada
-* Shampoo
-* Barba
-* Perfume
-
-Os produtos serão exibidos em forma de catálogo.
+```
+tiopretobarbearia-crud/
+├── index.php                  → redireciona para view/index.php
+├── config/
+│   └── Connection.php         → conexão PDO (singleton)
+├── helpers/
+│   └── helpers.php            → validações + resposta_json + guards
+├── sql/
+│   ├── *Sql.php               → DAOs (Agendamentos, Clientes, Horarios, ...)
+│   └── migrations/
+│       └── 000_schema_completo.sql   → schema completo do banco
+├── controllers/               → preparam dados para as views
+├── api/
+│   ├── auth/                  → login, cadastro, logout, guards de sessão
+│   ├── admin/                 → endpoints do painel (CRUD, horários, whatsapp)
+│   ├── user/                  → endpoints do cliente (agenda, carrinho, pedidos)
+│   └── produtos/              → upload de imagens
+├── view/
+│   ├── index.php · login.php · cadastro.php · catalogo.php
+│   ├── admin/                 → dashboard, agendamentos, horários, produtos...
+│   ├── user/                  → agenda, carrinho, pedidos, perfil...
+│   └── partials/              → head, sidebar, topbar, modais reutilizáveis
+└── assets/
+    ├── css/    (admin · public · auth · shared)
+    ├── js/     (admin · public · auth)
+    └── img/produtos/          → imagens enviadas
+```
 
 ---
 
-# Carrinho
+## 🗄️ Banco de dados
 
-O cliente poderá adicionar produtos ao carrinho.
+Database: **`tiopretobarbearia`** · Charset `utf8mb4`. Principais tabelas:
 
-Cada item armazenará:
-
-* Produto
-* Quantidade
-* Valor unitário
-* Valor total
-
-Será possível:
-
-* alterar quantidade;
-* remover itens;
-* limpar o carrinho.
-
-O valor total será atualizado automaticamente.
-
----
-
-# Finalização da Compra
-
-Ao clicar em "Encomendar", o sistema solicitará:
-
-* endereço de entrega.
-
-Neste momento será criado um Pedido.
-
-Como o projeto é acadêmico, não haverá integração com sistemas de pagamento.
-
-O pedido permanecerá aguardando confirmação do administrador.
+| Tabela                   | Descrição                                                        |
+| ------------------------ | ---------------------------------------------------------------- |
+| `usuarios`               | Clientes e admins (`admin` = 0/1), senha em `bcrypt`             |
+| `servicos`               | Serviços oferecidos (preço, duração)                             |
+| `agendamentos`           | Agendamentos (com status e observações)                          |
+| `agendamento_servicos`   | Relação N:N — múltiplos serviços por agendamento                 |
+| `produtos` / `tags`      | Produtos da loja e categorias                                    |
+| `carrinho` / `_itens`    | Carrinho por usuário                                             |
+| `pedidos` / `_itens`     | Pedidos com *snapshot* de preço                                  |
+| `notificacoes` / `logs`  | Notificações ao cliente e trilha de auditoria                    |
+| `site_config`            | Textos editáveis da landing/rodapé                               |
+| `horarios_funcionamento` | Padrão semanal (1=Seg … 7=Dom, ISO‑8601)                         |
+| `horarios_excecoes`      | Exceção por **data específica**                                  |
+| `horarios_bloqueios`     | Bloqueios recorrentes intra‑dia (com exceção de dias)            |
+| `horarios_periodos`      | Bloqueios por **período** (ex.: férias)                          |
 
 ---
 
-# Meus Pedidos
+## 🎯 Regras de negócio em destaque
 
-O cliente poderá acompanhar seus pedidos.
+- 🕐 **`hora_fim` calculada em SQL** somando a duração dos serviços do agendamento
+- 🔒 **Cliente não agenda em horário passado** nem em dias/faixas indisponíveis
+- 🧠 **Resolução de disponibilidade por prioridade:**
 
-Cada pedido exibirá:
+  ```
+  exceção por data  ▸  período (férias)  ▸  padrão semanal
+  ```
 
-* produtos;
-* quantidade;
-* valor total;
-* endereço;
-* data;
-* status.
-
-Status possíveis:
-
-* Recebido
-* Preparando
-* Pronto
-* Entregue
-* Cancelado
+  Ou seja, uma exceção por data pode **reabrir** um dia dentro das férias.
+- 🚫 **Bloqueios flexíveis:** recorrentes (ex.: almoço), *"todos os dias exceto sábado"* e por período (dia inteiro ou faixa de horário)
+- 🖼️ **Upload seguro de imagens:** valida MIME real (`finfo`), nome aleatório, máx. 2 MB
+- 🔐 **Segurança:** PDO com *prepared statements*, `htmlspecialchars` nas views, guards de sessão e validação de input em todas as camadas
 
 ---
 
-# Dashboard Administrativo
+## 🚀 Como rodar localmente
 
-Após o login como administrador, será exibido um painel contendo indicadores importantes.
+### Pré‑requisitos
+- [XAMPP](https://www.apachefriends.org/) (Apache + MySQL) — MySQL configurado na porta **3307**
+- [Node.js](https://nodejs.org/) (apenas para instalar o SweetAlert2)
 
-Exemplos:
+### Passo a passo
 
-* total de clientes cadastrados;
-* serviços cadastrados;
-* produtos cadastrados;
-* pedidos pendentes;
-* agendamentos do dia;
-* faturamento estimado.
+```bash
+# 1. Clone o repositório dentro de htdocs
+git clone <url-do-repo> tiopretobarbearia-crud
+cd tiopretobarbearia-crud
 
-Também poderá haver gráficos estatísticos.
+# 2. Instale as dependências de front (SweetAlert2)
+npm install
 
----
+# 3. Crie o banco de dados e importe o schema
+mysql -h 127.0.0.1 -P 3307 -u root -e "CREATE DATABASE IF NOT EXISTS tiopretobarbearia CHARACTER SET utf8mb4;"
+mysql -h 127.0.0.1 -P 3307 -u root tiopretobarbearia < sql/migrations/000_schema_completo.sql
+```
 
-# Gerenciamento de Clientes
+### Acesso
 
-O administrador poderá:
+```
+🌐 http://localhost/tiopretobarbearia-crud/
+```
 
-* visualizar clientes;
-* pesquisar clientes;
-* editar informações;
-* desativar contas.
-
-Também será possível visualizar:
-
-* histórico de pedidos;
-* histórico de agendamentos.
+> **Conexão padrão** (`config/Connection.php`): host `localhost`, porta `3307`, usuário `root`, senha vazia. Ajuste conforme o seu ambiente.
 
 ---
 
-# Gerenciamento de Serviços
+## 📐 Convenções do projeto
 
-O administrador poderá:
-
-* criar serviços;
-* editar serviços;
-* excluir serviços.
-
-Ao alterar um serviço, os novos valores serão utilizados apenas em futuros agendamentos.
+- Endpoints de API **sempre** retornam JSON via `helpers::resposta_json()`
+- Tratamento de erros por tipo: `InvalidArgumentException` → **422**, `RuntimeException` → **409**, `Throwable` → **500**
+- Ações `POST` usam o campo **`action`** no corpo JSON (`criar`, `editar`, `excluir`, `status`, ...)
+- Dias da semana em **ISO‑8601** (1=Segunda … 7=Domingo), compatível com `date('N')`
+- Nomenclatura: `view/{recurso}.php` · `api/{área}/{recurso}.php` · `sql/{Entidade}Sql.php` · `controllers/{recurso}.controller.php`
 
 ---
 
-# Gerenciamento de Produtos
+## 📄 Licença
 
-Será possível:
+Distribuído sob a licença **MIT**. Veja o arquivo [`LICENSE`](LICENSE) para mais detalhes.
 
-* cadastrar produtos;
-* alterar estoque;
-* editar preço;
-* alterar foto;
-* remover produtos.
-
-O sistema poderá avisar quando o estoque estiver baixo.
+<div align="center">
 
 ---
 
-# Gerenciamento da Agenda
+Feito para a **Tio Preto Barbearia**
 
-O administrador visualizará toda a agenda da barbearia.
-
-Será possível:
-
-* confirmar agendamentos;
-* cancelar agendamentos;
-* remarcar horários;
-* visualizar cliente responsável;
-* visualizar serviço escolhido.
-
-Também poderá configurar:
-
-* dias de funcionamento;
-* horário de abertura;
-* horário de fechamento.
-
----
-
-# Sistema de Logs
-
-Todas as ações importantes realizadas pelos administradores serão registradas.
-
-Exemplos:
-
-* login;
-* criação de produtos;
-* edição de serviços;
-* cancelamento de pedidos;
-* alteração de horários;
-* exclusão de registros.
-
-Cada log armazenará:
-
-* administrador responsável;
-* ação realizada;
-* descrição;
-* data e horário.
-
----
-
-# Integração com API de WhatsApp
-
-Para melhorar a comunicação com os clientes, o sistema será integrado a uma API oficial de envio de mensagens via WhatsApp.
-
-O objetivo dessa integração será automatizar lembretes e notificações sem que o administrador precise enviar mensagens manualmente.
-
-## Funcionalidades
-
-O administrador poderá enviar mensagens para um cliente específico diretamente pelo sistema.
-
-Também poderá utilizar mensagens automáticas.
-
-Exemplos:
-
-### Lembrete de agendamento
-
-Um dia antes do horário marcado, o sistema poderá enviar automaticamente:
-
-"Olá, João! Passando para lembrar que você possui um horário agendado para amanhã às 14:00 na nossa barbearia. Estamos esperando por você."
-
----
-
-### Confirmação de agendamento
-
-Assim que o agendamento for realizado:
-
-"Sua reserva foi realizada com sucesso."
-
----
-
-### Cancelamento
-
-Caso o administrador cancele um horário:
-
-"Seu agendamento foi cancelado. Entre em contato conosco para reagendar."
-
----
-
-### Pedido pronto
-
-Quando os produtos estiverem disponíveis:
-
-"Seu pedido já está pronto."
-
----
-
-### Promoções
-
-O administrador poderá selecionar diversos clientes e enviar campanhas promocionais.
-
-Exemplos:
-
-* descontos;
-* novos produtos;
-* novos serviços;
-* horários disponíveis.
-
----
-
-# Funcionamento da API
-
-O sistema realizará uma requisição HTTP para a API de WhatsApp contendo:
-
-* número do cliente;
-* mensagem;
-* identificação da aplicação;
-* autenticação da API.
-
-Fluxo:
-
-Cliente realiza ação → Sistema identifica o evento → Gera a mensagem → Envia para a API → API entrega a mensagem ao WhatsApp do cliente → O sistema registra no banco se o envio foi concluído ou retornou erro.
-
----
-
-# Histórico de Mensagens
-
-Para cada envio será armazenado:
-
-* cliente;
-* número utilizado;
-* conteúdo da mensagem;
-* data e horário;
-* status do envio;
-* identificador retornado pela API.
-
-Isso permitirá ao administrador consultar quais mensagens foram enviadas e verificar possíveis falhas.
-
----
-
-# Segurança
-
-O sistema utilizará:
-
-* criptografia das senhas utilizando hash seguro;
-* controle de permissões entre Cliente e Administrador;
-* validação de formulários;
-* proteção contra SQL Injection utilizando consultas preparadas;
-* validação de sessões;
-* controle de acesso às páginas administrativas;
-* validação de upload de imagens.
-
----
-
-# Objetivo Final
-
-Ao final do desenvolvimento, o sistema permitirá que toda a operação da barbearia seja administrada por uma única aplicação.
-
-Os clientes poderão criar contas, realizar agendamentos, acompanhar pedidos e encomendar produtos de forma prática.
-
-Os administradores terão controle completo sobre clientes, serviços, produtos, agenda, pedidos, horários de funcionamento, estoque, relatórios, logs e comunicação via WhatsApp, tornando a gestão da barbearia mais organizada, eficiente e moderna.
+</div>

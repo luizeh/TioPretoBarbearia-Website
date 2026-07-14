@@ -3,6 +3,35 @@
   "use strict";
 
   document.addEventListener("DOMContentLoaded", function () {
+    // ── Menu mobile (hamburger) ──
+    var menuToggle = document.getElementById("mobileMenuToggle");
+    var headerEl = document.querySelector("header");
+    if (menuToggle && headerEl) {
+      var setBurger = function (open) {
+        headerEl.classList.toggle("nav-open", open);
+        menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+        var icon = menuToggle.querySelector("i");
+        if (icon) icon.className = open ? "fa-solid fa-xmark" : "fa-solid fa-bars";
+      };
+      menuToggle.addEventListener("click", function (event) {
+        event.stopPropagation();
+        setBurger(!headerEl.classList.contains("nav-open"));
+      });
+      headerEl.querySelectorAll("nav a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          setBurger(false);
+        });
+      });
+      document.addEventListener("click", function (event) {
+        if (headerEl.classList.contains("nav-open") && !headerEl.contains(event.target)) {
+          setBurger(false);
+        }
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") setBurger(false);
+      });
+    }
+
     var userMenu = document.getElementById("headerUserMenu");
     if (userMenu) {
       var userTrigger = userMenu.querySelector(".user-menu__trigger");

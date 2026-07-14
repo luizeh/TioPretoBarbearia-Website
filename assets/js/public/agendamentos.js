@@ -24,6 +24,17 @@
     return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
   }
 
+  // Slot já decorrido? (dia passado, ou hoje em horário anterior ao atual)
+  function ehPassado(dateStr, timeStr) {
+    var agora = new Date();
+    var mm = String(agora.getMonth() + 1).padStart(2, '0');
+    var dd = String(agora.getDate()).padStart(2, '0');
+    var hoje = agora.getFullYear() + '-' + mm + '-' + dd;
+    if (dateStr !== hoje) return dateStr < hoje;
+    var horaAgora = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
+    return timeStr < horaAgora;
+  }
+
   function classeDeSlots(duracao) {
     var slots = Math.max(1, Math.ceil(Number(duracao || 30) / 30));
     return "agenda-appt--slots-" + Math.min(24, slots);
@@ -188,15 +199,21 @@
         }
       });
       cells.forEach(function (cell) {
+        // Células travadas pelo servidor (bloqueio/fora do expediente) não viram "Disponível".
+        if (cell.querySelector('.agenda-cell__fechado')) return;
         var entrada = porCelula[cell.dataset.date + '|' + cell.dataset.time];
         if (!entrada) {
-          cell.innerHTML = '<button class="agenda-cell__add" type="button" data-date="' + cell.dataset.date + '" data-time="' + cell.dataset.time + '"><span>Disponível</span><small>' + cell.dataset.time + '</small></button>';
+          if (ehPassado(cell.dataset.date, cell.dataset.time)) {
+            cell.innerHTML = '<div class="agenda-appt agenda-appt--ocupado agenda-appt--slots-1"><span class="agenda-appt__name">Indisponível</span></div>';
+          } else {
+            cell.innerHTML = '<button class="agenda-cell__add" type="button" data-date="' + cell.dataset.date + '" data-time="' + cell.dataset.time + '"><span>Disponível</span><small>' + cell.dataset.time + '</small></button>';
+          }
         } else if (!entrada.inicio) {
           cell.innerHTML = '<div class="agenda-cell__blocked" aria-hidden="true"></div>';
         } else if (entrada.ag.proprio) {
           cell.innerHTML = '<button class="agenda-appt agenda-appt--meu ' + classeDeSlots(entrada.ag.duracao_minutos) + '" type="button" data-own-id="' + entrada.ag.id + '"><span class="agenda-appt__name">Seu agendamento</span><span class="agenda-appt__service">' + escapeHtml(entrada.ag.servico) + ' · ' + Number(entrada.ag.duracao_minutos || 30) + ' min</span></button>';
         } else {
-          cell.innerHTML = '<div class="agenda-appt agenda-appt--ocupado ' + classeDeSlots(entrada.ag.duracao_minutos) + '"><span class="agenda-appt__name">Ocupado</span></div>';
+          cell.innerHTML = '<div class="agenda-appt agenda-appt--ocupado ' + classeDeSlots(entrada.ag.duracao_minutos) + '"><span class="agenda-appt__name">Indisponível</span></div>';
         }
       });
     });
@@ -250,4 +267,13 @@
   }
 
   atualizarAgenda();
+})();
+
+// ── Navegação por data: pula para a semana da data escolhida ──
+(function () {
+  var input = document.querySelector('.agenda-goto-input');
+  if (!input) return;
+  input.addEventListener('change', function () {
+    if (input.value) window.location.href = '?data=' + input.value;
+  });
 })();

@@ -40,7 +40,7 @@ try {
     if ($action === 'criar') {
         $body['usuario_id'] = $usuarioId;
         $body['status'] = 'pendente';
-        $id = AgendamentosSql::salvarComServicos($body);
+        $id = AgendamentosSql::salvarComServicos($body, null, null, true);
         LogsSql::registrar($usuarioId, 'agendamento_criado', "Agendamento #$id criado pelo cliente.");
         helpers::resposta_json(true, 'Agendamento criado com sucesso!', ['id' => $id], 201);
     }
@@ -49,7 +49,7 @@ try {
         $id = (int) ($body['id'] ?? 0);
         if (!$id) helpers::resposta_json(false, 'ID do agendamento é obrigatório.', null, 400);
         unset($body['status'], $body['usuario_id']);
-        AgendamentosSql::salvarComServicos($body, $id, $usuarioId);
+        AgendamentosSql::salvarComServicos($body, $id, $usuarioId, true);
         LogsSql::registrar($usuarioId, 'agendamento_editado', "Agendamento #$id editado pelo cliente.");
         helpers::resposta_json(true, 'Agendamento atualizado com sucesso.');
     }

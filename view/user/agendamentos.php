@@ -32,6 +32,14 @@ $meses            = [1 => 'jan', 2 => 'fev', 3 => 'mar', 4 => 'abr', 5 => 'mai',
 $weekLabel        = date('d', $weekStart) . ' a ' . date('d', strtotime('+6 days', $weekStart)) . ' de ' . $meses[(int) date('n', strtotime('+6 days', $weekStart))] . ' de ' . date('Y', strtotime('+6 days', $weekStart));
 $agendaData       = AgendamentosSql::listarPorPeriodo(date('Y-m-d', $weekStart), date('Y-m-d', strtotime('+6 days', $weekStart)));
 $horariosMap      = HorariosSql::buscarPorDatas($weekDays);
+// O cliente não visualiza dias totalmente fechados — apenas o admin.
+// Guarda o índice do dia da semana (0=Seg … 6=Dom) para rotular corretamente.
+$visibleDays      = [];
+foreach ($weekDays as $idx => $day) {
+    $hDiaSemana = $horariosMap[$day] ?? null;
+    if ($hDiaSemana && !empty($hDiaSemana['fechado'])) continue;
+    $visibleDays[] = ['date' => $day, 'dow' => $idx];
+}
 $agendaMap        = [];
 foreach ($agendaData as $item) {
     if (($item['status'] ?? '') === 'cancelado') {
@@ -56,94 +64,6 @@ include_once __DIR__ . '/../partials/head_public.php';
     <p class='page-banner__desc'>Olá, <?= $nomeUsuario ?>! Escolha um dia e agende seu horário.</p>
 </div>
 <main class="user-agenda user-agenda--calendar">
-    <section class="agenda-calendar-section">
-        <div class="agenda-calendar-header">
-            <h2 class="agenda-calendar-title">
-                <i class="fa-regular fa-calendar"></i> Minha Semana
-            </h2>
-            <div class="agenda-nav agenda-nav--compact">
-                <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('-7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-left"></i></a>
-                <span class="agenda-nav__label"><?= $weekLabel ?></span>
-                <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('+7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-right"></i></a>
-            </div>
-        </div>
-        <p class="agenda-mobile-hint"><i class="fa-solid fa-arrows-left-right"></i> Deslize para ver todos os dias</p>
-        <div class="agenda-wrap">
-            <div class="agenda-scroll">
-                <div class="agenda-grid">
-                    <div class="agenda-corner"></div>
-                    <?php foreach ($weekDays as $index => $day):
-                        $hDia = $horariosMap[$day] ?? null;
-                        $diaFechado = $hDia && $hDia['fechado'];
-                    ?>
-                        <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?><?= $diaFechado ? ' fechado' : '' ?>">
-                            <?= $diasSemana[$index] ?> <span><?= date('d', strtotime($day)) ?></span>
-                            <?php if ($diaFechado): ?><small class="agenda-day-head__fechado">Fechado</small><?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <?php
-                    $slots = [];
-                    for ($hour = 8; $hour <= 19; $hour++) {
-                        foreach ([0, 30] as $minute) {
-                            $slots[] = sprintf('%02d:%02d', $hour, $minute);
-                        }
-                    }
-                    foreach ($slots as $slotTime):
-                        $isHalf = (int) substr($slotTime, -2) === 30;
-                        echo '<div class="agenda-hour' . ($isHalf ? ' agenda-hour--half' : '') . '">' . $slotTime . '</div>';
-                        foreach ($weekDays as $day):
-                            $hDia        = $horariosMap[$day] ?? null;
-                            $diaFechado  = $hDia && $hDia['fechado'];
-                            $abertura    = $hDia ? substr($hDia['abertura'],   0, 5) : '08:00';
-                            $fecho       = $hDia ? substr($hDia['fechamento'], 0, 5) : '20:00';
-                            $foraDaHora  = !$diaFechado && ($slotTime < $abertura || $slotTime >= $fecho);
-                            $emBloqueio  = false;
-                            if (!$diaFechado && !$foraDaHora) {
-                                foreach (($hDia['bloqueios'] ?? []) as $blq) {
-                                    if ($slotTime >= substr($blq['hora_inicio'], 0, 5) && $slotTime < substr($blq['hora_fim'], 0, 5)) {
-                                        $emBloqueio = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            $appointments = $agendaMap[$day][$slotTime] ?? [];
-                            $ownAppointment = null;
-                            $continuaProprio = false;
-                            foreach ($appointments as $appointment) {
-                                if (empty($appointment['continuacao']) && (int) $appointment['usuario_id'] === $usuarioId) {
-                                    $ownAppointment = $appointment;
-                                    break;
-                                }
-                                if (!empty($appointment['continuacao']) && (int) ($appointment['usuario_id'] ?? 0) === $usuarioId) {
-                                    $continuaProprio = true;
-                                }
-                            }
-                            echo '<div class="agenda-cell' . ($day === date('Y-m-d') ? ' today' : '') . '" data-date="' . $day . '" data-time="' . $slotTime . '">';
-                            if ($diaFechado || $foraDaHora || $emBloqueio) {
-                                echo '<div class="agenda-cell--fora-horario" aria-hidden="true"></div>';
-                            } elseif ($ownAppointment) {
-                                $durationMinutes = (int) ($ownAppointment['duracao_minutos'] ?? 30);
-                                $slotsSpan = min(24, max(1, (int) ceil($durationMinutes / 30)));
-                                echo '<button class="agenda-appt agenda-appt--meu agenda-appt--slots-' . $slotsSpan . '" type="button" data-own-id="' . (int) $ownAppointment['id'] . '">';
-                                echo '<span class="agenda-appt__name">Seu agendamento</span>';
-                                echo '<span class="agenda-appt__service">' . htmlspecialchars($ownAppointment['servico']) . ' · ' . $durationMinutes . ' min</span>';
-                                echo '</button>';
-                            } elseif ($continuaProprio) {
-                                echo '<div class="agenda-cell__blocked" aria-hidden="true"></div>';
-                            } elseif (!empty($appointments)) {
-                                echo '<div class="agenda-appt agenda-appt--ocupado agenda-appt--slots-1"><span class="agenda-appt__name">Ocupado</span><span class="agenda-appt__service">Indisponível</span></div>';
-                            } else {
-                                echo '<button class="agenda-cell__add" type="button" data-date="' . $day . '" data-time="' . $slotTime . '"><span>Disponível</span><small>' . $slotTime . '</small></button>';
-                            }
-                            echo '</div>';
-                        endforeach;
-                    endforeach;
-                    ?>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- MEUS AGENDAMENTOS -->
     <section class="user-agenda-section">
         <div class="user-agenda__actions user-agenda__actions--list">
@@ -204,6 +124,132 @@ include_once __DIR__ . '/../partials/head_public.php';
                 </div>
             <?php endif; ?>
         <?php endif; ?>
+    </section>
+
+    <section class="agenda-calendar-section">
+        <div class="agenda-calendar-header">
+            <h2 class="agenda-calendar-title">
+                <i class="fa-regular fa-calendar"></i> Minha Semana
+            </h2>
+            <div class="agenda-nav agenda-nav--compact">
+                <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('-7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-left"></i></a>
+                <span class="agenda-nav__label"><?= $weekLabel ?></span>
+                <div class="agenda-goto">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <input type="date" class="agenda-goto-input" lang="pt-BR" value="<?= date('Y-m-d', $weekStart) ?>" title="Escolha uma data para ir direto à semana dela" aria-label="Ir para uma data">
+                    <a class="agenda-goto-hoje" href="?data=<?= date('Y-m-d') ?>">Hoje</a>
+                </div>
+                <a class="agenda-nav__btn" href="?data=<?= date('Y-m-d', strtotime('+7 days', $weekStart)) ?>"><i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+        <p class="agenda-mobile-hint"><i class="fa-solid fa-arrows-left-right"></i> Deslize para ver todos os dias</p>
+        <div class="agenda-wrap">
+            <div class="agenda-scroll">
+                <div class="agenda-grid agenda-grid--cliente" style="--agenda-dias: <?= max(1, count($visibleDays)) ?>">
+                    <div class="agenda-corner"></div>
+                    <?php foreach ($visibleDays as $entry): $day = $entry['date']; ?>
+                        <div class="agenda-day-head<?= $day === date('Y-m-d') ? ' today' : '' ?>">
+                            <?= $diasSemana[$entry['dow']] ?> <span><?= date('d', strtotime($day)) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php
+                    $slots = [];
+                    for ($hour = 8; $hour <= 19; $hour++) {
+                        foreach ([0, 30] as $minute) {
+                            $slots[] = sprintf('%02d:%02d', $hour, $minute);
+                        }
+                    }
+                    // ── Overlay de fora-de-expediente (caixa única) ──
+                    // O cliente não vê dias fechados (foram removidos das colunas). Aqui só
+                    // tratamos, nos dias abertos, os trechos antes da abertura e depois do
+                    // fechamento — que recebem a mesma caixa "Fechado". O miolo fica normal.
+                    // $_col usa a posição VISUAL entre os dias visíveis (não o dia da semana).
+                    $totalSlots = count($slots);
+                    foreach ($visibleDays as $_pos => $entry):
+                        $_hD  = $horariosMap[$entry['date']] ?? null;
+                        $_col = $_pos + 2;
+                        $_abertura = $_hD ? substr($_hD['abertura'],   0, 5) : '08:00';
+                        $_fecho    = $_hD ? substr($_hD['fechamento'], 0, 5) : '20:00';
+                        // Trecho antes da abertura
+                        $_antes = 0;
+                        foreach ($slots as $_s) {
+                            if ($_s < $_abertura) $_antes++;
+                            else break;
+                        }
+                        if ($_antes > 0) {
+                            $_lbl = $_antes >= 3 ? '<span>Fechado</span>' : '';
+                            echo '<div class="agenda-cell--dia-fechado-col" style="grid-column:' . $_col . ';grid-row:2/span ' . $_antes . '">' . $_lbl . '</div>';
+                        }
+                        // Trecho depois do fechamento
+                        $_inicioDepois = null;
+                        foreach ($slots as $_i => $_s) {
+                            if ($_s >= $_fecho) { $_inicioDepois = $_i; break; }
+                        }
+                        if ($_inicioDepois !== null) {
+                            $_depois = $totalSlots - $_inicioDepois;
+                            $_lbl = $_depois >= 3 ? '<span>Fechado</span>' : '';
+                            echo '<div class="agenda-cell--dia-fechado-col" style="grid-column:' . $_col . ';grid-row:' . ($_inicioDepois + 2) . '/span ' . $_depois . '">' . $_lbl . '</div>';
+                        }
+                    endforeach;
+                    $hojeStr      = date('Y-m-d'); // referência de "hoje" (mesmo fuso do restante da agenda)
+                    $horaAgoraStr = date('H:i');   // horário atual — slots de hoje anteriores a isto já passaram
+                    foreach ($slots as $slotTime):
+                        $isHalf = (int) substr($slotTime, -2) === 30;
+                        echo '<div class="agenda-hour' . ($isHalf ? ' agenda-hour--half' : '') . '">' . $slotTime . '</div>';
+                        foreach ($visibleDays as $entry):
+                            $day         = $entry['date'];
+                            $hDia        = $horariosMap[$day] ?? null;
+                            $abertura    = $hDia ? substr($hDia['abertura'],   0, 5) : '08:00';
+                            $fecho       = $hDia ? substr($hDia['fechamento'], 0, 5) : '20:00';
+                            if ($slotTime < $abertura || $slotTime >= $fecho) continue; // overlay fora-de-expediente cobre a célula
+                            $emBloqueio  = false;
+                            $bloqueioDesc = '';
+                            foreach (($hDia['bloqueios'] ?? []) as $blq) {
+                                if ($slotTime >= substr($blq['hora_inicio'], 0, 5) && $slotTime < substr($blq['hora_fim'], 0, 5)) {
+                                    $emBloqueio  = true;
+                                    $bloqueioDesc = $blq['descricao'] ?? '';
+                                    break;
+                                }
+                            }
+                            $appointments = $agendaMap[$day][$slotTime] ?? [];
+                            $ownAppointment = null;
+                            $continuaProprio = false;
+                            foreach ($appointments as $appointment) {
+                                if (empty($appointment['continuacao']) && (int) $appointment['usuario_id'] === $usuarioId) {
+                                    $ownAppointment = $appointment;
+                                    break;
+                                }
+                                if (!empty($appointment['continuacao']) && (int) ($appointment['usuario_id'] ?? 0) === $usuarioId) {
+                                    $continuaProprio = true;
+                                }
+                            }
+                            echo '<div class="agenda-cell' . ($day === date('Y-m-d') ? ' today' : '') . '" data-date="' . $day . '" data-time="' . $slotTime . '">';
+                            if ($emBloqueio) {
+                                $label = htmlspecialchars($bloqueioDesc ?: 'Indisponível');
+                                echo '<div class="agenda-cell__fechado agenda-cell__fechado--bloqueio" aria-hidden="true">' . $label . '</div>';
+                            } elseif ($ownAppointment) {
+                                $durationMinutes = (int) ($ownAppointment['duracao_minutos'] ?? 30);
+                                $slotsSpan = min(24, max(1, (int) ceil($durationMinutes / 30)));
+                                echo '<button class="agenda-appt agenda-appt--meu agenda-appt--slots-' . $slotsSpan . '" type="button" data-own-id="' . (int) $ownAppointment['id'] . '">';
+                                echo '<span class="agenda-appt__name">Seu agendamento</span>';
+                                echo '<span class="agenda-appt__service">' . htmlspecialchars($ownAppointment['servico']) . ' · ' . $durationMinutes . ' min</span>';
+                                echo '</button>';
+                            } elseif ($continuaProprio) {
+                                echo '<div class="agenda-cell__blocked" aria-hidden="true"></div>';
+                            } elseif (!empty($appointments)) {
+                                echo '<div class="agenda-appt agenda-appt--ocupado agenda-appt--slots-1"><span class="agenda-appt__name">Indisponível</span></div>';
+                            } elseif ($day === $hojeStr && $slotTime < $horaAgoraStr) {
+                                echo '<div class="agenda-appt agenda-appt--ocupado agenda-appt--slots-1"><span class="agenda-appt__name">Indisponível</span></div>';
+                            } else {
+                                echo '<button class="agenda-cell__add" type="button" data-date="' . $day . '" data-time="' . $slotTime . '"><span>Disponível</span><small>' . $slotTime . '</small></button>';
+                            }
+                            echo '</div>';
+                        endforeach;
+                    endforeach;
+                    ?>
+                </div>
+            </div>
+        </div>
     </section>
 </main>
 

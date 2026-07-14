@@ -582,7 +582,7 @@
 .notifications-menu__trigger { position:relative; border:0; background:none; color:var(--dark); font-size:1.05rem; padding:8px; cursor:pointer; }
 .notifications-menu__trigger:hover { color:var(--gold); }
 .notifications-menu__badge { position:absolute; top:1px; right:0; min-width:16px; height:16px; border-radius:999px; background:#c43d32; color:#fff; font-size:.65rem; line-height:16px; text-align:center; }
-.notifications-menu__dropdown { display:none; position:absolute; z-index:50; top:calc(100% + 10px); right:0; width:340px; background:var(--white); border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow); overflow:hidden; }
+.notifications-menu__dropdown { display:none; position:absolute; z-index:50; top:calc(100% + 10px); right:0; width:min(340px, 92vw); background:var(--white); border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow); overflow:hidden; }
 .notifications-menu.open .notifications-menu__dropdown { display:block; }
 .notifications-menu__header { display:flex; justify-content:space-between; align-items:center; padding:13px 15px; border-bottom:1px solid var(--border); }
 .notifications-menu__header button { border:0; background:none; color:var(--gold); cursor:pointer; font-size:.75rem; }

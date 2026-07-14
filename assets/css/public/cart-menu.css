@@ -57,7 +57,7 @@
   background: var(--white);
   border: 1.5px solid var(--border);
   border-radius: 6px;
-  width: 300px;
+  width: min(300px, 92vw);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   z-index: 200;
   overflow: hidden;

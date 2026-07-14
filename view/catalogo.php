@@ -7,7 +7,7 @@ include_once __DIR__ . '/partials/head_public.php';
 include_once __DIR__ . '/../config/connection.php';
 include_once __DIR__ . '/../sql/ProdutosSql.php';
 $pdo     = Connection::getConnection();
-$produtos = ProdutosSql::listarProdutos($pdo);
+$produtos = ProdutosSql::listarProdutos($pdo, true); // catálogo público: só produtos visíveis
 ?>
 <!-- ══════════════ HEADER ══════════════ -->
 <?php include_once __DIR__ . '/partials/header_public.php'; ?>

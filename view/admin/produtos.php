@@ -65,7 +65,7 @@ include __DIR__ . '/../partials/head.php';
           <tbody>
             <?php foreach ($produtos as $produto): ?>
 
-              <tr>
+              <tr class="<?= empty($produto['visivel']) ? 'produto-oculto' : '' ?>">
                 <td>
                   <?= number_format($produto['id']) ?>
                 </td>
@@ -97,17 +97,11 @@ include __DIR__ . '/../partials/head.php';
                 <td>
                   <div class="action-btns">
                     <button
-                      class="btn-action btn-action--view"
-                      title="Ver"
-                      data-modal="modal-produto-ver"
+                      class="btn-action btn-action--visibilidade"
                       data-id="<?= $produto['id'] ?>"
-                      data-nome="<?= htmlspecialchars($produto['nome']) ?>"
-                      data-descricao="<?= htmlspecialchars($produto['descricao']) ?>"
-                      data-estoque="<?= $produto['estoque'] ?>"
-                      data-preco="<?= number_format($produto['preco'], 2, ',', '.') ?>"
-                      data-tags="<?= htmlspecialchars($produto['tags'] ?? '') ?>"
-                      data-foto-url="<?= htmlspecialchars($produto['foto_url'] ?? '') ?>">
-                      <i class="fa-solid fa-eye"></i>
+                      data-visivel="<?= (int) $produto['visivel'] ?>"
+                      title="<?= !empty($produto['visivel']) ? 'Visível no site — clique para ocultar (só admin)' : 'Oculto (só admin) — clique para exibir no site' ?>">
+                      <i class="fa-solid <?= !empty($produto['visivel']) ? 'fa-eye' : 'fa-eye-slash' ?>"></i>
                     </button>
 
                     <button

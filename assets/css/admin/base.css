@@ -2,6 +2,15 @@
    base.css — variáveis, reset e base global
    ════════════════════════════════════════════ */
 
+/* ── BREAKPOINTS PADRÃO DO PROJETO (mobile-first) ──
+   Use SEMPRE estes valores nos @media para manter consistência:
+     xs  ≤ 480px   → celular pequeno
+     sm  ≤ 768px   → celular grande / tablet retrato
+     md  ≤ 1024px  → tablet paisagem / notebook pequeno
+     lg  ≤ 1280px  → desktop
+     xl  > 1280px  → telas largas
+*/
+
 :root {
   --gold: #c9963a;
   --gold-light: #e8b85a;
@@ -38,4 +47,5 @@ body {
   color: var(--text);
   display: flex;
   min-height: 100vh;
+  overflow-x: hidden; /* backstop: nada de rolagem lateral no painel */
 }
