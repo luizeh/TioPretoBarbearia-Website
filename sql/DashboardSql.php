@@ -28,14 +28,16 @@ class DashboardSql
     {
         $pdo = Connection::getConnection();
 
+        // Conta todos os usuários (clientes e admins) — usado na página de clientes.
         return (int) $pdo
-            ->query("SELECT COUNT(*) FROM usuarios WHERE admin = 0")
+            ->query("SELECT COUNT(*) FROM usuarios")
             ->fetchColumn();
     }
 
     public static function listarUsuarios(int $limite, int $offset): array
     {
         $pdo  = Connection::getConnection();
+        // Lista todos os usuários (clientes e admins), com o tipo (admin).
         $stmt = $pdo->prepare("
             SELECT
                 id,
@@ -43,9 +45,9 @@ class DashboardSql
                 sobrenome,
                 email,
                 telefone,
-                cidade
+                cidade,
+                admin
             FROM usuarios
-            WHERE admin = 0
             ORDER BY nome
             LIMIT :limite OFFSET :offset
         ");

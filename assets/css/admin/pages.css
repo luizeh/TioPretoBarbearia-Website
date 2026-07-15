@@ -707,6 +707,22 @@
   opacity: 1;
 }
 
+/* ── Dica de rolagem horizontal (aparece só no celular) ── */
+.table-scroll-hint {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 16px 0;
+  font-family: var(--font-condensed);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.table-scroll-hint i {
+  color: var(--gold);
+}
+
 /* ════════════════════════════════════════════
    RESPONSIVO — painel admin (tabelas e páginas)
    ════════════════════════════════════════════ */
@@ -728,6 +744,11 @@
   .table-date-filter {
     width: 100%;
     justify-content: space-between;
+  }
+
+  /* Dica de "arraste para o lado" visível no celular */
+  .table-scroll-hint {
+    display: flex;
   }
 
   /* Tabelas: rolagem lateral suave + células mais compactas */
@@ -814,6 +835,10 @@
 /* ── HORÁRIOS: no celular a tabela semanal vira cartões ──
    Evita rolagem lateral e garante que o toggle Aberto/Fechado apareça. */
 @media (max-width: 640px) {
+  /* Vira cartões: dispensa a largura mínima da tabela padrão */
+  #tbl-horarios {
+    min-width: 0;
+  }
   #tbl-horarios thead {
     display: none;
   }

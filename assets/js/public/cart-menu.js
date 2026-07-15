@@ -9,10 +9,6 @@
     return base + "user/carrinho.php";
   }
 
-  function ordersUrl() {
-    return base + "user/pedidos.php";
-  }
-
   function escapeHtml(value) {
     var element = document.createElement("div");
     element.textContent = value || "";
@@ -119,51 +115,6 @@
     });
   }
 
-  function requestCheckout() {
-    window.SwalTP.fire({
-      title: "Finalizar Pedido",
-      html: '<div class="modal-field"><label class="modal-label" for="swal-endereco">Endereço de Entrega</label><textarea class="modal-textarea cart-checkout-address" id="swal-endereco" placeholder="Rua, número, bairro, cidade..." rows="3"></textarea></div>',
-      showCancelButton: true,
-      confirmButtonText: "Encomendar",
-      cancelButtonText: "Cancelar",
-      preConfirm: function () {
-        var address = document.getElementById("swal-endereco").value.trim();
-        if (!address) {
-          window.Swal.showValidationMessage("Informe o endereço.");
-          return false;
-        }
-
-        return fetch(ordersUrl(), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "finalizar", endereco: address }),
-        }).then(function (response) {
-          return response.json();
-        });
-      },
-    }).then(function (result) {
-      if (!result.isConfirmed) return;
-
-      if (result.value && result.value.success) {
-        renderCart({ itens: [], total: 0, count: 0 });
-        window.SwalTP.fire({
-          icon: "success",
-          title: "Pedido realizado!",
-          text: result.value.message,
-          timer: 3000,
-          showConfirmButton: false,
-        });
-        return;
-      }
-
-      window.SwalTP.fire({
-        icon: "error",
-        title: "Erro",
-        text: (result.value && result.value.message) || "Não foi possível finalizar.",
-      });
-    });
-  }
-
   document.addEventListener("DOMContentLoaded", function () {
     loggedIn = Boolean(document.querySelector(".user-avatar"));
 
@@ -254,13 +205,8 @@
       });
     });
 
-    var checkoutButton = document.querySelector(".btn-cart-checkout");
-    if (checkoutButton) {
-      checkoutButton.addEventListener("click", function (event) {
-        event.preventDefault();
-        if (loggedIn && window.SwalTP) requestCheckout();
-      });
-    }
+    // "Finalizar Pedido" é um link direto para a página do carrinho
+    // (onde fica o formulário de endereço) — sem modal.
 
     fetchCart();
   });

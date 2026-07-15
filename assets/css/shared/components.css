@@ -152,10 +152,15 @@
 /* ── TABELA ── */
 .table-wrapper {
   overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch; /* rolagem suave em iOS */
+  overscroll-behavior-x: contain; /* não propaga o scroll para a página */
 }
 
 .dash-table {
   width: 100%;
+  /* Garante rolagem horizontal em telas estreitas em vez de espremer/cortar colunas */
+  min-width: 640px;
   border-collapse: collapse;
 }
 
@@ -169,6 +174,20 @@
   text-align: left;
   background: #fafaf9;
   border-bottom: 1px solid var(--border);
+  white-space: nowrap; /* cabeçalhos não quebram — mantêm o alinhamento */
+}
+
+/* Miniaturas dentro de tabelas não esticam a linha */
+.dash-table img {
+  max-height: 44px;
+  width: auto;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+/* Coluna de ações nunca quebra — botões acessíveis via rolagem */
+.dash-table td:has(.action-btns) {
+  white-space: nowrap;
 }
 
 .dash-table tbody tr {
@@ -235,6 +254,14 @@
 .badge--finalizado {
   background: rgba(201, 150, 58, 0.16);
   color: #9a6b13;
+}
+.badge--admin {
+  background: rgba(201, 150, 58, 0.16);
+  color: #9a6b13;
+}
+.badge--user {
+  background: rgba(100, 116, 139, 0.14);
+  color: #475569;
 }
 
 /* ── AÇÕES RÁPIDAS ── */
@@ -575,6 +602,12 @@
     background 0.2s,
     color 0.2s;
   background: none;
+}
+
+/* Foco visível por teclado nos botões de ação da tabela */
+.btn-action:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .btn-action--view {

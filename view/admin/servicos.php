@@ -47,6 +47,7 @@ include __DIR__ . '/../partials/head.php';
                     <input class="table-search" type="text" placeholder="Pesquisar serviço..." data-search="tbl-servicos" />
                 </div>
             </div>
+            <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
             <div class="table-wrapper">
                 <table class="dash-table" id="tbl-servicos">
                     <thead>

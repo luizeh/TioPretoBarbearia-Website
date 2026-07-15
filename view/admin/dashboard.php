@@ -54,6 +54,7 @@ include __DIR__ . '/../partials/sidebar.php';
                     <input class="table-search" type="search" placeholder="Pesquisar..." data-search="tbl-logs" />
                 </div>
             </div>
+            <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
             <div class="table-wrapper">
                 <table class="dash-table" id="tbl-logs">
                     <thead>

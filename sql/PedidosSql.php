@@ -91,13 +91,87 @@ class PedidosSql
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function atualizarStatus(int $id, string $status): bool
+    /**
+     * Altera o status do pedido reconciliando o estoque:
+     *  - o estoque fica reservado em todos os status, EXCETO 'cancelado';
+     *  - ao cancelar (sair de um status que reservava), os itens voltam ao estoque;
+     *  - ao reativar (sair de 'cancelado'), os itens são baixados de novo
+     *    (com verificação de disponibilidade).
+     */
+    public static function atualizarStatus(int $id, string $novoStatus): bool
     {
         $permitidos = ['recebido', 'preparando', 'pronto', 'entregue', 'cancelado'];
-        if (!in_array($status, $permitidos, true)) throw new InvalidArgumentException('Status de pedido inválido.');
+        if (!in_array($novoStatus, $permitidos, true)) throw new InvalidArgumentException('Status de pedido inválido.');
+
         $pdo = Connection::getConnection();
-        $stmt = $pdo->prepare('UPDATE pedidos SET status = :status WHERE id = :id');
-        $stmt->execute([':status' => $status, ':id' => $id]);
-        return $stmt->rowCount() > 0;
+        try {
+            $pdo->beginTransaction();
+
+            // Trava o pedido e lê o status atual.
+            $stmtAtual = $pdo->prepare('SELECT status FROM pedidos WHERE id = :id FOR UPDATE');
+            $stmtAtual->execute([':id' => $id]);
+            $statusAtual = $stmtAtual->fetchColumn();
+
+            if ($statusAtual === false) {
+                $pdo->commit();
+                return false; // pedido inexistente
+            }
+
+            if ($statusAtual !== $novoStatus) {
+                $reservavaAntes = self::consomeEstoque($statusAtual);
+                $reservaAgora   = self::consomeEstoque($novoStatus);
+
+                if ($reservavaAntes && !$reservaAgora) {
+                    self::ajustarEstoquePorPedido($pdo, $id, +1); // devolve ao estoque
+                } elseif (!$reservavaAntes && $reservaAgora) {
+                    self::ajustarEstoquePorPedido($pdo, $id, -1); // baixa do estoque
+                }
+            }
+
+            $upd = $pdo->prepare('UPDATE pedidos SET status = :status WHERE id = :id');
+            $upd->execute([':status' => $novoStatus, ':id' => $id]);
+
+            $pdo->commit();
+            return true;
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            throw $e;
+        }
+    }
+
+    /** O estoque é reservado em todos os status, menos 'cancelado'. */
+    private static function consomeEstoque(string $status): bool
+    {
+        return $status !== 'cancelado';
+    }
+
+    /**
+     * Ajusta o estoque de todos os itens de um pedido.
+     * $sinal = +1 devolve ao estoque; -1 baixa (verificando disponibilidade).
+     */
+    private static function ajustarEstoquePorPedido(PDO $pdo, int $pedidoId, int $sinal): void
+    {
+        $stmtItens = $pdo->prepare('SELECT produto_id, quantidade FROM pedido_itens WHERE pedido_id = :pid');
+        $stmtItens->execute([':pid' => $pedidoId]);
+        $itens = $stmtItens->fetchAll(PDO::FETCH_ASSOC);
+
+        // Ao baixar, garante que há estoque suficiente para cada item.
+        if ($sinal < 0) {
+            $stmtCheck = $pdo->prepare('SELECT nome, estoque FROM produtos WHERE id = :id FOR UPDATE');
+            foreach ($itens as $item) {
+                $stmtCheck->execute([':id' => (int) $item['produto_id']]);
+                $produto = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+                if ($produto && (int) $item['quantidade'] > (int) $produto['estoque']) {
+                    throw new RuntimeException('Estoque insuficiente para reativar o pedido (produto: ' . $produto['nome'] . ').');
+                }
+            }
+        }
+
+        $stmtAjuste = $pdo->prepare('UPDATE produtos SET estoque = estoque + :delta WHERE id = :id');
+        foreach ($itens as $item) {
+            $stmtAjuste->bindValue(':delta', $sinal * (int) $item['quantidade'], PDO::PARAM_INT);
+            $stmtAjuste->bindValue(':id', (int) $item['produto_id'], PDO::PARAM_INT);
+            $stmtAjuste->execute();
+        }
     }
 }

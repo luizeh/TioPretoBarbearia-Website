@@ -33,8 +33,8 @@ include __DIR__ . '/../partials/head.php';
                 <i class="fa-solid fa-users"></i>
             </div>
             <div class="clientes-stat-banner__info">
-                <span class="clientes-stat-banner__count"><?= count($usuarios) ?></span>
-                <span class="clientes-stat-banner__label">clientes cadastrados</span>
+                <span class="clientes-stat-banner__count"><?= (int) $totalUsuarios ?></span>
+                <span class="clientes-stat-banner__label">usuários cadastrados</span>
             </div>
         </div>
 
@@ -50,24 +50,29 @@ include __DIR__ . '/../partials/head.php';
                 </div>
             </div>
 
+            <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
             <div class="table-wrapper">
                 <table class="dash-table" id="tbl-clientes">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Nome</th>
                             <th>E-mail</th>
                             <th>Telefone</th>
                             <th>Cidade</th>
+                            <th>Tipo</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($usuarios as $u): ?>
+                        <?php foreach ($usuarios as $u): $ehAdmin = !empty($u['admin']); ?>
                             <tr>
+                                <td>#<?= (int) $u['id'] ?></td>
                                 <td><span class="client-name"><?= htmlspecialchars($u['nome']) . ' ' . htmlspecialchars($u['sobrenome']) ?></span></td>
                                 <td><?= htmlspecialchars($u['email']) ?></td>
                                 <td><?= htmlspecialchars($u['telefone']) ?></td>
                                 <td><?= htmlspecialchars($u['cidade']) ?></td>
+                                <td><span class="badge <?= $ehAdmin ? 'badge--admin' : 'badge--user' ?>"><?= $ehAdmin ? 'Admin' : 'Usuário' ?></span></td>
                                 <td>
                                     <div class="action-btns">
                                         <button class="btn-action btn-action--view" title="Ver"
@@ -88,12 +93,14 @@ include __DIR__ . '/../partials/head.php';
                                             data-cidade="<?= htmlspecialchars($u['cidade'] ?? '') ?>">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
-                                        <button class="btn-action btn-action--delete" title="Excluir"
-                                            data-modal="modal-cliente-excluir"
-                                            data-id="<?= $u['id'] ?>"
-                                            data-nome="<?= htmlspecialchars($u['nome'] . ' ' . $u['sobrenome']) ?>">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                        <?php if (!$ehAdmin): ?>
+                                            <button class="btn-action btn-action--delete" title="Excluir"
+                                                data-modal="modal-cliente-excluir"
+                                                data-id="<?= $u['id'] ?>"
+                                                data-nome="<?= htmlspecialchars($u['nome'] . ' ' . $u['sobrenome']) ?>">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

@@ -162,6 +162,7 @@ include __DIR__ . '/../partials/head.php';
                 <div class="bloqueio-lista-titulo">
                     <i class="fa-solid fa-list"></i> Bloqueios configurados
                 </div>
+                <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
                 <div class="table-wrapper">
                 <table class="dash-table horarios-table" id="tbl-bloqueios">
                     <thead>
@@ -278,6 +279,7 @@ include __DIR__ . '/../partials/head.php';
                 <div class="bloqueio-lista-titulo">
                     <i class="fa-solid fa-list"></i> Períodos configurados
                 </div>
+                <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
                 <div class="table-wrapper">
                 <table class="dash-table horarios-table" id="tbl-periodos">
                     <thead>

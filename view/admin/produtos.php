@@ -50,6 +50,7 @@ include __DIR__ . '/../partials/head.php';
           <input class="table-search" type="text" placeholder="Pesquisar produto..." data-search="tbl-produtos" />
         </div>
       </div>
+      <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
       <div class="table-wrapper">
         <table class="dash-table" id="tbl-produtos">
           <thead>
@@ -114,6 +115,7 @@ include __DIR__ . '/../partials/head.php';
                       data-estoque="<?= $produto['estoque'] ?>"
                       data-preco="<?= $produto['preco'] ?>"
                       data-tags="<?= htmlspecialchars($produto['tags'] ?? '') ?>"
+                      data-tag-ids="<?= htmlspecialchars($produto['tag_ids'] ?? '') ?>"
                       data-foto-url="<?= htmlspecialchars($produto['foto_url'] ?? '') ?>">
                       <i class="fa-solid fa-pen"></i>
                     </button>
@@ -147,6 +149,7 @@ include __DIR__ . '/../partials/head.php';
           <i class="fa-solid fa-plus"></i> Nova Tag
         </button>
       </div>
+      <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
       <div class="table-wrapper">
         <table class="dash-table" id="tbl-tags">
           <thead>

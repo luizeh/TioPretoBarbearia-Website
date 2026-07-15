@@ -62,7 +62,7 @@ $notificacoesNaoLidas = count(array_filter($notificacoesHeader, static fn(array 
                 </div>
                 <div class="cart-menu__items" id="cartItems"></div>
                 <div class="cart-menu__footer" id="cartFooter">
-                    <a href="#" class="btn-cart-checkout">Finalizar Pedido</a>
+                    <a href="<?= $linkBase ?>user/carrinho.php" class="btn-cart-checkout">Finalizar Pedido</a>
                     <a href="<?= $linkBase ?>user/carrinho.php" class="cart-menu__full-link">Ver carrinho completo</a>
                 </div>
             </div>

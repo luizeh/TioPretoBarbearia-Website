@@ -22,6 +22,7 @@ include __DIR__ . '/../partials/sidebar.php';
                 <h2 class="dashboard-card-title"><i class="fa-solid fa-receipt"></i> Pedidos dos clientes</h2>
                 <div class="table-search-wrap"><i class="fa-solid fa-magnifying-glass"></i><input class="table-search" type="text" placeholder="Pesquisar pedido..." data-search="tbl-pedidos" /></div>
             </div>
+            <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
             <div class="table-wrapper">
                 <table class="dash-table" id="tbl-pedidos">
                     <thead><tr><th>ID</th><th>Cliente</th><th>Telefone</th><th>Produtos</th><th>Endereço</th><th>Total</th><th>Status</th><th>Data</th></tr></thead>

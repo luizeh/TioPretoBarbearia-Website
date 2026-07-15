@@ -51,7 +51,14 @@ if ($method === 'POST') {
         if (empty($body['id'])) {
             helpers::resposta_json(false, 'ID do produto é obrigatório.', null, 400);
         }
-        ProdutosSql::excluirProduto($pdo, (int) $body['id']);
+        try {
+            ProdutosSql::excluirProduto($pdo, (int) $body['id']);
+        } catch (RuntimeException $e) {
+            helpers::resposta_json(false, $e->getMessage(), null, 409);
+        } catch (Throwable $e) {
+            error_log('Excluir produto: ' . $e->getMessage());
+            helpers::resposta_json(false, 'Não foi possível excluir o produto.', null, 500);
+        }
         helpers::resposta_json(true, 'Produto excluído com sucesso.', null, 200);
     }
 

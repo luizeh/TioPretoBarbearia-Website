@@ -92,14 +92,17 @@ class ProdutosSql
         ]);
     }
 
-    public static function listarTags($pdo)
+    public static function listarTags($pdo, string $ordenarPor = 'nome')
     {
+        // Whitelist da coluna de ordenação (evita SQL injection).
+        $coluna = $ordenarPor === 'id' ? 'id' : 'nome';
+
         $sql = "
             SELECT
                 id,
                 nome
             FROM tags
-            ORDER BY nome
+            ORDER BY {$coluna}
         ";
 
         $stmt = $pdo->prepare($sql);
@@ -110,21 +113,30 @@ class ProdutosSql
 
     public static function excluirProduto($pdo, $idProduto)
     {
-        $sql = "DELETE FROM produto_tags WHERE produto_id = :id";
+        $idProduto = (int) $idProduto;
 
-        $stmt = $pdo->prepare($sql);
+        try {
+            $pdo->beginTransaction();
 
-        $stmt->execute([
-            ":id" => $idProduto
-        ]);
+            // Produtos que já fazem parte de pedidos não podem ser excluídos
+            // (preservar o histórico de vendas). Sugere ocultar em vez de excluir.
+            $check = $pdo->prepare("SELECT COUNT(*) FROM pedido_itens WHERE produto_id = :id");
+            $check->execute([":id" => $idProduto]);
+            if ((int) $check->fetchColumn() > 0) {
+                throw new RuntimeException('Este produto já faz parte de pedidos e não pode ser excluído. Oculte-o do site em vez de excluir.');
+            }
 
-        $sql = "DELETE FROM produtos WHERE id = :id";
+            // Remove vínculos transitórios antes de excluir o produto
+            // (carrinhos de clientes e tags associadas).
+            $pdo->prepare("DELETE FROM carrinho_itens WHERE produto_id = :id")->execute([":id" => $idProduto]);
+            $pdo->prepare("DELETE FROM produto_tags WHERE produto_id = :id")->execute([":id" => $idProduto]);
+            $pdo->prepare("DELETE FROM produtos WHERE id = :id")->execute([":id" => $idProduto]);
 
-        $stmt = $pdo->prepare($sql);
-
-        $stmt->execute([
-            ":id" => $idProduto
-        ]);
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            throw $e;
+        }
     }
 
     public static function buscarProdutoPorId($pdo, $id)

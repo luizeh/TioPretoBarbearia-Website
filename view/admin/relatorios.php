@@ -191,6 +191,7 @@ include __DIR__ . '/../partials/head.php';
                     <i class="fa-solid fa-clock-rotate-left"></i> Últimos Atendimentos
                 </h2>
             </div>
+            <p class="table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Arraste a tabela para o lado para ver todas as colunas</p>
             <div class="table-wrapper">
                 <table class="dash-table">
                     <thead>

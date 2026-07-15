@@ -16,7 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pedido = null;
     foreach (PedidosSql::listarTodos() as $item) if ((int) $item['id'] === $id) { $pedido = $item; break; }
     if (!$pedido) helpers::resposta_json(false, 'Pedido não encontrado.', null, 404);
-    PedidosSql::atualizarStatus($id, $status);
+    try {
+        PedidosSql::atualizarStatus($id, $status);
+    } catch (InvalidArgumentException $e) {
+        helpers::resposta_json(false, $e->getMessage(), null, 422);
+    } catch (RuntimeException $e) {
+        helpers::resposta_json(false, $e->getMessage(), null, 409);
+    }
     LogsSql::registrar((int) $_SESSION['usuario_id'], 'pedido_status', "Status do pedido #$id alterado para $status.");
     NotificacoesSql::criar((int) $pedido['usuario_id'], 'pedido', 'Status do pedido atualizado', 'O status do seu pedido foi alterado para: ' . ucfirst($status) . '.');
     helpers::resposta_json(true, 'Status do pedido atualizado.');
