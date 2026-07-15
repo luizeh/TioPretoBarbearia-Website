@@ -74,13 +74,11 @@
     var overlay = document.getElementById("modal-tag-excluir");
     if (!overlay) return;
 
-    SwalTP.fire({
+    SwalTP.confirmarExclusao({
       title: "Excluir Tag",
       html: overlay.querySelector(".modal-body").innerHTML,
-      showCancelButton: true,
       confirmButtonText: "Excluir",
       cancelButtonText: "Cancelar",
-      customClass: { confirmButton: "swal-tp__btn swal-tp__btn--danger" },
       didOpen: function (popup) {
         var el = popup.querySelector("[data-field='nome']");
         if (el) el.textContent = btn.dataset.nome || "esta tag";

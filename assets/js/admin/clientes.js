@@ -194,16 +194,11 @@
 
     var bodyHTML = overlay.querySelector(".modal-body").innerHTML;
 
-    SwalTP.fire({
+    SwalTP.confirmarExclusao({
       title: "Excluir Cliente",
       html: bodyHTML,
-      showCancelButton: true,
       confirmButtonText: "Excluir",
       cancelButtonText: "Cancelar",
-      customClass: {
-        confirmButton: "swal-tp__btn swal-tp__btn--danger",
-        cancelButton: "swal-tp__btn swal-tp__btn--cancel",
-      },
       didOpen: function (popup) {
         var el = popup.querySelector("[data-field='nome']");
         if (el) el.textContent = btn.dataset.nome || "este cliente";

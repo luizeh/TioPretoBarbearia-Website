@@ -24,11 +24,36 @@ CREATE TABLE IF NOT EXISTS usuarios (
     senha      VARCHAR(255)  NOT NULL,
     cidade     VARCHAR(100)  NOT NULL,
     admin      TINYINT(1)    NOT NULL DEFAULT 0,
-    created_at DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    email_verificado    TINYINT(1) NOT NULL DEFAULT 0,
+    email_verificado_em DATETIME   NULL,
+    created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
     UNIQUE KEY uq_usuarios_email    (email),
     UNIQUE KEY uq_usuarios_telefone (telefone)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- 1b. codigos_verificacao  (confirmação de e-mail por código)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS codigos_verificacao (
+    id          INT          NOT NULL AUTO_INCREMENT,
+    usuario_id  INT          NOT NULL,
+    email       VARCHAR(320) NOT NULL,
+    codigo_hash VARCHAR(255) NOT NULL COMMENT 'hash do código — nunca em texto puro',
+    expira_em   DATETIME     NOT NULL,
+    tentativas  TINYINT      NOT NULL DEFAULT 0,
+    usado       TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    INDEX idx_cv_usuario (usuario_id),
+    INDEX idx_cv_email   (email),
+
+    CONSTRAINT fk_cv_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -41,6 +66,8 @@ CREATE TABLE IF NOT EXISTS servicos (
     preco          DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
     tempo_estimado INT            NOT NULL DEFAULT 30 COMMENT 'duração em minutos',
     foto_url       VARCHAR(500)   NULL,
+    created_at     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP      NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -57,6 +84,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     hora_fim    TIME  NOT NULL,
     status      ENUM('pendente','confirmado','cancelado','finalizado') NOT NULL DEFAULT 'pendente',
     observacoes TEXT  NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
     INDEX idx_agendamentos_data    (data),
@@ -111,6 +140,8 @@ CREATE TABLE IF NOT EXISTS produtos (
     estoque   INT            NOT NULL DEFAULT 0,
     foto_url  VARCHAR(500)   NULL,
     visivel   TINYINT(1)     NOT NULL DEFAULT 1 COMMENT '1 = visível no site; 0 = só admin',
+    created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -176,10 +207,19 @@ CREATE TABLE IF NOT EXISTS carrinho_itens (
 CREATE TABLE IF NOT EXISTS pedidos (
     id          INT            NOT NULL AUTO_INCREMENT,
     usuario_id  INT            NOT NULL,
-    endereco    TEXT           NOT NULL,
+    endereco    TEXT           NOT NULL COMMENT 'endereço completo formatado (compatibilidade)',
+    cep              VARCHAR(9)   NULL,
+    logradouro       VARCHAR(150) NULL,
+    numero           VARCHAR(20)  NULL,
+    bairro           VARCHAR(100) NULL,
+    cidade           VARCHAR(100) NULL,
+    estado           CHAR(2)      NULL,
+    complemento      VARCHAR(150) NULL,
+    ponto_referencia VARCHAR(150) NULL,
     valor_total DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
     status      ENUM('recebido','preparando','pronto','entregue','cancelado') NOT NULL DEFAULT 'recebido',
-    created_at  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP      NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
     INDEX idx_pedidos_usuario (usuario_id),

@@ -137,6 +137,10 @@
   padding-top: 12px;
   border-top: 1px solid var(--border);
 }
+.horario-dia-modal__restaurar .btn-secondary {
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
 
 /* ── FORMULÁRIO DE BLOQUEIOS ── */
 .bloqueio-form {

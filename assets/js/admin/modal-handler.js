@@ -57,21 +57,11 @@
     var isView = id.indexOf("-ver") !== -1;
 
     if (isDelete) {
-      SwalTP.fire({
+      SwalTP.confirmarExclusao({
         title: title,
         html: bodyHTML,
-        showCancelButton: true,
         confirmButtonText: "Excluir",
         cancelButtonText: "Cancelar",
-        customClass: {
-          popup: "swal-tp",
-          title: "swal-tp__title",
-          htmlContainer: "swal-tp__body",
-          confirmButton: "swal-tp__btn swal-tp__btn--danger",
-          cancelButton: "swal-tp__btn swal-tp__btn--cancel",
-          actions: "swal-tp__actions",
-          closeButton: "swal-tp__close",
-        },
         didOpen: function (popup) {
           populateFields(popup, btn.dataset);
         },

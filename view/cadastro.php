@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../helpers/helpers.php';
+$csrf      = helpers::tokenCsrf();
 $rootPath  = '../';
 $pageTitle = 'Cadastro — Tio Preto Barbearia';
 $extraCss  = ['assets/css/auth/login.css', 'assets/css/auth/cadastro.css'];
@@ -17,6 +19,7 @@ include_once __DIR__ . '/partials/head_public.php';
 
         <form id="form-cadastro" action="../api/auth/cadastro.php" method="POST" autocomplete="off">
             <input type="hidden" name="action" value="cadastro" />
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>" />
 
             <!-- Nome e Sobrenome -->
             <div class="form-row">
@@ -26,6 +29,7 @@ include_once __DIR__ . '/partials/head_public.php';
                         <input class="form-input" type="text" id="nome" name="nome"
                             placeholder="Seu nome" required autocomplete="given-name" />
                     </div>
+                    <small class="field-error" data-error-for="nome" hidden></small>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="sobrenome">Sobrenome</label>
@@ -33,6 +37,7 @@ include_once __DIR__ . '/partials/head_public.php';
                         <input class="form-input" type="text" id="sobrenome" name="sobrenome"
                             placeholder="Seu sobrenome" required autocomplete="family-name" />
                     </div>
+                    <small class="field-error" data-error-for="sobrenome" hidden></small>
                 </div>
             </div>
 
@@ -44,6 +49,7 @@ include_once __DIR__ . '/partials/head_public.php';
                         <input class="form-input" type="tel" id="telefone" name="telefone"
                             placeholder="(00) 9 0000-0000" required autocomplete="tel" />
                     </div>
+                    <small class="field-error" data-error-for="telefone" hidden></small>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="cidade">Cidade</label>
@@ -51,6 +57,7 @@ include_once __DIR__ . '/partials/head_public.php';
                         <input class="form-input" type="text" id="cidade" name="cidade"
                             placeholder="Sua cidade" required autocomplete="address-level2" />
                     </div>
+                    <small class="field-error" data-error-for="cidade" hidden></small>
                 </div>
             </div>
 
@@ -61,6 +68,7 @@ include_once __DIR__ . '/partials/head_public.php';
                     <input class="form-input" type="email" id="email" name="email"
                         placeholder="seu@email.com" required autocomplete="email" />
                 </div>
+                <small class="field-error" data-error-for="email" hidden></small>
             </div>
 
             <!-- Senha e Confirmar Senha -->
@@ -78,6 +86,7 @@ include_once __DIR__ . '/partials/head_public.php';
                         <span id="s3"></span>
                         <span id="s4"></span>
                     </div>
+                    <small class="field-error" data-error-for="senha" hidden></small>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="confirmar_senha">Confirmar senha</label>
@@ -86,6 +95,7 @@ include_once __DIR__ . '/partials/head_public.php';
                             name="confirmar_senha" placeholder="Repita a senha" required
                             autocomplete="new-password" />
                     </div>
+                    <small class="field-error" data-error-for="confirmar_senha" hidden></small>
                 </div>
             </div>
 

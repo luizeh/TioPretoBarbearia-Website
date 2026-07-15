@@ -79,18 +79,11 @@
 
     if (buttonExcluir) {
       buttonExcluir.addEventListener("click", function () {
-        window.SwalTP.fire({
-          icon: "warning",
+        window.SwalTP.confirmarExclusao({
           title: "Excluir minha conta?",
           text: "Todos os seus dados relacionados serão removidos permanentemente.",
-          showCancelButton: true,
           confirmButtonText: "Sim, excluir conta",
           cancelButtonText: "Voltar",
-          customClass: {
-            confirmButton: "swal-tp__btn swal-tp__btn--danger",
-            cancelButton: "swal-tp__btn swal-tp__btn--cancel",
-            actions: "swal-tp__actions",
-          },
         }).then(function (result) {
           if (!result.isConfirmed) return;
 

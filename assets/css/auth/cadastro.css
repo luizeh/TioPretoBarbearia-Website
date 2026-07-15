@@ -73,3 +73,55 @@
     padding: 40px 28px 36px;
   }
 }
+
+/* ── Verificação de e-mail ── */
+.verify-intro {
+  text-align: center;
+  font-family: "Barlow", sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 22px;
+}
+
+.verify-code-input {
+  text-align: center;
+  letter-spacing: 0.5em;
+  font-size: 1.4rem;
+  font-weight: 600;
+  padding-left: 0.5em; /* compensa o letter-spacing para centralizar */
+}
+
+.form-input.is-invalid {
+  border-color: #c0392b;
+}
+
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: "Barlow Condensed", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--gold);
+  transition: color 0.2s;
+}
+
+.link-button:hover:not(:disabled) {
+  color: var(--gold-light);
+  text-decoration: underline;
+}
+
+.link-button:disabled {
+  color: rgba(0, 0, 0, 0.35);
+  cursor: default;
+}
+
+.verify-resend__status {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.76rem;
+  color: rgba(0, 0, 0, 0.5);
+}

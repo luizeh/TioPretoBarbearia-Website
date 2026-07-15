@@ -148,22 +148,11 @@
   }
 
   function confirmarExclusao(id) {
-    SwalTP.fire({
+    SwalTP.confirmarExclusao({
       title: 'Excluir agendamento?',
       text: 'Esta ação não poderá ser desfeita.',
-      icon: 'warning',
-      showCancelButton: true,
       confirmButtonText: 'Sim, excluir',
-      cancelButtonText: 'Voltar',
-      customClass: {
-        popup: 'swal-tp',
-        title: 'swal-tp__title',
-        htmlContainer: 'swal-tp__body',
-        confirmButton: 'swal-tp__btn swal-tp__btn--danger',
-        cancelButton: 'swal-tp__btn swal-tp__btn--cancel',
-        actions: 'swal-tp__actions',
-        closeButton: 'swal-tp__close'
-      }
+      cancelButtonText: 'Voltar'
     }).then(function (result) {
       if (!result.isConfirmed) return;
       request(BASE + 'user/agendamentos.php', {
@@ -234,22 +223,11 @@
   });
 
   function confirmarCancelamentoComDialogo(id, servico) {
-    SwalTP.fire({
+    SwalTP.confirmarCancelamento({
       title: 'Cancelar agendamento?',
       text: 'O horário de ' + servico + ' será liberado.',
-      icon: 'warning',
-      showCancelButton: true,
       confirmButtonText: 'Cancelar agendamento',
-      cancelButtonText: 'Voltar',
-      customClass: {
-        popup: 'swal-tp',
-        title: 'swal-tp__title',
-        htmlContainer: 'swal-tp__body',
-        confirmButton: 'swal-tp__btn swal-tp__btn--danger',
-        cancelButton: 'swal-tp__btn swal-tp__btn--cancel',
-        actions: 'swal-tp__actions',
-        closeButton: 'swal-tp__close'
-      }
+      cancelButtonText: 'Voltar'
     }).then(function (result) {
       if (!result.isConfirmed) return;
       confirmarCancelamento(id).then(function (resposta) {

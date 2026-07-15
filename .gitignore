@@ -1,0 +1,14 @@
+# Credenciais e configurações sensíveis — nunca versionar
+.env
+.env.local
+
+# Dependências PHP (instaladas via `composer install`)
+/vendor/
+
+# E-mails gravados em modo desenvolvimento (sem SMTP)
+/storage/
+
+# Arquivos de sistema / editor
+Thumbs.db
+.DS_Store
+*.log

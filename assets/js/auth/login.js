@@ -41,6 +41,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 : "admin/dashboard.php";
             window.location.href = redirect;
           });
+        } else if (result.data && result.data.nao_verificado) {
+          // Credenciais corretas, mas conta ainda não verificada.
+          SwalTP.fire({
+            icon: "warning",
+            title: "Confirme seu e-mail",
+            text: result.message || "Sua conta ainda não foi verificada.",
+            confirmButtonText: "Verificar agora",
+            showCloseButton: false,
+          }).then(function () {
+            var redirect =
+              result.data && result.data.redirect
+                ? result.data.redirect
+                : "verificar-email.php";
+            window.location.href = redirect;
+          });
         } else {
           SwalTP.fire({
             icon: "error",

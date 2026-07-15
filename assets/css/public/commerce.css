@@ -11,6 +11,18 @@
 .cart-page-item__subtotal { white-space:nowrap; color:var(--gold); }.cart-page-item__remove { border:0; background:none; color:#c43d32; cursor:pointer; }
 .cart-page__summary { padding:22px; }.cart-page__summary h2 { margin-bottom:20px; }.cart-page__total { display:flex; justify-content:space-between; padding:14px 0 20px; margin-bottom:20px; border-bottom:1px solid var(--border); }.cart-page__total strong { color:var(--gold); font-size:1.2rem; }.cart-page__checkout { width:100%; justify-content:center; margin-top:16px; }
 .cart-page__empty { padding:48px 20px; text-align:center; color:var(--text-muted); }.cart-page__empty i { display:block; font-size:2rem; margin-bottom:12px; color:var(--gold); }.cart-page__empty .btn-cart { display:inline-flex; margin-top:16px; text-decoration:none; }
+
+/* ── Formulário de endereço do pedido ── */
+.cart-address-form { gap:14px; }
+.cart-address-form__title { font-family:var(--font-condensed); font-size:.9rem; text-transform:uppercase; letter-spacing:.1em; color:var(--dark); margin-bottom:2px; }
+.cart-address-form__title i { color:var(--gold); margin-right:6px; }
+.cart-optional { text-transform:none; letter-spacing:0; color:var(--text-muted); font-weight:400; }
+.cart-cep-wrap { position:relative; }
+.cart-cep-status { position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:.72rem; color:var(--gold); pointer-events:none; }
+.cart-field--uf { max-width:96px; }
+.field-error { color:#c0392b; font-size:.75rem; line-height:1.3; }
+.modal-input.is-invalid, .modal-select.is-invalid { border-color:#c0392b; }
+.modal-input.is-invalid:focus, .modal-select.is-invalid:focus { border-color:#c0392b; }
 .cart-menu__full-link { display:block; margin-top:8px; color:var(--gold); font-size:.78rem; text-align:center; text-decoration:none; }
 .cart-menu__full-link:hover { color:var(--gold-light); }
 .user-page {

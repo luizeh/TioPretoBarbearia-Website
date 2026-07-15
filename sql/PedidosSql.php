@@ -4,7 +4,14 @@ include_once __DIR__ . '/../config/connection.php';
 
 class PedidosSql
 {
-    public static function criar(int $usuarioId, string $endereco, array $itens): int
+    /**
+     * Cria um pedido. $endereco é um array validado com as chaves:
+     *   completo, cep, logradouro, numero, bairro, cidade, estado,
+     *   complemento, ponto_referencia
+     * A coluna `endereco` recebe o endereço completo formatado (compatibilidade)
+     * e as colunas separadas guardam cada parte.
+     */
+    public static function criar(int $usuarioId, array $endereco, array $itens): int
     {
         $pdo = Connection::getConnection();
         try {
@@ -25,8 +32,25 @@ class PedidosSql
                 $produtos[] = ['id' => $produtoId, 'quantidade' => $quantidade, 'preco' => $preco];
             }
 
-            $stmt = $pdo->prepare("INSERT INTO pedidos (usuario_id, endereco, valor_total, status) VALUES (:uid, :endereco, :total, 'recebido')");
-            $stmt->execute([':uid' => $usuarioId, ':endereco' => $endereco, ':total' => $total]);
+            $stmt = $pdo->prepare(
+                "INSERT INTO pedidos
+                    (usuario_id, endereco, cep, logradouro, numero, bairro, cidade, estado, complemento, ponto_referencia, valor_total, status)
+                 VALUES
+                    (:uid, :endereco, :cep, :logradouro, :numero, :bairro, :cidade, :estado, :complemento, :ponto_referencia, :total, 'recebido')"
+            );
+            $stmt->execute([
+                ':uid'              => $usuarioId,
+                ':endereco'         => $endereco['completo'] ?? '',
+                ':cep'              => $endereco['cep'] ?? null,
+                ':logradouro'       => $endereco['logradouro'] ?? null,
+                ':numero'           => $endereco['numero'] ?? null,
+                ':bairro'           => $endereco['bairro'] ?? null,
+                ':cidade'           => $endereco['cidade'] ?? null,
+                ':estado'           => $endereco['estado'] ?? null,
+                ':complemento'      => ($endereco['complemento'] ?? '') !== '' ? $endereco['complemento'] : null,
+                ':ponto_referencia' => ($endereco['ponto_referencia'] ?? '') !== '' ? $endereco['ponto_referencia'] : null,
+                ':total'            => $total,
+            ]);
             $pedidoId = (int) $pdo->lastInsertId();
             $itemStmt = $pdo->prepare('INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco) VALUES (:pid, :prod_id, :qty, :preco)');
             $estoqueStmt = $pdo->prepare('UPDATE produtos SET estoque = estoque - :qty WHERE id = :id');

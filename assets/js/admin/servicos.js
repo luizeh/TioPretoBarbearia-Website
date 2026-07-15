@@ -103,17 +103,11 @@
     var overlay = document.getElementById("modal-servico-excluir");
     if (!overlay) return;
 
-    window.SwalTP.fire({
+    window.SwalTP.confirmarExclusao({
       title: "Excluir Serviço",
       html: overlay.querySelector(".modal-body").innerHTML,
-      showCancelButton: true,
       confirmButtonText: "Excluir",
       cancelButtonText: "Cancelar",
-      customClass: {
-        confirmButton: "swal-tp__btn swal-tp__btn--danger",
-        cancelButton: "swal-tp__btn swal-tp__btn--cancel",
-        actions: "swal-tp__actions",
-      },
       didOpen: function (popup) {
         var name = popup.querySelector("[data-field='nome']");
         if (name) name.textContent = button.dataset.nome || "este serviço";

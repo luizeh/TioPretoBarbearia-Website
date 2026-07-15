@@ -34,10 +34,32 @@ if ($method === 'POST') {
     $action  = $body['action'] ?? '';
 
     if ($action === 'finalizar') {
-        $endereco = trim($body['endereco'] ?? '');
-        if (empty($endereco)) {
-            helpers::resposta_json(false, 'Informe o endereço de entrega.', null, 400);
+        helpers::verificarCsrf($body);
+
+        // Validação de cada campo do endereço (revalida tudo no servidor).
+        $endereco = [
+            'cep'              => helpers::validarCep($body['cep'] ?? ''),
+            'logradouro'       => helpers::validarObrigatorio($body['logradouro'] ?? '', 'logradouro', 2, 150),
+            'numero'           => helpers::validarObrigatorio($body['numero'] ?? '', 'número', 1, 20),
+            'bairro'           => helpers::validarObrigatorio($body['bairro'] ?? '', 'bairro', 2, 100),
+            'cidade'           => helpers::validarObrigatorio($body['cidade'] ?? '', 'cidade', 2, 100),
+            'estado'           => helpers::validarUf($body['estado'] ?? ''),
+            'complemento'      => helpers::validarOpcional($body['complemento'] ?? '', 'complemento', 150),
+            'ponto_referencia' => helpers::validarOpcional($body['ponto_referencia'] ?? '', 'ponto de referência', 150),
+        ];
+
+        // Monta o endereço completo (mantém compatibilidade com a coluna `endereco`).
+        $completo = $endereco['logradouro'] . ', ' . $endereco['numero']
+            . ' - ' . $endereco['bairro']
+            . ', ' . $endereco['cidade'] . '/' . $endereco['estado']
+            . ' - CEP: ' . $endereco['cep'];
+        if ($endereco['complemento'] !== '') {
+            $completo .= ' - Compl.: ' . $endereco['complemento'];
         }
+        if ($endereco['ponto_referencia'] !== '') {
+            $completo .= ' - Ref.: ' . $endereco['ponto_referencia'];
+        }
+        $endereco['completo'] = $completo;
 
         $itens = CarrinhoSql::listarItens($carrinhoId);
         if (empty($itens)) {

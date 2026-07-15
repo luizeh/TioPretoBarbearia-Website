@@ -189,10 +189,21 @@ cd tiopretobarbearia-crud
 # 2. Instale as dependências de front (SweetAlert2)
 npm install
 
-# 3. Crie o banco de dados e importe o schema
+# 3. Instale as dependências de back (PHPMailer)
+composer install
+
+# 4. Configure as variáveis de ambiente (credenciais SMTP)
+cp .env.example .env
+#   → edite .env e preencha MAIL_HOST, MAIL_USERNAME, MAIL_PASSWORD, etc.
+#   Sem SMTP configurado (MAIL_HOST vazio), os e-mails são gravados em
+#   storage/mail/ para inspeção durante o desenvolvimento.
+
+# 5. Crie o banco de dados e importe o schema
 mysql -h 127.0.0.1 -P 3307 -u root -e "CREATE DATABASE IF NOT EXISTS tiopretobarbearia CHARACTER SET utf8mb4;"
 mysql -h 127.0.0.1 -P 3307 -u root tiopretobarbearia < sql/migrations/000_schema_completo.sql
 ```
+
+> **`.env` e `vendor/` não são versionados** (ver `.gitignore`). Rode `composer install` e crie o `.env` a partir do `.env.example` após clonar.
 
 ### Acesso
 

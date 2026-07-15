@@ -17,21 +17,11 @@
     var overlay = document.getElementById("modal-agendamento-excluir");
     if (!overlay) return;
 
-    SwalTP.fire({
+    SwalTP.confirmarExclusao({
       title: "Excluir Agendamento",
       html: overlay.querySelector(".modal-body").innerHTML,
-      showCancelButton: true,
       confirmButtonText: "Excluir",
       cancelButtonText: "Cancelar",
-      customClass: {
-        popup: "swal-tp",
-        title: "swal-tp__title",
-        htmlContainer: "swal-tp__body",
-        confirmButton: "swal-tp__btn swal-tp__btn--danger",
-        cancelButton: "swal-tp__btn swal-tp__btn--cancel",
-        actions: "swal-tp__actions",
-        closeButton: "swal-tp__close",
-      },
       didOpen: function (popup) {
         var el = popup.querySelector("[data-field='nome']");
         if (el) el.textContent = btn.dataset.nome || "este agendamento";
@@ -503,7 +493,7 @@
       '" step="1800" class="horario-input" /></label>' +
       "</div>" +
       (temExcecao
-        ? '<p class="horario-dia-modal__restaurar"><button type="button" id="btn-restaurar-padrao" class="btn-secondary" style="font-size:.8rem;padding:6px 12px"><i class="fa-solid fa-rotate-left"></i> Restaurar padrão da semana</button></p>'
+        ? '<p class="horario-dia-modal__restaurar"><button type="button" id="btn-restaurar-padrao" class="btn-secondary"><i class="fa-solid fa-rotate-left"></i> Restaurar padrão da semana</button></p>'
         : "") +
       "</div>";
 

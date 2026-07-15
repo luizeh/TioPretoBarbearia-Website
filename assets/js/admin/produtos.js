@@ -206,24 +206,14 @@
     event.preventDefault();
     event.stopPropagation();
 
-    window.SwalTP.fire({
+    window.SwalTP.confirmarExclusao({
       title: "Excluir produto?",
       html:
         "Tem certeza que deseja excluir <strong>" +
         escapeHtml(button.dataset.nome || "este produto") +
         '</strong>?<br><small class="swal-text-muted">Esta ação não pode ser desfeita.</small>',
-      showCancelButton: true,
       confirmButtonText: "Excluir",
       cancelButtonText: "Cancelar",
-      customClass: {
-        popup: "swal-tp",
-        title: "swal-tp__title",
-        htmlContainer: "swal-tp__body",
-        confirmButton: "swal-tp__btn swal-tp__btn--danger",
-        cancelButton: "swal-tp__btn swal-tp__btn--cancel",
-        actions: "swal-tp__actions",
-        closeButton: "swal-tp__close",
-      },
       preConfirm: function () {
         return post({ action: "excluir", id: button.dataset.id });
       },

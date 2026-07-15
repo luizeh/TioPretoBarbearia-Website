@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../helpers/helpers.php';
+$csrf      = helpers::tokenCsrf();
 $rootPath  = '../';
 $pageTitle = 'Login — Tio Preto Barbearia';
 $extraCss  = ['assets/css/auth/login.css'];
@@ -17,6 +19,7 @@ include_once __DIR__ . '/partials/head_public.php';
 
     <form id="form-login" action="../api/auth/login.php" method="POST">
       <input type="hidden" name="action" value="login">
+      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
 
       <div class="form-group">
         <label class="form-label" for="email">E-mail</label>

@@ -185,7 +185,7 @@
   function labelDiaBloqueio(dia, exc) {
     if (dia) return nomes[Number(dia)] || "—";
     if (exc && exc.length) {
-      return '<em>Todos os dias</em> <small style="opacity:.75">(exceto ' +
+      return '<em>Todos os dias</em> <small class="swal-text-muted">(exceto ' +
         exc.map(function (d) { return abrev[d] || d; }).join(", ") + ")</small>";
     }
     return "<em>Todos os dias</em>";
@@ -321,10 +321,8 @@
     var btn = e.target.closest(".btn-bloqueio-excluir");
     if (!btn) return;
     var id = Number(btn.dataset.id);
-    window.SwalTP.fire({
-      icon: "question",
+    window.SwalTP.confirmarExclusao({
       title: "Remover bloqueio?",
-      showCancelButton: true,
       confirmButtonText: "Remover",
       cancelButtonText: "Cancelar",
     }).then(function (result) {
@@ -400,7 +398,7 @@
   function labelDiaBloqueio(dia, exc) {
     if (dia) return nomes[Number(dia)] || "—";
     if (exc && exc.length) {
-      return '<em>Todos os dias</em> <small style="opacity:.75">(exceto ' +
+      return '<em>Todos os dias</em> <small class="swal-text-muted">(exceto ' +
         exc.map(function (d) { return abrev[d] || d; }).join(", ") + ")</small>";
     }
     return "<em>Todos os dias</em>";
@@ -428,23 +426,22 @@
     var chips = "";
     for (var x = 1; x <= 7; x++) {
       chips +=
-        '<label style="display:inline-flex;align-items:center;gap:4px;font-size:.8rem;font-weight:500"><input type="checkbox" class="eb-exc" value="' +
+        '<label class="swal-chip"><input type="checkbox" class="eb-exc" value="' +
         x + '"> ' + abrev[x] + "</label>";
     }
 
-    var campo =
-      'style="font-size:.82rem;font-weight:600;display:block;margin-bottom:2px"';
-    var input = 'class="horario-input" style="width:100%;margin-top:4px"';
+    var campo = 'class="swal-form-label"';
+    var input = 'class="horario-input"';
 
     window.SwalTP.fire({
       title: "Editar bloqueio",
       html:
-        '<div style="display:grid;gap:12px;text-align:left">' +
+        '<div class="swal-form-grid">' +
         "<label " + campo + ">Dia da semana<select id=\"eb-dia\" " + input + ">" + opts + "</select></label>" +
         "<label " + campo + ">Início<input type=\"time\" id=\"eb-inicio\" step=\"1800\" " + input + "></label>" +
         "<label " + campo + ">Fim<input type=\"time\" id=\"eb-fim\" step=\"1800\" " + input + "></label>" +
         "<label " + campo + ">Descrição<input type=\"text\" id=\"eb-desc\" maxlength=\"100\" " + input + "></label>" +
-        "<div id=\"eb-excecao-wrap\"><span " + campo + ">Exceto nos dias</span><div style=\"display:flex;flex-wrap:wrap;gap:10px;margin-top:2px\">" + chips + "</div></div>" +
+        "<div id=\"eb-excecao-wrap\"><span " + campo + ">Exceto nos dias</span><div class=\"swal-chips\">" + chips + "</div></div>" +
         "</div>",
       showCancelButton: true,
       confirmButtonText: "Salvar",
@@ -676,10 +673,8 @@
     var btn = e.target.closest(".btn-periodo-excluir");
     if (!btn) return;
     var id = Number(btn.dataset.id);
-    window.SwalTP.fire({
-      icon: "question",
+    window.SwalTP.confirmarExclusao({
       title: "Remover período?",
-      showCancelButton: true,
       confirmButtonText: "Remover",
       cancelButtonText: "Cancelar",
     }).then(function (result) {

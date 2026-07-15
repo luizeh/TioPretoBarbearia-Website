@@ -997,12 +997,38 @@
   background: #a93226 !important;
 }
 
+/* Foco visível por teclado — acessibilidade em todos os botões do modal */
+.swal-tp__btn:focus-visible {
+  outline: 3px solid rgba(201, 162, 39, 0.6) !important;
+  outline-offset: 2px !important;
+}
+.swal-tp__btn--danger:focus-visible {
+  outline-color: rgba(192, 57, 43, 0.65) !important;
+}
+
 /* Botão fechar (X) */
 .swal-tp__close {
   color: var(--gray) !important;
 }
 .swal-tp__close:hover {
   color: var(--dark) !important;
+}
+.swal-tp__close:focus-visible {
+  outline: 2px solid var(--gold) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* Responsividade — botões empilham em telas estreitas */
+@media (max-width: 480px) {
+  .swal-tp__actions {
+    flex-direction: column-reverse !important;
+    padding: 10px 20px 20px !important;
+  }
+  .swal-tp__actions .swal-tp__btn {
+    width: 100% !important;
+    margin: 0 !important;
+  }
 }
 
 /* Ícone warning com a cor dourada do projeto */
@@ -1093,6 +1119,36 @@
 .swal-text-muted {
   color: #888;
   font-size: 0.85rem;
+}
+
+/* Formulário montado dentro de um SweetAlert (ex.: editar bloqueio) */
+.swal-form-grid {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+.swal-form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+.swal-form-label .horario-input {
+  width: 100%;
+  margin-top: 4px;
+}
+.swal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2px;
+}
+.swal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .whatsapp-modal__icon {
