@@ -695,3 +695,81 @@ nav a[href*="notificacoes"] { display:none; }
 .btn-new-appt--muted {
   background: #444;
 }
+
+/* ── Contato e verificação (perfil) ── */
+.contato-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.contato-row:first-of-type {
+  border-top: none;
+}
+
+.contato-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.contato-row__label {
+  font-family: var(--font-condensed, "Barlow Condensed", sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.contato-row__label i {
+  color: var(--gold);
+}
+
+.contato-row__value {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text, #1a1a1a);
+  word-break: break-word;
+}
+
+.contato-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.contato-badge--ok {
+  color: #1e7e34;
+  background: rgba(30, 126, 52, 0.12);
+}
+
+.contato-badge--pendente {
+  color: #b26a00;
+  background: rgba(178, 106, 0, 0.12);
+}
+
+.contato-pendente {
+  font-size: 0.78rem;
+  color: #b26a00;
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .contato-row {
+    align-items: flex-start;
+  }
+  .contato-row .btn-new-appt {
+    width: 100%;
+    justify-content: center;
+  }
+}

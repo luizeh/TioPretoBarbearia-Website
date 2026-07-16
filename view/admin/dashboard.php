@@ -82,6 +82,12 @@ include __DIR__ . '/../partials/sidebar.php';
                     </tbody>
                 </table>
             </div>
+            <?php
+            // Paginação server-side dos logs (usa $pagina/$totalPaginas do partial).
+            $pagina       = $paginaLogs;
+            $totalPaginas = $totalPaginasLogs;
+            include __DIR__ . '/../partials/pagination.php';
+            ?>
         </section>
     </main>
 </div>

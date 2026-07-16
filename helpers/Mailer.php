@@ -26,15 +26,53 @@ class Mailer
     }
 
     /**
-     * Envia o código de verificação de e-mail para um novo cadastro.
+     * Envia o código de verificação de e-mail para um novo cadastro / troca de e-mail.
      * Lança RuntimeException se o envio falhar (para o chamador tratar).
      */
     public static function enviarCodigoVerificacao(string $paraEmail, string $paraNome, string $codigo, int $minutosValidade): void
     {
-        $cfg     = self::config();
-        $assunto = 'Seu código de verificação — Tio Preto Barbearia';
-        $html    = self::montarHtmlCodigo($paraNome, $codigo, $minutosValidade);
-        $texto   = self::montarTextoCodigo($paraNome, $codigo, $minutosValidade);
+        self::enviarCodigo(
+            $paraEmail,
+            $paraNome,
+            $codigo,
+            $minutosValidade,
+            'Seu código de verificação — Tio Preto Barbearia',
+            'Confirme seu e-mail',
+            'Use o código abaixo para confirmar seu e-mail:'
+        );
+    }
+
+    /**
+     * Envia o código de recuperação de senha por e-mail.
+     */
+    public static function enviarCodigoRecuperacao(string $paraEmail, string $paraNome, string $codigo, int $minutosValidade): void
+    {
+        self::enviarCodigo(
+            $paraEmail,
+            $paraNome,
+            $codigo,
+            $minutosValidade,
+            'Recuperação de senha — Tio Preto Barbearia',
+            'Recuperar senha',
+            'Recebemos um pedido para redefinir sua senha. Use o código abaixo:'
+        );
+    }
+
+    /**
+     * Envio genérico de um código destacado. Reutilizado por todos os fluxos.
+     */
+    public static function enviarCodigo(
+        string $paraEmail,
+        string $paraNome,
+        string $codigo,
+        int $minutosValidade,
+        string $assunto,
+        string $titulo,
+        string $chamada
+    ): void {
+        $cfg   = self::config();
+        $html  = self::montarHtmlCodigo($paraNome, $codigo, $minutosValidade, $titulo, $chamada);
+        $texto = self::montarTextoCodigo($paraNome, $codigo, $minutosValidade, $chamada);
 
         self::enviar($cfg, $paraEmail, $paraNome, $assunto, $html, $texto);
     }
@@ -108,65 +146,77 @@ class Mailer
         error_log("[Mailer DEV] E-mail para {$paraEmail} gravado em {$arquivo} (SMTP não configurado).");
     }
 
-    private static function montarHtmlCodigo(string $nome, string $codigo, int $minutos): string
+    /**
+     * Template simples e compatível (Gmail, Outlook, mobile).
+     * Baseado em tabelas e CSS inline mínimo — sem gradientes, flex ou grid.
+     */
+    private static function montarHtmlCodigo(string $nome, string $codigo, int $minutos, string $titulo, string $chamada): string
     {
-        $nomeSeguro   = htmlspecialchars($nome, ENT_QUOTES, 'UTF-8');
-        $codigoSeguro = htmlspecialchars($codigo, ENT_QUOTES, 'UTF-8');
+        $nomeSeguro    = htmlspecialchars($nome, ENT_QUOTES, 'UTF-8');
+        $codigoSeguro  = htmlspecialchars($codigo, ENT_QUOTES, 'UTF-8');
+        $tituloSeguro  = htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8');
+        $chamadaSegura = htmlspecialchars($chamada, ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
-<div style="margin:0;padding:0;background:#f4f1ec;">
-  <div style="max-width:540px;margin:0 auto;padding:32px 16px;font-family:'Segoe UI',Arial,Helvetica,sans-serif;">
-    <div style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(0,0,0,.10);">
-
-      <!-- Cabeçalho com logo -->
-      <div style="background:#1a1a1a;padding:32px 32px 26px;text-align:center;">
-        <img src="cid:tplogo" alt="Tio Preto Barbearia" width="160" style="width:160px;max-width:62%;height:auto;display:inline-block;border:0;" />
-      </div>
-      <!-- Faixa dourada -->
-      <div style="height:4px;background:linear-gradient(90deg,#a67c1e,#e6c65c,#a67c1e);"></div>
-
-      <!-- Corpo -->
-      <div style="padding:36px 38px 26px;color:#2b2b2b;">
-        <h2 style="margin:0 0 8px;font-size:21px;color:#1a1a1a;font-weight:700;">Confirme seu e-mail</h2>
-        <p style="font-size:15px;line-height:1.6;margin:0 0 26px;color:#555;">
-          Olá, <strong style="color:#1a1a1a;">{$nomeSeguro}</strong>! Falta pouco para ativar sua conta.
-          Informe o código abaixo na tela de verificação:
-        </p>
-
-        <!-- Código em destaque -->
-        <div style="text-align:center;margin:0 0 22px;">
-          <div style="display:inline-block;background:#faf7f0;border:2px dashed #c9a227;border-radius:12px;padding:20px 26px 20px 38px;">
-            <span style="font-size:38px;font-weight:700;letter-spacing:12px;color:#1a1a1a;">{$codigoSeguro}</span>
-          </div>
-        </div>
-
-        <p style="text-align:center;font-size:14px;color:#777;margin:0;">
-          Válido por <strong style="color:#1a1a1a;">{$minutos} minutos</strong>.
-        </p>
-      </div>
-
-      <!-- Aviso -->
-      <div style="padding:20px 38px 30px;border-top:1px solid #efe9df;">
-        <p style="font-size:12.5px;line-height:1.6;color:#999;margin:0;">
-          Não solicitou este cadastro? É só ignorar esta mensagem — nenhuma conta é ativada sem o código.
-        </p>
-      </div>
-    </div>
-
-    <!-- Rodapé -->
-    <p style="text-align:center;font-size:11.5px;color:#b0a99c;margin:20px 0 0;letter-spacing:.3px;">
-      © 2026 Tio Preto Barbearia · Douradina-PR
-    </p>
-  </div>
-</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ec;margin:0;padding:0;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="440" cellpadding="0" cellspacing="0" style="width:440px;max-width:100%;background:#ffffff;border:1px solid #e7e0d4;border-radius:8px;font-family:Arial,Helvetica,sans-serif;">
+        <tr>
+          <td align="center" style="background:#1a1a1a;border-radius:8px 8px 0 0;padding:24px;">
+            <img src="cid:tplogo" alt="Tio Preto Barbearia" width="140" style="width:140px;max-width:60%;height:auto;border:0;" />
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 28px 8px;color:#1a1a1a;">
+            <h1 style="margin:0 0 12px;font-size:20px;font-weight:bold;color:#1a1a1a;">{$tituloSeguro}</h1>
+            <p style="margin:0 0 20px;font-size:15px;line-height:22px;color:#555555;">
+              Olá, <strong>{$nomeSeguro}</strong>! {$chamadaSegura}
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 28px;">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="center" style="background:#faf7f0;border:2px dashed #c9963a;border-radius:8px;padding:16px 28px;font-size:34px;font-weight:bold;letter-spacing:8px;color:#1a1a1a;">
+                  {$codigoSeguro}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:16px 28px 4px;">
+            <p style="margin:0;font-size:14px;color:#777777;">Válido por <strong>{$minutos} minutos</strong>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 28px 24px;">
+            <p style="margin:0;font-size:12px;line-height:18px;color:#999999;">
+              Se você não solicitou, ignore esta mensagem — nada é alterado sem o código.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="border-top:1px solid #efe9df;padding:16px 28px;">
+            <p style="margin:0;font-size:11px;color:#b0a99c;">© 2026 Tio Preto Barbearia · Douradina-PR</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
 HTML;
     }
 
-    private static function montarTextoCodigo(string $nome, string $codigo, int $minutos): string
+    private static function montarTextoCodigo(string $nome, string $codigo, int $minutos, string $chamada): string
     {
         return "Ola, {$nome}!\n\n"
-            . "Seu codigo de verificacao da Tio Preto Barbearia e: {$codigo}\n"
-            . "Ele e valido por {$minutos} minutos.\n\n"
-            . "Se voce nao solicitou este cadastro, ignore esta mensagem.";
+            . "{$chamada}\n\n"
+            . "Codigo: {$codigo}\n"
+            . "Valido por {$minutos} minutos.\n\n"
+            . "Se voce nao solicitou, ignore esta mensagem.\n\n"
+            . "Tio Preto Barbearia";
     }
 }

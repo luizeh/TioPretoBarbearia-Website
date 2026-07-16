@@ -125,3 +125,47 @@
   font-size: 0.76rem;
   color: rgba(0, 0, 0, 0.5);
 }
+
+/* ── Recuperação de senha: seletor de canal ── */
+.recover-channel {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.recover-channel__opt {
+  flex: 1;
+  cursor: pointer;
+}
+
+.recover-channel__opt input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.recover-channel__opt span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1.5px solid rgba(201, 150, 58, 0.3);
+  border-radius: 6px;
+  font-family: "Barlow Condensed", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.55);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.recover-channel__opt input:checked + span {
+  border-color: var(--gold);
+  background: rgba(201, 150, 58, 0.08);
+  color: var(--dark);
+}
+
+.recover-channel__opt span i {
+  color: var(--gold);
+}

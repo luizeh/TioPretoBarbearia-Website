@@ -2,50 +2,15 @@
 
 require_once __DIR__ . '/session_admin.php';
 require_once __DIR__ . '/../../helpers/helpers.php';
+require_once __DIR__ . '/../../helpers/Whatsapp.php';
 require_once __DIR__ . '/../../sql/LogsSql.php';
 require_once __DIR__ . '/../../sql/AgendamentosSql.php';
 
+// Envio de mensagens centralizado em helpers/Whatsapp.php (reutilizado pelos
+// fluxos de verificação de telefone e recuperação de senha).
 function enviarMensagemWhatsApp(string $telefone, string $mensagem): array
 {
-    $telefone = preg_replace('/\D/', '', $telefone);
-    if ($telefone === '') {
-        return ['success' => false, 'message' => 'Telefone nao informado.'];
-    }
-    if (!str_starts_with($telefone, '55')) {
-        $telefone = '55' . $telefone;
-    }
-    if (strlen($telefone) < 12 || strlen($telefone) > 13) {
-        return ['success' => false, 'message' => 'Numero de telefone invalido.'];
-    }
-
-    $ch = curl_init('https://dev-api.r4dev.com.br/v1/instance/cmqqzc2j1002d104shfslo3sj/messages/chat');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => [
-            'Token: cmqqzc2j2002e104so1o09hqy',
-            'Content-Type: application/json',
-        ],
-        CURLOPT_POSTFIELDS => json_encode(['to' => $telefone, 'body' => $mensagem], JSON_UNESCAPED_UNICODE),
-        CURLOPT_TIMEOUT => 15,
-        CURLOPT_SSL_VERIFYPEER => true,
-    ]);
-
-    $response = curl_exec($ch);
-    $curlError = curl_error($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($curlError) {
-        return ['success' => false, 'message' => 'Erro de conexao com a API de mensagens.'];
-    }
-
-    $decoded = json_decode($response, true);
-    if ($httpCode >= 200 && $httpCode < 300 && !empty($decoded['id'])) {
-        return ['success' => true, 'id' => $decoded['id'], 'telefone' => $telefone];
-    }
-
-    return ['success' => false, 'message' => 'A API de mensagens retornou um erro.', 'http_code' => $httpCode];
+    return Whatsapp::enviar($telefone, $mensagem);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

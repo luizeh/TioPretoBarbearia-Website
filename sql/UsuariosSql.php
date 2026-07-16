@@ -51,22 +51,163 @@ class UsuariosSql
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function atualizar(int $id, array $dados): void
+    /**
+     * Busca um usuário pelo e-mail (linha completa) — usado na recuperação de senha.
+     */
+    public static function buscarPorEmail(string $email): array|false
     {
         $pdo  = Connection::getConnection();
-        $stmt = $pdo->prepare("
-            UPDATE usuarios
-            SET nome = :nome, sobrenome = :sobrenome, email = :email, telefone = :telefone, cidade = :cidade
-            WHERE id = :id
-        ");
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email LIMIT 1");
+        $stmt->execute([':email' => $email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Busca um usuário pelo telefone (só dígitos) — usado na recuperação de senha.
+     */
+    public static function buscarPorTelefone(string $telefone): array|false
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE telefone = :telefone LIMIT 1");
+        $stmt->execute([':telefone' => $telefone]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retorna o estado de verificação (e pendências) da conta.
+     */
+    public static function statusVerificacao(int $id): array|false
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare(
+            "SELECT id, nome, email, telefone,
+                    email_verificado, telefone_verificado,
+                    email_pendente, telefone_pendente
+             FROM usuarios WHERE id = :id"
+        );
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Atualiza apenas os dados que não exigem reverificação (nome, sobrenome, cidade).
+     * E-mail e telefone têm fluxo próprio (definir pendente → confirmar por código).
+     */
+    public static function atualizarDadosBasicos(int $id, array $dados): void
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare(
+            "UPDATE usuarios SET nome = :nome, sobrenome = :sobrenome, cidade = :cidade WHERE id = :id"
+        );
         $stmt->execute([
             ':nome'      => $dados['nome'],
             ':sobrenome' => $dados['sobrenome'],
-            ':email'     => $dados['email'],
-            ':telefone'  => $dados['telefone'],
             ':cidade'    => $dados['cidade'],
             ':id'        => $id,
         ]);
+    }
+
+    public static function telefoneEmUso(string $telefone, int $ignorarId): bool
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE telefone = :telefone AND id <> :id LIMIT 1');
+        $stmt->execute([':telefone' => $telefone, ':id' => $ignorarId]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    // ── Verificação de e-mail/telefone ──────────────────────────────
+
+    public static function marcarEmailVerificado(int $id): void
+    {
+        Connection::getConnection()
+            ->prepare('UPDATE usuarios SET email_verificado = 1, email_verificado_em = NOW() WHERE id = :id')
+            ->execute([':id' => $id]);
+    }
+
+    public static function marcarTelefoneVerificado(int $id): void
+    {
+        Connection::getConnection()
+            ->prepare('UPDATE usuarios SET telefone_verificado = 1, telefone_verificado_em = NOW() WHERE id = :id')
+            ->execute([':id' => $id]);
+    }
+
+    // ── Troca de e-mail/telefone (pendente até nova verificação) ─────
+
+    /**
+     * Guarda um novo e-mail como pendente — o e-mail atual continua válido.
+     */
+    public static function definirEmailPendente(int $id, string $email): void
+    {
+        Connection::getConnection()
+            ->prepare('UPDATE usuarios SET email_pendente = :email WHERE id = :id')
+            ->execute([':email' => $email, ':id' => $id]);
+    }
+
+    /**
+     * Guarda um novo telefone como pendente — o telefone atual continua válido.
+     */
+    public static function definirTelefonePendente(int $id, string $telefone): void
+    {
+        Connection::getConnection()
+            ->prepare('UPDATE usuarios SET telefone_pendente = :tel WHERE id = :id')
+            ->execute([':tel' => $telefone, ':id' => $id]);
+    }
+
+    /**
+     * Confirma a troca de e-mail: promove o pendente a definitivo, verifica e
+     * atualiza a data. Retorna o novo e-mail, ou null se não havia pendente.
+     */
+    public static function confirmarEmailPendente(int $id): ?string
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare('SELECT email_pendente FROM usuarios WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $novo = $stmt->fetchColumn();
+        if (empty($novo)) {
+            return null;
+        }
+
+        $pdo->prepare(
+            'UPDATE usuarios
+                SET email = :email, email_verificado = 1, email_verificado_em = NOW(), email_pendente = NULL
+              WHERE id = :id'
+        )->execute([':email' => $novo, ':id' => $id]);
+
+        return (string) $novo;
+    }
+
+    /**
+     * Confirma a troca de telefone: promove o pendente a definitivo, verifica e
+     * atualiza a data. Retorna o novo telefone, ou null se não havia pendente.
+     */
+    public static function confirmarTelefonePendente(int $id): ?string
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare('SELECT telefone_pendente FROM usuarios WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $novo = $stmt->fetchColumn();
+        if (empty($novo)) {
+            return null;
+        }
+
+        $pdo->prepare(
+            'UPDATE usuarios
+                SET telefone = :tel, telefone_verificado = 1, telefone_verificado_em = NOW(), telefone_pendente = NULL
+              WHERE id = :id'
+        )->execute([':tel' => $novo, ':id' => $id]);
+
+        return (string) $novo;
+    }
+
+    /**
+     * Redefine a senha diretamente (recuperação de senha — sem checar a atual).
+     * A autorização é feita antes, via código de verificação validado.
+     */
+    public static function redefinirSenha(int $id, string $novaSenha): void
+    {
+        Connection::getConnection()
+            ->prepare('UPDATE usuarios SET senha = :senha WHERE id = :id')
+            ->execute([':senha' => password_hash($novaSenha, PASSWORD_DEFAULT), ':id' => $id]);
     }
 
     public static function emailEmUso(string $email, int $ignorarId): bool
@@ -83,6 +224,7 @@ class UsuariosSql
 
         try {
             $pdo->beginTransaction();
+            $pdo->prepare('DELETE FROM codigos_verificacao WHERE usuario_id = :id')->execute([':id' => $id]);
             $pdo->prepare('DELETE FROM notificacoes WHERE usuario_id = :id')->execute([':id' => $id]);
             $pdo->prepare('DELETE FROM carrinho_itens WHERE carrinho_id IN (SELECT id FROM carrinho WHERE usuario_id = :id)')->execute([':id' => $id]);
             $pdo->prepare('DELETE FROM carrinho WHERE usuario_id = :id')->execute([':id' => $id]);

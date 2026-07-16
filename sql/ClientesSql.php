@@ -1,6 +1,7 @@
 <?php
 
 include_once __DIR__ . '/../config/connection.php';
+include_once __DIR__ . '/UsuariosSql.php';
 
 class ClientesSql
 {
@@ -63,10 +64,14 @@ class ClientesSql
         ]);
     }
 
-    public static function excluir(int $id): void
+    /**
+     * Exclui um cliente e todos os dados relacionados.
+     * Delega para UsuariosSql::excluirConta (rotina única de exclusão, que remove
+     * agendamentos, carrinho, pedidos, logs, notificações e códigos do usuário).
+     * Retorna false se o id não existir ou for de um administrador.
+     */
+    public static function excluir(int $id): bool
     {
-        $pdo  = Connection::getConnection();
-        $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = :id AND admin = 0");
-        $stmt->execute([':id' => $id]);
+        return UsuariosSql::excluirConta($id);
     }
 }

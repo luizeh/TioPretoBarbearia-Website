@@ -53,6 +53,10 @@ include_once __DIR__ . '/partials/head_public.php';
     </form>
 
     <p class="form-footer-link">
+      <a href="esqueci-senha.php">Esqueci minha senha</a>
+    </p>
+
+    <p class="form-footer-link">
       Ainda não tem uma conta? &nbsp;<a href="cadastro.php">Criar conta</a>
     </p>
 

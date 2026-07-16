@@ -110,6 +110,8 @@ include __DIR__ . '/../partials/head.php';
                 </table>
             </div>
 
+            <?php include __DIR__ . '/../partials/pagination.php'; ?>
+
         </div>
 
     </main>

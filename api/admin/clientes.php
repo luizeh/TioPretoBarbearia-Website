@@ -56,7 +56,14 @@ if ($method === 'POST') {
             helpers::resposta_json(false, 'ID do cliente é obrigatório.', null, 400);
         }
         $clienteId = (int) $body['id'];
-        ClientesSql::excluir($clienteId);
+        try {
+            if (!ClientesSql::excluir($clienteId)) {
+                helpers::resposta_json(false, 'Cliente não encontrado ou não pode ser excluído.', null, 404);
+            }
+        } catch (Throwable $e) {
+            error_log('admin clientes excluir: ' . $e->getMessage());
+            helpers::resposta_json(false, 'Não foi possível excluir o cliente agora.', null, 500);
+        }
         LogsSql::registrar((int) $_SESSION['usuario_id'], 'conta_excluida', "Conta do cliente #{$clienteId} excluída pelo administrador.");
         helpers::resposta_json(true, 'Cliente excluído com sucesso.', null, 200);
     }

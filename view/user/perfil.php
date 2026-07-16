@@ -36,25 +36,49 @@ include_once __DIR__ . '/../partials/header_public.php';
                     <input class="modal-input" type="text" id="perfil-sobrenome" name="sobrenome" required />
                 </div>
             </div>
-            <div class="modal-row">
-                <div class="modal-field">
-                    <label class="modal-label" for="perfil-telefone">Telefone</label>
-                    <input class="modal-input" type="tel" id="perfil-telefone" name="telefone" />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label" for="perfil-cidade">Cidade</label>
-                    <input class="modal-input" type="text" id="perfil-cidade" name="cidade" required />
-                </div>
-            </div>
-            <div class="modal-field profile-card__email-field">
-                <label class="modal-label" for="perfil-email">E-mail</label>
-                <input class="modal-input" type="email" id="perfil-email" name="email" required />
+            <div class="modal-field">
+                <label class="modal-label" for="perfil-cidade">Cidade</label>
+                <input class="modal-input" type="text" id="perfil-cidade" name="cidade" required />
             </div>
             <button type="submit" class="btn-new-appt profile-card__submit">
                 <i class="fa-solid fa-floppy-disk"></i>
                 Salvar Alterações
             </button>
         </form>
+    </section>
+
+    <section class="appt-card profile-card">
+        <h2 class="profile-card__title">
+            <i class="fa-solid fa-shield-halved profile-card__icon"></i>
+            Contato e Verificação
+        </h2>
+        <p class="profile-card__description">
+            Alterações de e-mail e telefone precisam ser confirmadas por um código. O valor atual continua válido até a confirmação.
+        </p>
+
+        <div class="contato-row">
+            <div class="contato-row__info">
+                <span class="contato-row__label"><i class="fa-solid fa-envelope"></i> E-mail</span>
+                <span class="contato-row__value" id="contato-email">—</span>
+                <span class="contato-badge" id="badge-email"></span>
+                <span class="contato-pendente" id="pendente-email" hidden></span>
+            </div>
+            <button type="button" class="btn-new-appt btn-new-appt--muted" id="btn-alterar-email">
+                <i class="fa-solid fa-pen"></i> Alterar
+            </button>
+        </div>
+
+        <div class="contato-row">
+            <div class="contato-row__info">
+                <span class="contato-row__label"><i class="fa-brands fa-whatsapp"></i> Telefone</span>
+                <span class="contato-row__value" id="contato-telefone">—</span>
+                <span class="contato-badge" id="badge-telefone"></span>
+                <span class="contato-pendente" id="pendente-telefone" hidden></span>
+            </div>
+            <button type="button" class="btn-new-appt btn-new-appt--muted" id="btn-alterar-telefone">
+                <i class="fa-solid fa-pen"></i> Alterar
+            </button>
+        </div>
     </section>
 
     <section class="appt-card profile-card profile-card--danger">

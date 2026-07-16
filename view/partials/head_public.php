@@ -10,6 +10,8 @@
  *   $bodyClass — classe(s) para o <body> (opcional)
  */
 $pageTitle = $pageTitle ?? 'Tio Preto Barbearia';
+require_once __DIR__ . '/../../helpers/helpers.php';
+$csrfToken = helpers::tokenCsrf();
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -17,6 +19,7 @@ $pageTitle = $pageTitle ?? 'Tio Preto Barbearia';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>" />
     <link rel="icon" href="../../assets/img/favicon.ico" type="image/x-icon" />
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <link

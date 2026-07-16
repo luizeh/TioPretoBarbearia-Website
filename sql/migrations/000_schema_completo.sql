@@ -24,8 +24,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
     senha      VARCHAR(255)  NOT NULL,
     cidade     VARCHAR(100)  NOT NULL,
     admin      TINYINT(1)    NOT NULL DEFAULT 0,
-    email_verificado    TINYINT(1) NOT NULL DEFAULT 0,
-    email_verificado_em DATETIME   NULL,
+    email_verificado       TINYINT(1)   NOT NULL DEFAULT 0,
+    email_verificado_em    DATETIME     NULL,
+    telefone_verificado    TINYINT(1)   NOT NULL DEFAULT 0,
+    telefone_verificado_em DATETIME     NULL,
+    email_pendente         VARCHAR(320) NULL COMMENT 'novo e-mail aguardando verificação (troca)',
+    telefone_pendente      VARCHAR(20)  NULL COMMENT 'novo telefone aguardando verificação (troca)',
     created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
@@ -35,12 +39,20 @@ CREATE TABLE IF NOT EXISTS usuarios (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
--- 1b. codigos_verificacao  (confirmação de e-mail por código)
+-- 1b. codigos_verificacao  (estrutura reutilizável de códigos)
+--     Usada para verificação de e-mail, de telefone (WhatsApp) e
+--     para recuperação de senha.
+--       proposito: 'email_verificacao' | 'telefone_verificacao' | 'recuperacao'
+--       canal:     'email' | 'whatsapp'
+--       destino:   e-mail ou telefone (só dígitos) para onde o código foi enviado
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS codigos_verificacao (
     id          INT          NOT NULL AUTO_INCREMENT,
     usuario_id  INT          NOT NULL,
-    email       VARCHAR(320) NOT NULL,
+    proposito   VARCHAR(30)  NOT NULL DEFAULT 'email_verificacao',
+    canal       VARCHAR(15)  NOT NULL DEFAULT 'email',
+    destino     VARCHAR(320) NULL COMMENT 'e-mail ou telefone de destino do código',
+    email       VARCHAR(320) NULL COMMENT 'legado — mantido por compatibilidade',
     codigo_hash VARCHAR(255) NOT NULL COMMENT 'hash do código — nunca em texto puro',
     expira_em   DATETIME     NOT NULL,
     tentativas  TINYINT      NOT NULL DEFAULT 0,
@@ -49,7 +61,7 @@ CREATE TABLE IF NOT EXISTS codigos_verificacao (
 
     PRIMARY KEY (id),
     INDEX idx_cv_usuario (usuario_id),
-    INDEX idx_cv_email   (email),
+    INDEX idx_cv_usuario_proposito (usuario_id, proposito, usado),
 
     CONSTRAINT fk_cv_usuario
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)

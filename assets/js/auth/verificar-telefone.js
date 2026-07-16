@@ -1,8 +1,8 @@
-// verificar-email.js — confirmação de e-mail por código (com reenvio e cooldown)
+// verificar-telefone.js — confirmação de telefone por código (WhatsApp), com reenvio e cooldown
 (function () {
   "use strict";
 
-  var API = "../api/auth/verificar-email.php";
+  var API = "../api/auth/verificar-telefone.php";
   var form = document.getElementById("form-verificar");
   if (!form) return;
 
@@ -24,7 +24,6 @@
     if (el) { el.textContent = ""; el.hidden = true; }
   }
 
-  // Só dígitos no campo de código.
   input.addEventListener("input", function () {
     input.value = input.value.replace(/\D/g, "").slice(0, 6);
     limparErro();
@@ -40,7 +39,6 @@
     });
   }
 
-  // Contagem regressiva do reenvio.
   function iniciarCooldown(segundos) {
     if (timer) clearInterval(timer);
     var restante = segundos;
@@ -60,7 +58,7 @@
     timer = setInterval(tick, 1000);
   }
 
-  // Ao abrir a página, respeita um cooldown eventualmente em curso.
+  // Respeita um cooldown eventualmente em curso ao abrir a página.
   fetch(API, { method: "GET" })
     .then(function (r) { return r.json(); })
     .then(function (resposta) {
@@ -70,7 +68,6 @@
     })
     .catch(function () {});
 
-  // Verificar código.
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     limparErro();
@@ -88,15 +85,14 @@
         SwalTP.erro("Não foi possível verificar", resposta.message);
         return;
       }
-      var redirect = resposta.data && resposta.data.redirect ? resposta.data.redirect : "login.php";
-      var vaiParaTelefone = redirect.indexOf("verificar-telefone") !== -1;
       SwalTP.fire({
         icon: "success",
-        title: "E-mail verificado!",
+        title: "Telefone verificado!",
         text: resposta.message,
-        confirmButtonText: vaiParaTelefone ? "Verificar telefone" : "Ir para o login",
+        confirmButtonText: "Ir para o login",
         showCloseButton: false,
       }).then(function () {
+        var redirect = resposta.data && resposta.data.redirect ? resposta.data.redirect : "login.php";
         window.location.href = redirect;
       });
     }).catch(function () {
@@ -105,7 +101,6 @@
     });
   });
 
-  // Reenviar código.
   btnReenviar.addEventListener("click", function () {
     if (btnReenviar.disabled) return;
     btnReenviar.disabled = true;
