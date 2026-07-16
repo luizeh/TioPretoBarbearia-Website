@@ -12,3 +12,6 @@
 Thumbs.db
 .DS_Store
 *.log
+
+# Skills internas de time — não expor no repositório
+.github/skills/
