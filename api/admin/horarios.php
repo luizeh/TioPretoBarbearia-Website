@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body   = json_decode(file_get_contents('php://input'), true) ?? [];
+    helpers::verificarCsrf($body);
     $action = $body['action'] ?? 'salvar';
 
     // ── Exceção por data específica ──────────────────────────────

@@ -6,7 +6,7 @@
  */
 
 require_once __DIR__ . '/session_admin.php';
-require_once __DIR__ . '/../../config/connection.php';
+require_once __DIR__ . '/../../config/Connection.php';
 require_once __DIR__ . '/../../sql/ClientesSql.php';
 require_once __DIR__ . '/../../helpers/helpers.php';
 require_once __DIR__ . '/../../sql/LogsSql.php';

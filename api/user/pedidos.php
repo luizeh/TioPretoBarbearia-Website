@@ -6,7 +6,8 @@
  * GET                   → lista pedidos do usuário
  */
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../../helpers/helpers.php';
+helpers::iniciarSessao();
 header('Content-Type: application/json; charset=utf-8');
 
 if (empty($_SESSION['usuario_id'])) {

@@ -1,5 +1,5 @@
 <?php
-include_once __DIR__ . '/../config/connection.php';
+include_once __DIR__ . '/../config/Connection.php';
 
 class NotificacoesSql
 {

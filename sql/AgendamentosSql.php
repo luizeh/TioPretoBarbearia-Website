@@ -1,6 +1,6 @@
 <?php
 
-include_once __DIR__ . '/../config/connection.php';
+include_once __DIR__ . '/../config/Connection.php';
 include_once __DIR__ . '/HorariosSql.php';
 
 class AgendamentosSql
@@ -155,20 +155,24 @@ class AgendamentosSql
         return ['ids' => $ids, 'duracao' => $duracao, 'servicos' => $servicos];
     }
 
-    private static function validarPeriodo(string $data, string $horaInicio, int $duracao, bool $bloquearPassado = false): array
+    private static function validarPeriodo(string $data, string $horaInicio, int $duracao, bool $bloquearPassado = false, bool $permitirDataPassada = false): array
     {
         $inicio = DateTime::createFromFormat('Y-m-d H:i', "$data $horaInicio");
         $erros = DateTime::getLastErrors();
         if (!$inicio || ($erros !== false && ($erros['warning_count'] || $erros['error_count']))) {
             throw new InvalidArgumentException('Data ou horário inválidos.');
         }
-        if ($bloquearPassado) {
-            // Cliente: não pode agendar em um horário que já passou (inclui horários de hoje).
-            if ($inicio < new DateTime()) {
-                throw new InvalidArgumentException('Não é possível agendar em um horário que já passou. Escolha um horário futuro.');
+        // O admin pode registrar agendamentos em datas passadas (ajustes retroativos);
+        // nesse caso a restrição de data/horário passado é dispensada.
+        if (!$permitirDataPassada) {
+            if ($bloquearPassado) {
+                // Cliente: não pode agendar em um horário que já passou (inclui horários de hoje).
+                if ($inicio < new DateTime()) {
+                    throw new InvalidArgumentException('Não é possível agendar em um horário que já passou. Escolha um horário futuro.');
+                }
+            } elseif ($inicio < new DateTime('today')) {
+                throw new InvalidArgumentException('Não é possível agendar em uma data passada.');
             }
-        } elseif ($inicio < new DateTime('today')) {
-            throw new InvalidArgumentException('Não é possível agendar em uma data passada.');
         }
         $fim = (clone $inicio)->modify("+$duracao minutes");
 
@@ -239,7 +243,7 @@ class AgendamentosSql
         }
     }
 
-    public static function salvarComServicos(array $dados, ?int $id = null, ?int $usuarioId = null, bool $bloquearPassado = false): int
+    public static function salvarComServicos(array $dados, ?int $id = null, ?int $usuarioId = null, bool $bloquearPassado = false, bool $permitirDataPassada = false): int
     {
         $data = trim((string) ($dados['data'] ?? ''));
         $horaInicio = trim((string) ($dados['hora_inicio'] ?? ''));
@@ -248,7 +252,7 @@ class AgendamentosSql
             $idsServicos = [(int) $dados['servico_id']];
         }
         $servicos = self::calcularDadosServicos($idsServicos);
-        [$inicio, $fim] = self::validarPeriodo($data, $horaInicio, $servicos['duracao'], $bloquearPassado);
+        [$inicio, $fim] = self::validarPeriodo($data, $horaInicio, $servicos['duracao'], $bloquearPassado, $permitirDataPassada);
         $status = null;
         if ($id === null) {
             if ((int) ($dados['usuario_id'] ?? 0) <= 0) {

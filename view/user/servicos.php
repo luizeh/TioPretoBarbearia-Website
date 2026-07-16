@@ -5,7 +5,7 @@ $activeNav = 'servicos';
 $pageTitle = 'Serviços — Tio Preto Barbearia';
 $bodyClass = 'user-page';
 include_once __DIR__ . '/../partials/head_public.php';
-include_once __DIR__ . '/../../config/connection.php';
+include_once __DIR__ . '/../../config/Connection.php';
 include_once __DIR__ . '/../../sql/ServicosSql.php';
 $servicos = ServicosSql::listar();
 ?>

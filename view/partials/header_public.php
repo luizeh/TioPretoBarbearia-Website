@@ -9,9 +9,8 @@
  *   $linkBase  — caminho até view/ (ex: '' de view/, '../' de view/user/)
  *   $activeNav — chave da nav ativa: 'inicio' | 'produtos' | 'servicos' | 'agendar'
  */
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../../helpers/helpers.php';
+helpers::iniciarSessao();
 $rootPath  = $rootPath  ?? '../';
 $linkBase  = $linkBase  ?? '';
 $activeNav = $activeNav ?? '';

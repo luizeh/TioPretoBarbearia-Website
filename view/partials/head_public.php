@@ -37,6 +37,7 @@ $csrfToken = helpers::tokenCsrf();
 </head>
 
 <body<?= isset($bodyClass) ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?> data-api-base="<?= htmlspecialchars($rootPath ?? '', ENT_QUOTES, 'UTF-8') ?>api/">
+    <script src="<?= $rootPath ?? '' ?>assets/js/shared/csrf.js" defer></script>
     <script src="<?= $rootPath ?? '' ?>assets/js/public/app.js" defer></script>
     <script src="<?= $rootPath ?? '' ?>assets/js/shared/form-utils.js" defer></script>
     <script src="<?= $rootPath ?? '' ?>node_modules/sweetalert2/dist/sweetalert2.all.min.js" defer></script>

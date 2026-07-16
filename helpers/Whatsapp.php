@@ -9,11 +9,23 @@
  *
  * O telefone é sempre normalizado para 55{DDD}{numero} (só dígitos) antes do
  * envio. Nenhum dado sensível (código, senha) é gravado em log.
+ *
+ * Credenciais (endpoint e token) vêm do .env via Env — nunca hardcoded.
  */
+
+require_once __DIR__ . '/../config/Env.php';
+
 class Whatsapp
 {
-    private const ENDPOINT = 'https://dev-api.r4dev.com.br/v1/instance/cmqqzc2j1002d104shfslo3sj/messages/chat';
-    private const TOKEN     = 'cmqqzc2j2002e104so1o09hqy';
+    private static function endpoint(): string
+    {
+        return (string) Env::get('WHATSAPP_ENDPOINT', '');
+    }
+
+    private static function token(): string
+    {
+        return (string) Env::get('WHATSAPP_TOKEN', '');
+    }
 
     /**
      * Envia uma mensagem de texto para um telefone.
@@ -21,6 +33,13 @@ class Whatsapp
      */
     public static function enviar(string $telefone, string $mensagem): array
     {
+        $endpoint = self::endpoint();
+        $token    = self::token();
+        if ($endpoint === '' || $token === '') {
+            error_log('Whatsapp: WHATSAPP_ENDPOINT/WHATSAPP_TOKEN não configurados no .env.');
+            return ['success' => false, 'message' => 'Integração de WhatsApp não configurada.'];
+        }
+
         $telefone = preg_replace('/\D/', '', $telefone);
         if ($telefone === '') {
             return ['success' => false, 'message' => 'Telefone nao informado.'];
@@ -32,12 +51,12 @@ class Whatsapp
             return ['success' => false, 'message' => 'Numero de telefone invalido.'];
         }
 
-        $ch = curl_init(self::ENDPOINT);
+        $ch = curl_init($endpoint);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
             CURLOPT_HTTPHEADER     => [
-                'Token: ' . self::TOKEN,
+                'Token: ' . $token,
                 'Content-Type: application/json',
             ],
             CURLOPT_POSTFIELDS     => json_encode(['to' => $telefone, 'body' => $mensagem], JSON_UNESCAPED_UNICODE),

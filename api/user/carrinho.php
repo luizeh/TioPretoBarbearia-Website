@@ -9,7 +9,8 @@
  * POST action=limpar     → esvazia o carrinho
  */
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../../helpers/helpers.php';
+helpers::iniciarSessao();
 header('Content-Type: application/json; charset=utf-8');
 
 if (empty($_SESSION['usuario_id'])) {
@@ -34,6 +35,7 @@ if ($method === 'GET') {
 
 if ($method === 'POST') {
     $body   = json_decode(file_get_contents('php://input'), true) ?? [];
+    helpers::verificarCsrf($body);
     $action = $body['action'] ?? '';
 
     try {

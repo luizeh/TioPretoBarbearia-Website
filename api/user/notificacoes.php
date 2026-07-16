@@ -1,7 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../../helpers/helpers.php';
 require_once __DIR__ . '/../../sql/NotificacoesSql.php';
+helpers::iniciarSessao();
 helpers::verificar_login();
 $usuarioId = (int) $_SESSION['usuario_id'];
 
@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_decode(file_get_contents('php://input'), true) ?? [];
+    helpers::verificarCsrf($body);
     if (($body['action'] ?? '') === 'marcar_todas') {
         NotificacoesSql::marcarTodasComoLidas($usuarioId);
         helpers::resposta_json(true, 'Notificações marcadas como lidas.');

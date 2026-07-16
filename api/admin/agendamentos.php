@@ -13,9 +13,11 @@ try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') helpers::resposta_json(false, 'Método não reconhecido.', null, 405);
 
     $body = json_decode(file_get_contents('php://input'), true) ?? [];
+    helpers::verificarCsrf($body);
     $action = $body['action'] ?? '';
     if ($action === 'criar') {
-        $id = AgendamentosSql::salvarComServicos($body);
+        // Admin pode criar em datas passadas (ajustes retroativos): permitirDataPassada = true.
+        $id = AgendamentosSql::salvarComServicos($body, null, null, false, true);
         LogsSql::registrar((int) $_SESSION['usuario_id'], 'agendamento_criado', "Agendamento #$id criado pelo administrador.");
         NotificacoesSql::criar((int) $body['usuario_id'], 'agendamento', 'Novo agendamento', 'Um agendamento foi criado para você pelo administrador.');
         helpers::resposta_json(true, 'Agendamento criado com sucesso.', ['id' => $id], 201);
@@ -24,7 +26,8 @@ try {
         $id = (int) ($body['id'] ?? 0);
         if (!$id) helpers::resposta_json(false, 'ID do agendamento é obrigatório.', null, 400);
         $anterior = AgendamentosSql::buscarPorId($id);
-        AgendamentosSql::salvarComServicos($body, $id);
+        // Admin pode editar/mover para datas passadas (ajustes retroativos).
+        AgendamentosSql::salvarComServicos($body, $id, null, false, true);
         $agendamento = AgendamentosSql::buscarPorId($id);
         LogsSql::registrar((int) $_SESSION['usuario_id'], 'agendamento_editado', "Agendamento #$id editado pelo administrador.");
         if ($agendamento) {

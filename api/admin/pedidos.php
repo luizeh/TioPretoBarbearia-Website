@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_decode(file_get_contents('php://input'), true) ?? [];
+    helpers::verificarCsrf($body);
     $id = (int) ($body['id'] ?? 0);
     $status = $body['status'] ?? '';
     if (!$id || !$status) helpers::resposta_json(false, 'Pedido e status são obrigatórios.', null, 400);

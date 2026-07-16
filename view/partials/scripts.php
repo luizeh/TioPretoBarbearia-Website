@@ -1,3 +1,4 @@
+    <script src="../../assets/js/shared/csrf.js" defer></script>
     <script src="../../assets/js/shared/form-utils.js" defer></script>
     <script src="../../assets/js/admin/table-filters.js" defer></script>
     <script src="../../assets/js/admin/layout.js" defer></script>

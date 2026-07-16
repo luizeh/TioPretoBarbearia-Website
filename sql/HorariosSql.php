@@ -1,6 +1,6 @@
 <?php
 
-include_once __DIR__ . '/../config/connection.php';
+include_once __DIR__ . '/../config/Connection.php';
 
 /**
  * HorariosSql — DAO para a tabela horarios_funcionamento.

@@ -44,6 +44,16 @@ class helpers
     public static function iniciarSessao(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
+            // Só marca Secure quando a requisição é HTTPS (não quebra o dev em HTTP).
+            $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || (int) ($_SERVER['SERVER_PORT'] ?? 0) === 443;
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path'     => '/',
+                'httponly' => true,      // inacessível via document.cookie (mitiga roubo por XSS)
+                'secure'   => $secure,   // só trafega em HTTPS quando disponível
+                'samesite' => 'Lax',     // reduz superfície de CSRF
+            ]);
             session_start();
         }
     }

@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id         INT           NOT NULL AUTO_INCREMENT,
     nome       VARCHAR(100)  NOT NULL,
     sobrenome  VARCHAR(100)  NOT NULL,
-    email      VARCHAR(150)  NOT NULL,
+    email      VARCHAR(320)  NOT NULL,
     telefone   VARCHAR(20)   NOT NULL,
     senha      VARCHAR(255)  NOT NULL,
-    cidade     VARCHAR(100)  NOT NULL,
+    cidade     VARCHAR(255)  NOT NULL,
     admin      TINYINT(1)    NOT NULL DEFAULT 0,
     email_verificado       TINYINT(1)   NOT NULL DEFAULT 0,
     email_verificado_em    DATETIME     NULL,
@@ -100,8 +100,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     updated_at  TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    INDEX idx_agendamentos_data    (data),
-    INDEX idx_agendamentos_usuario (usuario_id),
+    INDEX idx_agendamentos_data_status (data, status),
+    INDEX idx_agendamentos_usuario     (usuario_id),
 
     CONSTRAINT fk_agendamentos_usuario
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
@@ -245,12 +245,14 @@ CREATE TABLE IF NOT EXISTS pedidos (
 -- 11. pedido_itens
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS pedido_itens (
+    id         INT            NOT NULL AUTO_INCREMENT,
     pedido_id  INT            NOT NULL,
     produto_id INT            NOT NULL,
     quantidade INT            NOT NULL,
     preco      DECIMAL(10,2)  NOT NULL COMMENT 'preço snapshot no momento da compra',
 
-    PRIMARY KEY (pedido_id, produto_id),
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_pedido_produto (pedido_id, produto_id),
 
     CONSTRAINT fk_pedido_itens_pedido
         FOREIGN KEY (pedido_id) REFERENCES pedidos(id)

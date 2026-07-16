@@ -51,8 +51,9 @@
         .then(function (result) {
           if (!result.success) throw new Error(result.message || "Não foi possível enviar a imagem.");
 
-          hiddenInput.value = result.url;
-          setPreview(result.url);
+          var url = (result.data && result.data.url) || result.url;
+          hiddenInput.value = url;
+          setPreview(url);
         })
         .catch(function (error) {
           notifyError(error.message || "Não foi possível enviar a imagem.");

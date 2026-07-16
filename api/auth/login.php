@@ -1,7 +1,7 @@
 <?php
 ob_start();
 error_reporting(0);
-include_once(__DIR__ . '/../../config/connection.php');
+include_once(__DIR__ . '/../../config/Connection.php');
 include_once(__DIR__ . '/../../helpers/helpers.php');
 include_once(__DIR__ . '/../../sql/VerificacaoSql.php');
 include_once(__DIR__ . '/../../helpers/Mailer.php');

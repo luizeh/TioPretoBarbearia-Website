@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $body = json_decode(file_get_contents('php://input'), true) ?? [];
+helpers::verificarCsrf($body);
 $action = $body['action'] ?? 'individual';
 
 if ($action === 'enviar_dia') {

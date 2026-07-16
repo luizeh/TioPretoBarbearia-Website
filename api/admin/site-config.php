@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body  = json_decode(file_get_contents('php://input'), true) ?? [];
+    helpers::verificarCsrf($body);
     $chave = trim((string) ($body['chave'] ?? ''));
     $valor = (string) ($body['valor'] ?? '');
 

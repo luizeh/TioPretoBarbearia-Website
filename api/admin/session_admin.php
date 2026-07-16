@@ -6,9 +6,8 @@
  * Retorna JSON 401/403 em vez de redirecionar.
  */
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../../helpers/helpers.php';
+helpers::iniciarSessao();
 
 header('Content-Type: application/json; charset=utf-8');
 

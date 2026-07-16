@@ -1,6 +1,6 @@
 <?php
 include_once(__DIR__ . '/../../api/auth/session.php');
-include_once(__DIR__ . '/../../config/connection.php');
+include_once(__DIR__ . '/../../config/Connection.php');
 include_once(__DIR__ . '/../../sql/ServicosSql.php');
 include_once(__DIR__ . '/../../sql/AgendamentosSql.php');
 include_once(__DIR__ . '/../../sql/HorariosSql.php');

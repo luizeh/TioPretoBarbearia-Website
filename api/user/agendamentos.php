@@ -1,11 +1,10 @@
 <?php
 
-if (session_status() === PHP_SESSION_NONE) session_start();
-
 require_once __DIR__ . '/../../sql/AgendamentosSql.php';
 require_once __DIR__ . '/../../helpers/helpers.php';
 require_once __DIR__ . '/../../sql/LogsSql.php';
 
+helpers::iniciarSessao();
 helpers::verificar_login();
 $usuarioId = (int) $_SESSION['usuario_id'];
 $method = $_SERVER['REQUEST_METHOD'];
@@ -35,6 +34,7 @@ try {
     if ($method !== 'POST') helpers::resposta_json(false, 'Método não reconhecido.', null, 405);
 
     $body = json_decode(file_get_contents('php://input'), true) ?? [];
+    helpers::verificarCsrf($body);
     $action = $body['action'] ?? '';
 
     if ($action === 'criar') {
