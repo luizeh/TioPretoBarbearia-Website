@@ -96,6 +96,10 @@ class Mailer
             $mail->Password   = $cfg['password'];
             $mail->Port       = $cfg['port'];
             $mail->CharSet    = PHPMailer::CHARSET_UTF8;
+            // Limita a espera por um SMTP lento/indisponível (em segundos).
+            // Mesmo com o envio já desacoplado da resposta ao cliente, evita
+            // que o processo de background fique preso por muito tempo.
+            $mail->Timeout    = 15;
             if (!empty($cfg['encryption'])) {
                 $mail->SMTPSecure = $cfg['encryption'] === 'ssl'
                     ? PHPMailer::ENCRYPTION_SMTPS

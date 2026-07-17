@@ -3,12 +3,18 @@
 class ProdutosSql
 {
     /**
-     * Lista produtos. Se $apenasVisiveis for true, retorna só os marcados
+     * Lista produtos ATIVOS. Se $apenasVisiveis for true, retorna só os marcados
      * como visíveis no site (usado pelo catálogo público).
+     * Produtos excluídos logicamente (ativo = 0) nunca aparecem — eles existem
+     * apenas para preservar o histórico de pedidos antigos.
      */
     public static function listarProdutos($pdo, bool $apenasVisiveis = false): array
     {
-        $where = $apenasVisiveis ? 'WHERE p.visivel = 1' : '';
+        $condicoes = ['p.ativo = 1'];
+        if ($apenasVisiveis) {
+            $condicoes[] = 'p.visivel = 1';
+        }
+        $where = 'WHERE ' . implode(' AND ', $condicoes);
         $sql = "
             SELECT
                 p.id,
@@ -111,28 +117,56 @@ class ProdutosSql
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function excluirProduto($pdo, $idProduto)
+    /**
+     * Conta os relacionamentos de um produto que impedem a exclusão física
+     * (itens de pedidos já realizados). Usado para avisar o admin antes de agir.
+     */
+    public static function contarPedidos($pdo, int $idProduto): int
+    {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM pedido_itens WHERE produto_id = :id");
+        $stmt->execute([":id" => $idProduto]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Exclui um produto preservando o histórico de vendas.
+     *
+     *  - Se o produto já faz parte de pedidos → EXCLUSÃO LÓGICA
+     *    (ativo = 0, visivel = 0). Ele some da loja, das listagens e de novas
+     *    compras, mas continua existindo internamente para que os pedidos
+     *    antigos permaneçam íntegros (nome, preço e itens preservados).
+     *
+     *  - Se NÃO há pedidos relacionados → EXCLUSÃO FÍSICA
+     *    (remove vínculos transitórios + a linha do produto).
+     *
+     * Tudo em uma transação: ou aplica tudo, ou faz rollback.
+     * Retorna ['tipo' => 'logico'|'fisico', 'pedidos' => int].
+     */
+    public static function excluirProduto($pdo, $idProduto): array
     {
         $idProduto = (int) $idProduto;
 
         try {
             $pdo->beginTransaction();
 
-            // Produtos que já fazem parte de pedidos não podem ser excluídos
-            // (preservar o histórico de vendas). Sugere ocultar em vez de excluir.
-            $check = $pdo->prepare("SELECT COUNT(*) FROM pedido_itens WHERE produto_id = :id");
-            $check->execute([":id" => $idProduto]);
-            if ((int) $check->fetchColumn() > 0) {
-                throw new RuntimeException('Este produto já faz parte de pedidos e não pode ser excluído. Oculte-o do site em vez de excluir.');
+            $qtdPedidos = self::contarPedidos($pdo, $idProduto);
+
+            if ($qtdPedidos > 0) {
+                // Histórico existe → exclusão lógica. Remove só os vínculos
+                // transitórios (carrinhos ativos e tags), preservando pedidos.
+                $pdo->prepare("DELETE FROM carrinho_itens WHERE produto_id = :id")->execute([":id" => $idProduto]);
+                $pdo->prepare("DELETE FROM produto_tags WHERE produto_id = :id")->execute([":id" => $idProduto]);
+                $pdo->prepare("UPDATE produtos SET ativo = 0, visivel = 0 WHERE id = :id")->execute([":id" => $idProduto]);
+                $pdo->commit();
+                return ['tipo' => 'logico', 'pedidos' => $qtdPedidos];
             }
 
-            // Remove vínculos transitórios antes de excluir o produto
-            // (carrinhos de clientes e tags associadas).
+            // Sem histórico → exclusão física.
             $pdo->prepare("DELETE FROM carrinho_itens WHERE produto_id = :id")->execute([":id" => $idProduto]);
             $pdo->prepare("DELETE FROM produto_tags WHERE produto_id = :id")->execute([":id" => $idProduto]);
             $pdo->prepare("DELETE FROM produtos WHERE id = :id")->execute([":id" => $idProduto]);
-
             $pdo->commit();
+            return ['tipo' => 'fisico', 'pedidos' => 0];
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) $pdo->rollBack();
             throw $e;

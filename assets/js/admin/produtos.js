@@ -206,36 +206,51 @@
     event.preventDefault();
     event.stopPropagation();
 
-    window.SwalTP.confirmarExclusao({
-      title: "Excluir produto?",
-      html:
-        "Tem certeza que deseja excluir <strong>" +
-        escapeHtml(button.dataset.nome || "este produto") +
-        '</strong>?<br><small class="swal-text-muted">Esta ação não pode ser desfeita.</small>',
-      confirmButtonText: "Excluir",
-      cancelButtonText: "Cancelar",
-      preConfirm: function () {
-        return post({ action: "excluir", id: button.dataset.id });
-      },
-    }).then(function (result) {
-      if (!result.isConfirmed) return;
+    var nomeProduto = escapeHtml(button.dataset.nome || "este produto");
 
-      if (result.value && result.value.success) {
-        window.SwalTP.fire({
-          icon: "success",
-          title: "Excluído!",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then(function () {
-          window.location.reload();
-        });
+    // 1) Consulta os relacionamentos antes de decidir a mensagem de confirmação.
+    post({ action: "info-exclusao", id: button.dataset.id }).then(function (info) {
+      if (!info || !info.success) {
+        window.SwalTP.erro("Erro", (info && info.message) || "Não foi possível verificar o produto.");
         return;
       }
 
-      window.SwalTP.fire({
-        icon: "error",
-        title: "Erro",
-        text: (result.value && result.value.message) || "Erro ao excluir.",
+      var pedidos = (info.data && info.data.pedidos) || 0;
+      var temHistorico = pedidos > 0;
+
+      var html = temHistorico
+        ? "O produto <strong>" + nomeProduto + "</strong> está em <strong>" + pedidos +
+          " pedido(s)</strong> já realizados.<br><br>" +
+          '<span class="swal-text-muted">Por isso ele não será apagado: será <strong>desativado</strong> ' +
+          "— some da loja e de novas compras, mas os pedidos antigos são preservados.</span>"
+        : "Tem certeza que deseja excluir <strong>" + nomeProduto + "</strong>?<br>" +
+          '<small class="swal-text-muted">Este produto não possui pedidos. Esta ação não pode ser desfeita.</small>';
+
+      window.SwalTP.confirmarExclusao({
+        title: temHistorico ? "Desativar produto?" : "Excluir produto?",
+        html: html,
+        confirmButtonText: temHistorico ? "Sim, desativar" : "Sim, excluir",
+        cancelButtonText: "Cancelar",
+        preConfirm: function () {
+          return post({ action: "excluir", id: button.dataset.id });
+        },
+      }).then(function (result) {
+        if (!result.isConfirmed) return;
+
+        if (result.value && result.value.success) {
+          window.SwalTP.fire({
+            icon: "success",
+            title: temHistorico ? "Desativado!" : "Excluído!",
+            text: result.value.message || "",
+            timer: 2200,
+            showConfirmButton: false,
+          }).then(function () {
+            window.location.reload();
+          });
+          return;
+        }
+
+        window.SwalTP.erro("Erro", (result.value && result.value.message) || "Erro ao excluir.");
       });
     });
   });

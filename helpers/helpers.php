@@ -17,6 +17,48 @@ class helpers
         exit;
     }
 
+    /**
+     * Responde JSON ao cliente e LIBERA a conexão, mas NÃO encerra o script —
+     * permitindo que tarefas lentas (envio de e-mail/WhatsApp) rodem depois,
+     * sem o usuário esperar por elas.
+     *
+     * O cliente recebe a resposta completa (Content-Length) e o fetch resolve
+     * imediatamente; o PHP segue processando em segundo plano.
+     * Cabe ao chamador chamar exit; ao terminar o pós-processamento.
+     */
+    public static function responderEContinuar($sucesso, $mensagem, $dados = null, $status = 200): void
+    {
+        // Segue processando mesmo se o navegador encerrar a conexão.
+        ignore_user_abort(true);
+
+        $payload = json_encode([
+            'success' => $sucesso,
+            'message' => $mensagem,
+            'data'    => $dados,
+        ], JSON_UNESCAPED_UNICODE);
+
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Content-Length: ' . strlen($payload));
+        header('Connection: close');
+        echo $payload;
+
+        // Entrega os bytes ao cliente agora.
+        flush();
+        // Em FPM, encerra a requisição do ponto de vista do cliente.
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+        // Libera o lock da sessão para não travar outras requisições do usuário.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+    }
+
 
     public static function verificar_login()
     {

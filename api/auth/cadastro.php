@@ -57,16 +57,9 @@ if (($dados['action'] ?? '') == 'cadastro') {
     $usuarioId = (int) $result['id'];
     LogsSql::registrar($usuarioId, 'conta_criada', 'Conta de cliente criada (aguardando verificação de e-mail e telefone).');
 
-    // Gera e envia o código de verificação de e-mail (o telefone é verificado na sequência).
-    $mensagem = 'Enviamos um código de verificação para o seu e-mail.';
-    try {
-        $codigo = VerificacaoSql::gerar($usuarioId, VerificacaoSql::EMAIL, 'email', $dados['email']);
-        Mailer::enviarCodigoVerificacao($dados['email'], $dados['nome'], $codigo, VerificacaoSql::VALIDADE_MIN);
-    } catch (RuntimeException $e) {
-        // Conta criada e código salvo; falha apenas no envio → usuário pode reenviar.
-        error_log('Cadastro: falha ao enviar código de e-mail.');
-        $mensagem = 'Sua conta foi criada, mas não conseguimos enviar o e-mail agora. Use "Reenviar código" na próxima tela.';
-    }
+    // Gera o código de verificação (operação rápida — fica salvo no banco).
+    // O ENVIO do e-mail (parte lenta) é feito depois de responder ao cliente.
+    $codigo = VerificacaoSql::gerar($usuarioId, VerificacaoSql::EMAIL, 'email', $dados['email']);
 
     // Guarda o contexto para as páginas de verificação (não confia em ID vindo do cliente).
     $_SESSION['pendente_verificacao'] = [
@@ -76,5 +69,21 @@ if (($dados['action'] ?? '') == 'cadastro') {
         'telefone'   => $dados['telefone'],
     ];
 
-    helpers::resposta_json(true, $mensagem, ['redirect' => 'verificar-email.php'], 201);
+    // ── Responde JÁ: a operação principal (criar conta + código) está concluída.
+    // O usuário é redirecionado para a verificação sem esperar o SMTP.
+    helpers::responderEContinuar(
+        true,
+        'Enviamos um código de verificação para o seu e-mail.',
+        ['redirect' => 'verificar-email.php'],
+        201
+    );
+
+    // ── Pós-processamento (o cliente já recebeu a resposta): envia o e-mail.
+    // Se falhar, a conta e o código já existem → o usuário reenvia na próxima tela.
+    try {
+        Mailer::enviarCodigoVerificacao($dados['email'], $dados['nome'], $codigo, VerificacaoSql::VALIDADE_MIN);
+    } catch (Throwable $e) {
+        error_log('Cadastro: falha ao enviar código de e-mail no pós-processamento.');
+    }
+    exit;
 }

@@ -21,7 +21,8 @@ class CarrinhoSql
     public static function adicionarItem(int $carrinhoId, int $produtoId): void
     {
         $pdo  = Connection::getConnection();
-        $produtoStmt = $pdo->prepare('SELECT estoque FROM produtos WHERE id = :id');
+        // Só produtos ativos podem ser adicionados ao carrinho.
+        $produtoStmt = $pdo->prepare('SELECT estoque FROM produtos WHERE id = :id AND ativo = 1');
         $produtoStmt->execute([':id' => $produtoId]);
         $produto = $produtoStmt->fetch(PDO::FETCH_ASSOC);
         if (!$produto) throw new RuntimeException('Produto não encontrado.');

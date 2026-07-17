@@ -92,9 +92,38 @@
       return ok;
     }
 
+    var enviando = false; // trava contra envios duplicados
+    var btnSubmit = form.querySelector('button[type="submit"]') || form.querySelector(".btn-primary");
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      if (enviando) return;            // ignora cliques repetidos
       if (!validar()) return;
+
+      enviando = true;
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.dataset.textoOriginal = btnSubmit.innerHTML;
+        btnSubmit.innerHTML = "Criando conta...";
+      }
+
+      // Feedback visual imediato — não deixa a página parecer travada.
+      SwalTP.fire({
+        title: "Criando sua conta...",
+        text: "Estamos preparando o código de verificação.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: function () { Swal.showLoading(); },
+      });
+
+      function liberar() {
+        enviando = false;
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          if (btnSubmit.dataset.textoOriginal) btnSubmit.innerHTML = btnSubmit.dataset.textoOriginal;
+        }
+      }
 
       var data = new FormData(form);
 
@@ -105,26 +134,32 @@
           try {
             result = JSON.parse(text);
           } catch (parseErr) {
+            liberar();
             SwalTP.erro("Erro", "Resposta inválida do servidor. Tente novamente.");
             return;
           }
-          if (!result) return;
+          if (!result) { liberar(); return; }
           if (result.success) {
+            // Mantém a conta protegida contra reenvio: NÃO reabilita o botão,
+            // pois vamos redirecionar para a verificação.
             SwalTP.fire({
               icon: "success",
               title: "Quase lá!",
               text: result.message || "Enviamos um código para o seu e-mail.",
               confirmButtonText: "Confirmar e-mail",
               showCloseButton: false,
+              allowOutsideClick: false,
             }).then(function () {
               var redirect = result.data && result.data.redirect ? result.data.redirect : "verificar-email.php";
               window.location.href = redirect;
             });
           } else {
+            liberar();
             SwalTP.erro("Erro no cadastro", result.message || "Ocorreu um erro. Tente novamente.");
           }
         })
         .catch(function () {
+          liberar();
           SwalTP.erro("Erro", "Não foi possível conectar ao servidor.");
         });
     });

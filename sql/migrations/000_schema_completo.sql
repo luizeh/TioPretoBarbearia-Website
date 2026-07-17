@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS servicos (
     preco          DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
     tempo_estimado INT            NOT NULL DEFAULT 30 COMMENT 'duração em minutos',
     foto_url       VARCHAR(500)   NULL,
+    ativo          TINYINT(1)     NOT NULL DEFAULT 1 COMMENT '1 = ativo; 0 = excluído logicamente (mantido só p/ histórico)',
     created_at     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP      NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
@@ -152,6 +153,7 @@ CREATE TABLE IF NOT EXISTS produtos (
     estoque   INT            NOT NULL DEFAULT 0,
     foto_url  VARCHAR(500)   NULL,
     visivel   TINYINT(1)     NOT NULL DEFAULT 1 COMMENT '1 = visível no site; 0 = só admin',
+    ativo     TINYINT(1)     NOT NULL DEFAULT 1 COMMENT '1 = ativo; 0 = excluído logicamente (mantido só p/ histórico)',
     created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 
@@ -248,6 +250,7 @@ CREATE TABLE IF NOT EXISTS pedido_itens (
     id         INT            NOT NULL AUTO_INCREMENT,
     pedido_id  INT            NOT NULL,
     produto_id INT            NOT NULL,
+    produto_nome VARCHAR(150) NULL COMMENT 'nome do produto no momento da compra (snapshot histórico)',
     quantidade INT            NOT NULL,
     preco      DECIMAL(10,2)  NOT NULL COMMENT 'preço snapshot no momento da compra',
 

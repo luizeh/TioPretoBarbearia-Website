@@ -8,6 +8,7 @@
 require_once __DIR__ . '/session_admin.php';
 require_once __DIR__ . '/../../config/Connection.php';
 require_once __DIR__ . '/../../sql/ProdutosSql.php';
+require_once __DIR__ . '/../../sql/LogsSql.php';
 require_once __DIR__ . '/../../helpers/helpers.php';
 
 $pdo    = Connection::getConnection();
@@ -48,19 +49,38 @@ if ($method === 'POST') {
         helpers::resposta_json(true, 'Produto atualizado com sucesso.', null, 200);
     }
 
+    // Informa os relacionamentos do produto ANTES de excluir, para que o painel
+    // possa alertar o admin sobre o que será afetado (pedidos preservados).
+    if ($action === 'info-exclusao') {
+        if (empty($body['id'])) {
+            helpers::resposta_json(false, 'ID do produto é obrigatório.', null, 400);
+        }
+        $pedidos = ProdutosSql::contarPedidos($pdo, (int) $body['id']);
+        helpers::resposta_json(true, 'OK', [
+            'pedidos'  => $pedidos,
+            'tem_historico' => $pedidos > 0,
+        ], 200);
+    }
+
     if ($action === 'excluir') {
         if (empty($body['id'])) {
             helpers::resposta_json(false, 'ID do produto é obrigatório.', null, 400);
         }
         try {
-            ProdutosSql::excluirProduto($pdo, (int) $body['id']);
-        } catch (RuntimeException $e) {
-            helpers::resposta_json(false, $e->getMessage(), null, 409);
+            $resultado = ProdutosSql::excluirProduto($pdo, (int) $body['id']);
         } catch (Throwable $e) {
             error_log('Excluir produto: ' . $e->getMessage());
-            helpers::resposta_json(false, 'Não foi possível excluir o produto.', null, 500);
+            helpers::resposta_json(false, 'Não foi possível excluir o produto. Tente novamente.', null, 500);
         }
-        helpers::resposta_json(true, 'Produto excluído com sucesso.', null, 200);
+
+        $adminId = (int) ($_SESSION['usuario_id'] ?? 0);
+        if ($resultado['tipo'] === 'logico') {
+            LogsSql::registrar($adminId, 'produto_desativado', "Produto #{$body['id']} desativado (exclusão lógica — {$resultado['pedidos']} pedido(s) relacionados preservados).");
+            helpers::resposta_json(true, 'Produto desativado. Ele saiu da loja e de novas compras, mas os pedidos antigos foram preservados.', $resultado, 200);
+        }
+
+        LogsSql::registrar($adminId, 'produto_excluido', "Produto #{$body['id']} excluído definitivamente (sem histórico de pedidos).");
+        helpers::resposta_json(true, 'Produto excluído com sucesso.', $resultado, 200);
     }
 
     if ($action === 'visibilidade') {

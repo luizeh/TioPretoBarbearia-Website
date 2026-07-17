@@ -18,7 +18,8 @@ class PedidosSql
             $pdo->beginTransaction();
             $total = 0.0;
             $produtos = [];
-            $buscarProduto = $pdo->prepare('SELECT id, preco, estoque FROM produtos WHERE id = :id FOR UPDATE');
+            // Só produtos ativos podem entrar em novos pedidos (ativo = 1).
+            $buscarProduto = $pdo->prepare('SELECT id, nome, preco, estoque FROM produtos WHERE id = :id AND ativo = 1 FOR UPDATE');
 
             foreach ($itens as $item) {
                 $produtoId = (int) $item['produto_id'];
@@ -29,7 +30,8 @@ class PedidosSql
                 if ($quantidade < 1 || $quantidade > (int) $produto['estoque']) throw new RuntimeException('Estoque insuficiente para um dos produtos.');
                 $preco = (float) $produto['preco'];
                 $total += $preco * $quantidade;
-                $produtos[] = ['id' => $produtoId, 'quantidade' => $quantidade, 'preco' => $preco];
+                // Guarda o nome atual como snapshot histórico do item.
+                $produtos[] = ['id' => $produtoId, 'nome' => (string) $produto['nome'], 'quantidade' => $quantidade, 'preco' => $preco];
             }
 
             $stmt = $pdo->prepare(
@@ -52,10 +54,10 @@ class PedidosSql
                 ':total'            => $total,
             ]);
             $pedidoId = (int) $pdo->lastInsertId();
-            $itemStmt = $pdo->prepare('INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco) VALUES (:pid, :prod_id, :qty, :preco)');
+            $itemStmt = $pdo->prepare('INSERT INTO pedido_itens (pedido_id, produto_id, produto_nome, quantidade, preco) VALUES (:pid, :prod_id, :prod_nome, :qty, :preco)');
             $estoqueStmt = $pdo->prepare('UPDATE produtos SET estoque = estoque - :qty WHERE id = :id');
             foreach ($produtos as $produto) {
-                $itemStmt->execute([':pid' => $pedidoId, ':prod_id' => $produto['id'], ':qty' => $produto['quantidade'], ':preco' => $produto['preco']]);
+                $itemStmt->execute([':pid' => $pedidoId, ':prod_id' => $produto['id'], ':prod_nome' => $produto['nome'], ':qty' => $produto['quantidade'], ':preco' => $produto['preco']]);
                 $estoqueStmt->execute([':qty' => $produto['quantidade'], ':id' => $produto['id']]);
             }
             $pdo->commit();
@@ -80,7 +82,7 @@ class PedidosSql
         $stmt = $pdo->prepare("SELECT p.id, p.usuario_id, CONCAT(u.nome, ' ', u.sobrenome) AS cliente,
                 u.telefone, p.endereco, p.valor_total, p.status,
                 DATE_FORMAT(p.created_at, '%d/%m/%Y %H:%i') AS data_fmt,
-                COALESCE(GROUP_CONCAT(CONCAT(pr.nome, ' (', pi.quantidade, 'x)') SEPARATOR ', '), 'Sem itens') AS itens
+                COALESCE(GROUP_CONCAT(CONCAT(COALESCE(pi.produto_nome, pr.nome, 'Produto removido'), ' (', pi.quantidade, 'x)') SEPARATOR ', '), 'Sem itens') AS itens
             FROM pedidos p
             JOIN usuarios u ON u.id = p.usuario_id
             LEFT JOIN pedido_itens pi ON pi.pedido_id = p.id
