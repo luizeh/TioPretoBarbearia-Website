@@ -3,8 +3,7 @@ ob_start();
 error_reporting(0);
 include_once(__DIR__ . '/../../helpers/helpers.php');
 include_once(__DIR__ . '/../../sql/UsuariosSql.php');
-include_once(__DIR__ . '/../../sql/VerificacaoSql.php');
-include_once(__DIR__ . '/../../sql/LogsSql.php');
+include_once(__DIR__ . '/../../helpers/CadastroPendente.php');
 include_once(__DIR__ . '/../../helpers/Mailer.php');
 
 helpers::iniciarSessao();
@@ -47,30 +46,22 @@ if (($dados['action'] ?? '') == 'cadastro') {
         helpers::resposta_json(false, 'As senhas não coincidem.', null, 400);
     }
 
-    // Cria a conta (não verificada). Senha é armazenada com password_hash().
-    $result = UsuariosSql::cadastrar($dados);
-
-    if (!$result['success']) {
-        helpers::resposta_json(false, $result['message'], null, 409);
+    // NÃO grava no banco ainda: a conta só é criada quando e-mail E telefone
+    // forem confirmados (ver verificar-telefone.php). Aqui apenas rejeitamos
+    // e-mail/telefone já usados e guardamos o cadastro na sessão do servidor.
+    if (UsuariosSql::emailExiste($dados['email'])) {
+        helpers::resposta_json(false, 'E-mail já cadastrado.', null, 409);
+    }
+    if (UsuariosSql::telefoneExiste($dados['telefone'])) {
+        helpers::resposta_json(false, 'Telefone já cadastrado.', null, 409);
     }
 
-    $usuarioId = (int) $result['id'];
-    LogsSql::registrar($usuarioId, 'conta_criada', 'Conta de cliente criada (aguardando verificação de e-mail e telefone).');
+    // Guarda o cadastro pendente (com a senha em hash) e gera o código de e-mail.
+    CadastroPendente::iniciar($dados);
+    $codigo = CadastroPendente::gerarCodigo(CadastroPendente::EMAIL);
 
-    // Gera o código de verificação (operação rápida — fica salvo no banco).
-    // O ENVIO do e-mail (parte lenta) é feito depois de responder ao cliente.
-    $codigo = VerificacaoSql::gerar($usuarioId, VerificacaoSql::EMAIL, 'email', $dados['email']);
-
-    // Guarda o contexto para as páginas de verificação (não confia em ID vindo do cliente).
-    $_SESSION['pendente_verificacao'] = [
-        'usuario_id' => $usuarioId,
-        'email'      => $dados['email'],
-        'nome'       => $dados['nome'],
-        'telefone'   => $dados['telefone'],
-    ];
-
-    // ── Responde JÁ: a operação principal (criar conta + código) está concluída.
-    // O usuário é redirecionado para a verificação sem esperar o SMTP.
+    // ── Responde JÁ: o cadastro pendente está pronto; o usuário segue para a
+    // verificação sem esperar o SMTP. Nenhum registro foi criado no banco.
     helpers::responderEContinuar(
         true,
         'Enviamos um código de verificação para o seu e-mail.',
@@ -78,10 +69,10 @@ if (($dados['action'] ?? '') == 'cadastro') {
         201
     );
 
-    // ── Pós-processamento (o cliente já recebeu a resposta): envia o e-mail.
-    // Se falhar, a conta e o código já existem → o usuário reenvia na próxima tela.
+    // ── Pós-processamento (cliente já respondido): envia o e-mail.
+    // Se falhar, o cadastro pendente e o código continuam na sessão → reenvio.
     try {
-        Mailer::enviarCodigoVerificacao($dados['email'], $dados['nome'], $codigo, VerificacaoSql::VALIDADE_MIN);
+        Mailer::enviarCodigoVerificacao($dados['email'], $dados['nome'], $codigo, CadastroPendente::VALIDADE_MIN);
     } catch (Throwable $e) {
         error_log('Cadastro: falha ao enviar código de e-mail no pós-processamento.');
     }

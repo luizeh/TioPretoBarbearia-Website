@@ -162,18 +162,7 @@ class AgendamentosSql
         if (!$inicio || ($erros !== false && ($erros['warning_count'] || $erros['error_count']))) {
             throw new InvalidArgumentException('Data ou horário inválidos.');
         }
-        // O admin pode registrar agendamentos em datas passadas (ajustes retroativos);
-        // nesse caso a restrição de data/horário passado é dispensada.
-        if (!$permitirDataPassada) {
-            if ($bloquearPassado) {
-                // Cliente: não pode agendar em um horário que já passou (inclui horários de hoje).
-                if ($inicio < new DateTime()) {
-                    throw new InvalidArgumentException('Não é possível agendar em um horário que já passou. Escolha um horário futuro.');
-                }
-            } elseif ($inicio < new DateTime('today')) {
-                throw new InvalidArgumentException('Não é possível agendar em uma data passada.');
-            }
-        }
+        
         $fim = (clone $inicio)->modify("+$duracao minutes");
 
         // Resolve o horário efetivo da data com a prioridade

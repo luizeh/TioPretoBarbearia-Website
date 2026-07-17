@@ -46,16 +46,22 @@
 
 ### 👤 Área do cliente
 - Cadastro e login com senha criptografada (`bcrypt`)
+- **Verificação obrigatória de e-mail e telefone** por código (envio via SMTP / WhatsApp)
+- **Recuperação de senha** por código enviado ao e-mail
 - Agenda semanal com horários **disponíveis / indisponíveis / fechados**
 - Criação, edição e cancelamento dos próprios agendamentos (multi‑serviço)
 - Bloqueio de horários que já passaram e de dias fechados
 - Carrinho de compras e finalização de pedidos
 - Notificações e edição de perfil
+- **Exclusão da própria conta**
 
 ### 🛠️ Área administrativa
 - **Dashboard** com estatísticas (clientes, agendamentos do dia, receita, etc.)
 - **Agenda semanal** com visão de calendário + lista, e envio de lembretes
 - **CRUD** de clientes, serviços, produtos (com upload de imagem) e tags
+- **Exclusão lógica** de produtos e serviços (mantidos só para histórico de pedidos/agendamentos)
+- **Agendamento retroativo** pelo admin (registrar atendimentos já realizados)
+- **Trilha de auditoria (logs)** paginada
 - **Gestão de horários de funcionamento** por dia da semana
 - **Bloqueios recorrentes** (ex.: almoço) — inclusive *"todos os dias, exceto X"*
 - **Bloqueios por período** (ex.: férias) — dia inteiro ou faixa de horário, com exceções por data
@@ -117,7 +123,7 @@ tiopretobarbearia-crud/
 │       └── 000_schema_completo.sql   → schema completo do banco
 ├── controllers/               → preparam dados para as views
 ├── api/
-│   ├── auth/                  → login, cadastro, logout, guards de sessão
+│   ├── auth/                  → login, cadastro, verificação e-mail/telefone, recuperação de senha, guards de sessão
 │   ├── admin/                 → endpoints do painel (CRUD, horários, whatsapp)
 │   ├── user/                  → endpoints do cliente (agenda, carrinho, pedidos)
 │   └── produtos/              → upload de imagens
@@ -140,11 +146,12 @@ Database: **`tiopretobarbearia`** · Charset `utf8mb4`. Principais tabelas:
 
 | Tabela                   | Descrição                                                        |
 | ------------------------ | ---------------------------------------------------------------- |
-| `usuarios`               | Clientes e admins (`admin` = 0/1), senha em `bcrypt`             |
-| `servicos`               | Serviços oferecidos (preço, duração)                             |
+| `usuarios`               | Clientes e admins (`admin` = 0/1), senha em `bcrypt`, flags de e-mail/telefone verificado |
+| `codigos_verificacao`    | Códigos de verificação de e-mail/telefone e recuperação de senha |
+| `servicos`               | Serviços oferecidos (preço, duração) — `ativo` p/ exclusão lógica |
 | `agendamentos`           | Agendamentos (com status e observações)                          |
 | `agendamento_servicos`   | Relação N:N — múltiplos serviços por agendamento                 |
-| `produtos` / `tags`      | Produtos da loja e categorias                                    |
+| `produtos` / `tags`      | Produtos da loja (`ativo` p/ exclusão lógica) e categorias       |
 | `carrinho` / `_itens`    | Carrinho por usuário                                             |
 | `pedidos` / `_itens`     | Pedidos com *snapshot* de preço                                  |
 | `notificacoes` / `logs`  | Notificações ao cliente e trilha de auditoria                    |
@@ -169,6 +176,8 @@ Database: **`tiopretobarbearia`** · Charset `utf8mb4`. Principais tabelas:
   Ou seja, uma exceção por data pode **reabrir** um dia dentro das férias.
 - 🚫 **Bloqueios flexíveis:** recorrentes (ex.: almoço), *"todos os dias exceto sábado"* e por período (dia inteiro ou faixa de horário)
 - 🖼️ **Upload seguro de imagens:** valida MIME real (`finfo`), nome aleatório, máx. 2 MB
+- ✉️ **Verificação obrigatória** de e-mail e telefone por código com expiração antes de liberar o acesso
+- 🗑️ **Exclusão lógica** de produtos/serviços: o registro é desativado (`ativo = 0`), preservando pedidos e agendamentos históricos
 - 🔐 **Segurança:** PDO com *prepared statements*, `htmlspecialchars` nas views, guards de sessão e validação de input em todas as camadas
 
 ---

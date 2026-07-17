@@ -43,6 +43,61 @@ class UsuariosSql
         ];
     }
 
+    /** Existe uma conta com este e-mail? (usado na validação prévia do cadastro) */
+    public static function emailExiste(string $email): bool
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = :email LIMIT 1");
+        $stmt->execute([':email' => $email]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    /** Existe uma conta com este telefone? */
+    public static function telefoneExiste(string $telefone): bool
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE telefone = :telefone LIMIT 1");
+        $stmt->execute([':telefone' => $telefone]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    /**
+     * Insere um cliente JÁ verificado (e-mail e telefone confirmados por código).
+     * Usado ao concluir o cadastro em duas etapas — a conta só passa a existir
+     * no banco neste momento. A senha já vem em hash ($dados['senha_hash']).
+     * Rechecar unicidade evita corrida (mesmo e-mail/telefone criado enquanto pendente).
+     */
+    public static function cadastrarVerificado(array $dados): array
+    {
+        $pdo = Connection::getConnection();
+
+        if (self::emailExiste($dados['email'])) {
+            return ['success' => false, 'message' => 'E-mail já cadastrado.'];
+        }
+        if (self::telefoneExiste($dados['telefone'])) {
+            return ['success' => false, 'message' => 'Telefone já cadastrado.'];
+        }
+
+        $stmt = $pdo->prepare("
+            INSERT INTO usuarios
+                (nome, sobrenome, telefone, email, senha, cidade,
+                 email_verificado, email_verificado_em, telefone_verificado, telefone_verificado_em)
+            VALUES
+                (:nome, :sobrenome, :telefone, :email, :senha, :cidade,
+                 1, NOW(), 1, NOW())
+        ");
+        $stmt->execute([
+            ':nome'      => $dados['nome'],
+            ':sobrenome' => $dados['sobrenome'],
+            ':telefone'  => $dados['telefone'],
+            ':email'     => $dados['email'],
+            ':senha'     => $dados['senha_hash'],
+            ':cidade'    => $dados['cidade'],
+        ]);
+
+        return ['success' => true, 'id' => (int) $pdo->lastInsertId()];
+    }
+
     public static function buscarPorId(int $id): array|false
     {
         $pdo  = Connection::getConnection();

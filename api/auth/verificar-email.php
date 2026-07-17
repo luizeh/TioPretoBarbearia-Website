@@ -20,10 +20,68 @@ include_once __DIR__ . '/../../helpers/helpers.php';
 include_once __DIR__ . '/../../sql/VerificacaoSql.php';
 include_once __DIR__ . '/../../sql/UsuariosSql.php';
 include_once __DIR__ . '/../../sql/LogsSql.php';
+include_once __DIR__ . '/../../helpers/CadastroPendente.php';
 include_once __DIR__ . '/../../helpers/Mailer.php';
 include_once __DIR__ . '/../../helpers/Whatsapp.php';
 
 helpers::iniciarSessao();
+
+// ── Cadastro em duas etapas: a conta AINDA NÃO existe no banco (fica na sessão).
+// Confirma o e-mail e, em seguida, dispara o código de telefone.
+if (CadastroPendente::existe()) {
+    try {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            helpers::resposta_json(true, 'OK', CadastroPendente::statusReenvio(CadastroPendente::EMAIL));
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            helpers::resposta_json(false, 'Método não reconhecido.', null, 405);
+        }
+
+        $body   = json_decode(file_get_contents('php://input'), true) ?? [];
+        $action = $body['action'] ?? '';
+        helpers::verificarCsrf($body);
+        $dados = CadastroPendente::dados();
+
+        if ($action === 'verificar') {
+            $resultado = CadastroPendente::validar(CadastroPendente::EMAIL, $body['codigo'] ?? '');
+            if (!$resultado['success']) {
+                helpers::resposta_json(false, $resultado['message'], null, 400);
+            }
+
+            // E-mail confirmado. Dispara o código de telefone (WhatsApp) se ainda pendente.
+            if (!CadastroPendente::verificado(CadastroPendente::TELEFONE)
+                && CadastroPendente::statusReenvio(CadastroPendente::TELEFONE)['pode']) {
+                try {
+                    $codigo = CadastroPendente::gerarCodigo(CadastroPendente::TELEFONE);
+                    Whatsapp::enviarCodigo($dados['telefone'], $codigo, CadastroPendente::VALIDADE_MIN);
+                } catch (RuntimeException $e) {
+                    error_log('verificar-email (cadastro): falha ao enviar código de telefone.');
+                }
+            }
+            helpers::resposta_json(true, 'E-mail verificado! Agora confirme seu telefone.', ['redirect' => 'verificar-telefone.php'], 200);
+        }
+
+        if ($action === 'reenviar') {
+            $status = CadastroPendente::statusReenvio(CadastroPendente::EMAIL);
+            if (!$status['pode']) {
+                helpers::resposta_json(false, $status['message'], ['espera' => $status['espera']], 429);
+            }
+            $codigo = CadastroPendente::gerarCodigo(CadastroPendente::EMAIL);
+            try {
+                Mailer::enviarCodigoVerificacao($dados['email'], $dados['nome'], $codigo, CadastroPendente::VALIDADE_MIN);
+            } catch (RuntimeException $e) {
+                error_log('Reenvio e-mail (cadastro): falha ao enviar código.');
+                helpers::resposta_json(false, 'Não foi possível enviar o e-mail agora. Tente novamente em instantes.', null, 502);
+            }
+            helpers::resposta_json(true, 'Enviamos um novo código para o seu e-mail.', ['espera' => CadastroPendente::COOLDOWN_SEG], 200);
+        }
+
+        helpers::resposta_json(false, 'Ação não reconhecida.', null, 400);
+    } catch (Throwable $e) {
+        error_log('verificar-email (cadastro): ' . $e->getMessage());
+        helpers::resposta_json(false, 'Não foi possível concluir a verificação.', null, 500);
+    }
+}
 
 $pendente = $_SESSION['pendente_verificacao'] ?? null;
 if (empty($pendente['usuario_id'])) {

@@ -15,3 +15,7 @@ Thumbs.db
 
 # Skills internas de time — não expor no repositório
 .github/skills/
+
+# Imagens de produtos enviadas via upload (mantém a pasta e o .htaccess)
+/assets/img/produtos/*
+!/assets/img/produtos/.htaccess

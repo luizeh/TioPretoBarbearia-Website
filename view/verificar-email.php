@@ -1,17 +1,23 @@
 <?php
 require_once __DIR__ . '/../helpers/helpers.php';
 require_once __DIR__ . '/../sql/VerificacaoSql.php';
+require_once __DIR__ . '/../helpers/CadastroPendente.php';
 helpers::iniciarSessao();
 
-// Sem verificação pendente não há o que confirmar aqui.
+// Descobre a origem: cadastro pendente (na sessão) ou conta já existente (login).
 $pendente = $_SESSION['pendente_verificacao'] ?? null;
-if (empty($pendente['usuario_id'])) {
+if (CadastroPendente::existe()) {
+    $dados = CadastroPendente::dados();
+    $email = (string) $dados['email'];
+} elseif (!empty($pendente['usuario_id'])) {
+    $email = (string) ($pendente['email'] ?? '');
+} else {
+    // Sem verificação pendente não há o que confirmar aqui.
     header('Location: login.php');
     exit;
 }
 
-$csrf  = helpers::tokenCsrf();
-$email = (string) ($pendente['email'] ?? '');
+$csrf = helpers::tokenCsrf();
 
 // Mascara o e-mail exibido: primeira letra + *** + domínio.
 $emailMascarado = $email;
