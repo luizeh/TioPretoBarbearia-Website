@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Scripts de shell / entrypoints e configs lidas dentro do container Linux
+# precisam de fim de linha LF, mesmo commitados no Windows — CRLF quebra o
+# shebang e a leitura do Apache.
+*.sh text eol=lf
+deploy/entrypoint.sh text eol=lf
+Dockerfile text eol=lf
+deploy/apache.conf text eol=lf

@@ -1,0 +1,19 @@
+# Reproduzível: dependências são instaladas dentro do build, não copiadas do host
+/vendor/
+/node_modules/
+
+# Segredos e estado local — nunca vão para a imagem
+.env
+.env.local
+/storage/
+
+# Git e metadados
+.git
+.gitignore
+.gitattributes
+.github
+
+# Lixo de SO / editor
+Thumbs.db
+.DS_Store
+*.log

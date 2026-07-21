@@ -2,8 +2,26 @@
 -- Schema completo — tiopretobarbearia
 -- Gerado em: 2026-07-10
 --
--- Como executar (XAMPP porta 3307):
---   mysql -h 127.0.0.1 -P 3307 -u root tiopretobarbearia < 000_schema_completo.sql
+-- Este script é AGNÓSTICO DE BANCO: não contém USE nem CREATE DATABASE,
+-- então as tabelas são criadas no banco já selecionado pela conexão.
+-- O nome do banco fica a cargo do ambiente (ver DB_NAME em config/Connection.php).
+--
+-- ▸ Local (XAMPP, porta 3307 — banco "tiopretobarbearia"):
+--     mysql -h 127.0.0.1 -P 3307 -u root tiopretobarbearia < 000_schema_completo.sql
+--
+-- ▸ Railway (plugin MySQL — o banco padrão se chama "railway"):
+--   1) No serviço MySQL do Railway, copie as credenciais da aba "Variables".
+--   2) Importe apontando para o banco "railway" (NÃO "tiopretobarbearia",
+--      que não existe lá). Duas opções:
+--        a) via CLI, usando a connection string pública do Railway:
+--             mysql --protocol=TCP -h <MYSQLHOST> -P <MYSQLPORT> \
+--                   -u <MYSQLUSER> -p<MYSQLPASSWORD> railway < 000_schema_completo.sql
+--        b) ou cole o conteúdo deste arquivo na aba "Data"/Query do serviço.
+--   3) No serviço da APP, defina as variáveis de ambiente:
+--        DB_HOST=${{MySQL.MYSQLHOST}}   DB_PORT=${{MySQL.MYSQLPORT}}
+--        DB_NAME=${{MySQL.MYSQLDATABASE}}  (= "railway")
+--        DB_USER=${{MySQL.MYSQLUSER}}   DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+--      (a sintaxe ${{Serviço.VAR}} é a referência de variáveis do Railway)
 --
 -- Todas as tabelas usam IF NOT EXISTS — seguro de re-executar.
 -- Ordem respeitando dependências de FK.
