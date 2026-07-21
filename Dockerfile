@@ -12,6 +12,11 @@ RUN npm install --omit=dev --no-audit --no-fund
 # --- Estágio 2: aplicação PHP + Apache ---
 FROM php:8.2-apache
 
+# Utilitários que o Composer precisa para extrair pacotes (a imagem base não os traz)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Extensão PDO MySQL (o app acessa o banco só via PDO)
 RUN docker-php-ext-install pdo_mysql
 
