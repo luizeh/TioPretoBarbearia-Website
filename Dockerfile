@@ -23,6 +23,11 @@ RUN docker-php-ext-install pdo_mysql
 # mod_rewrite: inofensivo aqui, mas deixa .htaccess de rewrite funcionar se surgir
 RUN a2enmod rewrite
 
+# Garante um ÚNICO MPM. O mod_php exige o prefork; se a imagem vier com o
+# event/worker também habilitado, o Apache não inicia ("More than one MPM loaded").
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true \
+    && a2enmod mpm_prefork
+
 # Composer (copiado da imagem oficial)
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
