@@ -21,7 +21,9 @@ return [
     'debug'      => Env::get('MAIL_DEBUG', '0') === '1',
 
     // Envio via API HTTP (porta 443) — necessário onde o SMTP é bloqueado
-    // (ex.: Railway bloqueia as portas 25/465/587/2525). Quando BREVO_API_KEY
-    // está definido, o Mailer envia via API da Brevo em vez de SMTP.
-    'brevo_api_key' => Env::get('BREVO_API_KEY', ''),
+    // (ex.: Railway bloqueia as portas 25/465/587/2525). Prioridade de envio:
+    // Resend → Brevo → SMTP. Basta definir a chave do provedor desejado.
+    'resend_api_key' => Env::get('RESEND_API_KEY', ''),
+    'resend_from'    => Env::get('RESEND_FROM', 'onboarding@resend.dev'),
+    'brevo_api_key'  => Env::get('BREVO_API_KEY', ''),
 ];

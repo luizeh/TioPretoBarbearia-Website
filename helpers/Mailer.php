@@ -79,9 +79,14 @@ class Mailer
 
     private static function enviar(array $cfg, string $paraEmail, string $paraNome, string $assunto, string $html, string $texto): void
     {
-        // ── Envio via API HTTP (Brevo) ──────────────────────────────────
+        // ── Envio via API HTTP ──────────────────────────────────────────
         // Preferido em produção (Railway), onde as portas de SMTP são
         // bloqueadas. Usa porta 443 (HTTPS), que não sofre bloqueio.
+        // Prioridade: Resend → Brevo.
+        if (!empty($cfg['resend_api_key'])) {
+            self::enviarViaResend($cfg, $paraEmail, $paraNome, $assunto, $html, $texto);
+            return;
+        }
         if (!empty($cfg['brevo_api_key'])) {
             self::enviarViaBrevo($cfg, $paraEmail, $paraNome, $assunto, $html, $texto);
             return;
@@ -140,14 +145,11 @@ class Mailer
     }
 
     /**
-     * Envio via API HTTP da Brevo (https://api.brevo.com) — porta 443.
-     * Usado em produção (Railway) onde o SMTP é bloqueado.
-     * Lança RuntimeException em caso de falha (mesmo contrato do envio SMTP).
+     * Substitui a logo embutida (cid:tplogo) pela URL pública da logo no site,
+     * já que o envio por API não suporta imagem embutida por cid:.
      */
-    private static function enviarViaBrevo(array $cfg, string $paraEmail, string $paraNome, string $assunto, string $html, string $texto): void
+    private static function trocarLogoPorUrlPublica(string $html): string
     {
-        // No e-mail via API não existe imagem embutida por cid: — troca o
-        // cid:tplogo pela URL pública da logo no próprio site.
         $base = Env::get('APP_URL', '');
         if ($base === '') {
             $dom = getenv('RAILWAY_PUBLIC_DOMAIN');
@@ -158,6 +160,65 @@ class Mailer
         if ($base !== '') {
             $html = str_replace('cid:tplogo', rtrim($base, '/') . '/assets/img/tiopretonb.png', $html);
         }
+        return $html;
+    }
+
+    /**
+     * Envio via API HTTP do Resend (https://api.resend.com) — porta 443.
+     * Usado em produção (Railway) onde o SMTP é bloqueado.
+     * Lança RuntimeException em caso de falha (mesmo contrato do envio SMTP).
+     *
+     * Obs.: com o remetente de teste onboarding@resend.dev, o Resend só
+     * entrega no e-mail da própria conta; outros destinatários exigem um
+     * domínio verificado no Resend.
+     */
+    private static function enviarViaResend(array $cfg, string $paraEmail, string $paraNome, string $assunto, string $html, string $texto): void
+    {
+        $html = self::trocarLogoPorUrlPublica($html);
+
+        $de = $cfg['from_name'] !== ''
+            ? sprintf('%s <%s>', $cfg['from_name'], $cfg['resend_from'])
+            : $cfg['resend_from'];
+
+        $payload = json_encode([
+            'from'    => $de,
+            'to'      => [$paraEmail],
+            'subject' => $assunto,
+            'html'    => $html,
+            'text'    => $texto,
+        ], JSON_UNESCAPED_UNICODE);
+
+        $ch = curl_init('https://api.resend.com/emails');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $cfg['resend_api_key'],
+            ],
+            CURLOPT_TIMEOUT        => 15,
+        ]);
+        $resp = curl_exec($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err  = curl_error($ch);
+        curl_close($ch);
+
+        if ($code < 200 || $code >= 300) {
+            error_log("Resend API falhou (HTTP {$code}): " . ($err !== '' ? $err : (string) $resp));
+            throw new RuntimeException('Não foi possível enviar o e-mail de verificação. Tente novamente em instantes.');
+        }
+    }
+
+    /**
+     * Envio via API HTTP da Brevo (https://api.brevo.com) — porta 443.
+     * Usado em produção (Railway) onde o SMTP é bloqueado.
+     * Lança RuntimeException em caso de falha (mesmo contrato do envio SMTP).
+     */
+    private static function enviarViaBrevo(array $cfg, string $paraEmail, string $paraNome, string $assunto, string $html, string $texto): void
+    {
+        $html = self::trocarLogoPorUrlPublica($html);
 
         $payload = json_encode([
             'sender'      => ['name' => $cfg['from_name'], 'email' => $cfg['from_email']],
