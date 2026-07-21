@@ -8,6 +8,16 @@ set -e
 
 PORT="${PORT:-8080}"
 
+# Garante um ÚNICO MPM em TEMPO DE EXECUÇÃO. A imagem base às vezes vem com
+# mpm_event + mpm_prefork habilitados, e o cache de build do Railway pode
+# preservar isso apesar da limpeza no Dockerfile. Remover aqui, a cada start,
+# é imune a cache: roda sobre o filesystem real antes do Apache iniciar.
+# O mod_php exige o prefork.
+rm -f /etc/apache2/mods-enabled/mpm_event.load \
+      /etc/apache2/mods-enabled/mpm_event.conf \
+      /etc/apache2/mods-enabled/mpm_worker.load \
+      /etc/apache2/mods-enabled/mpm_worker.conf
+
 # Substitui o placeholder __PORT__ pela porta real, no vhost e no ports.conf
 sed -i "s/__PORT__/${PORT}/g" \
     /etc/apache2/ports.conf \
