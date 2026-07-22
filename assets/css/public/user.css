@@ -65,6 +65,17 @@
   background: var(--white);
 }
 
+/* Pagina de servicos: a imagem preenche todo o quadrado, sem fundo nem
+   padding (diferente de produtos, que usa object-fit: contain). */
+#servicos .product-image-wrap {
+  background: none;
+}
+
+#servicos .product-image-wrap img {
+  object-fit: cover;
+  padding: 0;
+}
+
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
