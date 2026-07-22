@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['foto'])) {
 }
 
 $file    = $_FILES['foto'];
-$maxSize = 2 * 1024 * 1024; // 2 MB
+$maxSize = 8 * 1024 * 1024; // 8 MB (fotos de celular)
 
 // Mapa MIME real → extensão. A extensão é derivada do conteúdo validado,
 // NUNCA do nome enviado pelo cliente (evita salvar .php disfarçado de imagem).
@@ -35,7 +35,7 @@ if ($file['error'] !== UPLOAD_ERR_OK) {
 }
 
 if ($file['size'] > $maxSize) {
-    helpers::resposta_json(false, 'Arquivo muito grande. Máximo 2 MB.', null, 400);
+    helpers::resposta_json(false, 'Arquivo muito grande. Máximo 8 MB.', null, 400);
 }
 
 $finfo    = new finfo(FILEINFO_MIME_TYPE);

@@ -20,6 +20,14 @@ RUN apt-get update \
 # Extensão PDO MySQL (o app acessa o banco só via PDO)
 RUN docker-php-ext-install pdo_mysql
 
+# Limites de upload: a imagem base vem com upload_max_filesize=2M, pequeno
+# demais para fotos de celular (3-8MB). Sobe para 10M/12M.
+RUN { \
+      echo 'upload_max_filesize=10M'; \
+      echo 'post_max_size=12M'; \
+      echo 'memory_limit=256M'; \
+    } > /usr/local/etc/php/conf.d/zz-uploads.ini
+
 # mod_rewrite: inofensivo aqui, mas deixa .htaccess de rewrite funcionar se surgir
 RUN a2enmod rewrite
 
