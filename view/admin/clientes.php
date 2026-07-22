@@ -65,7 +65,13 @@ include __DIR__ . '/../partials/head.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($usuarios as $u): $ehAdmin = !empty($u['admin']); ?>
+                        <?php
+                        // Quem promoveu o admin atual (não pode ser alterado por ele).
+                        $meuPromotor = (int) ($usuario['promovido_por'] ?? 0);
+                        foreach ($usuarios as $u):
+                            $ehAdmin    = !empty($u['admin']);
+                            $ehPromotor = ($meuPromotor > 0 && (int) $u['id'] === $meuPromotor);
+                        ?>
                             <tr>
                                 <td>#<?= (int) $u['id'] ?></td>
                                 <td><span class="client-name"><?= htmlspecialchars($u['nome']) . ' ' . htmlspecialchars($u['sobrenome']) ?></span></td>
@@ -83,23 +89,34 @@ include __DIR__ . '/../partials/head.php';
                                             data-cidade="<?= htmlspecialchars($u['cidade'] ?? '') ?>">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
-                                        <button class="btn-action btn-action--edit" title="Editar"
-                                            data-modal="modal-cliente-editar"
-                                            data-id="<?= $u['id'] ?>"
-                                            data-nome="<?= htmlspecialchars($u['nome']) ?>"
-                                            data-sobrenome="<?= htmlspecialchars($u['sobrenome']) ?>"
-                                            data-email="<?= htmlspecialchars($u['email']) ?>"
-                                            data-telefone="<?= htmlspecialchars($u['telefone'] ?? '') ?>"
-                                            data-cidade="<?= htmlspecialchars($u['cidade'] ?? '') ?>">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
+                                        <?php if (!$ehPromotor): ?>
+                                            <button class="btn-action btn-action--edit" title="Editar"
+                                                data-modal="modal-cliente-editar"
+                                                data-id="<?= $u['id'] ?>"
+                                                data-nome="<?= htmlspecialchars($u['nome']) ?>"
+                                                data-sobrenome="<?= htmlspecialchars($u['sobrenome']) ?>"
+                                                data-email="<?= htmlspecialchars($u['email']) ?>"
+                                                data-telefone="<?= htmlspecialchars($u['telefone'] ?? '') ?>"
+                                                data-cidade="<?= htmlspecialchars($u['cidade'] ?? '') ?>">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                        <?php endif; ?>
                                         <?php if (!$ehAdmin): ?>
+                                            <button class="btn-action btn-action--promote" title="Promover a admin"
+                                                data-action-promover
+                                                data-id="<?= $u['id'] ?>"
+                                                data-nome="<?= htmlspecialchars($u['nome'] . ' ' . $u['sobrenome']) ?>">
+                                                <i class="fa-solid fa-user-shield"></i>
+                                            </button>
                                             <button class="btn-action btn-action--delete" title="Excluir"
                                                 data-modal="modal-cliente-excluir"
                                                 data-id="<?= $u['id'] ?>"
                                                 data-nome="<?= htmlspecialchars($u['nome'] . ' ' . $u['sobrenome']) ?>">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
+                                        <?php endif; ?>
+                                        <?php if ($ehPromotor): ?>
+                                            <span class="badge badge--admin" title="Foi quem promoveu você — não pode ser alterado">Seu promotor</span>
                                         <?php endif; ?>
                                     </div>
                                 </td>

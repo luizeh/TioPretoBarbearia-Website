@@ -68,9 +68,13 @@ include __DIR__ . '/../partials/sidebar.php';
                     </thead>
                     <tbody>
                         <?php foreach ($logs as $log): ?>
+                            <?php
+                            $logNome = trim(($log['usuario_nome'] ?? '') . ' ' . ($log['usuario_sobrenome'] ?? ''));
+                            $logNome = $logNome !== '' ? $logNome : 'Usuário removido';
+                            ?>
                             <tr>
                                 <td><?= (int) $log['id'] ?></td>
-                                <td><?= (int) $log['usuario_id'] ?></td>
+                                <td><?= htmlspecialchars($logNome) ?> <span class="log-user-id">#<?= (int) $log['usuario_id'] ?></span></td>
                                 <td><?= htmlspecialchars($log['acao']) ?></td>
                                 <td><?= htmlspecialchars($log['descricao'] ?? 'Nenhuma') ?></td>
                                 <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($log['created_at']))) ?></td>

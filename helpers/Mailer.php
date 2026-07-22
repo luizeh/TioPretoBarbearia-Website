@@ -79,16 +79,11 @@ class Mailer
 
     private static function enviar(array $cfg, string $paraEmail, string $paraNome, string $assunto, string $html, string $texto): void
     {
-        // ── Envio via API HTTP ──────────────────────────────────────────
+        // ── Envio via API HTTP (Resend) ─────────────────────────────────
         // Preferido em produção (Railway), onde as portas de SMTP são
         // bloqueadas. Usa porta 443 (HTTPS), que não sofre bloqueio.
-        // Prioridade: Resend → Brevo.
         if (!empty($cfg['resend_api_key'])) {
             self::enviarViaResend($cfg, $paraEmail, $paraNome, $assunto, $html, $texto);
-            return;
-        }
-        if (!empty($cfg['brevo_api_key'])) {
-            self::enviarViaBrevo($cfg, $paraEmail, $paraNome, $assunto, $html, $texto);
             return;
         }
 
@@ -207,46 +202,6 @@ class Mailer
 
         if ($code < 200 || $code >= 300) {
             error_log("Resend API falhou (HTTP {$code}): " . ($err !== '' ? $err : (string) $resp));
-            throw new RuntimeException('Não foi possível enviar o e-mail de verificação. Tente novamente em instantes.');
-        }
-    }
-
-    /**
-     * Envio via API HTTP da Brevo (https://api.brevo.com) — porta 443.
-     * Usado em produção (Railway) onde o SMTP é bloqueado.
-     * Lança RuntimeException em caso de falha (mesmo contrato do envio SMTP).
-     */
-    private static function enviarViaBrevo(array $cfg, string $paraEmail, string $paraNome, string $assunto, string $html, string $texto): void
-    {
-        $html = self::trocarLogoPorUrlPublica($html);
-
-        $payload = json_encode([
-            'sender'      => ['name' => $cfg['from_name'], 'email' => $cfg['from_email']],
-            'to'          => [['email' => $paraEmail, 'name' => $paraNome]],
-            'subject'     => $assunto,
-            'htmlContent' => $html,
-            'textContent' => $texto,
-        ], JSON_UNESCAPED_UNICODE);
-
-        $ch = curl_init('https://api.brevo.com/v3/smtp/email');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_HTTPHEADER     => [
-                'accept: application/json',
-                'content-type: application/json',
-                'api-key: ' . $cfg['brevo_api_key'],
-            ],
-            CURLOPT_TIMEOUT        => 15,
-        ]);
-        $resp = curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $err  = curl_error($ch);
-        curl_close($ch);
-
-        if ($code < 200 || $code >= 300) {
-            error_log("Brevo API falhou (HTTP {$code}): " . ($err !== '' ? $err : (string) $resp));
             throw new RuntimeException('Não foi possível enviar o e-mail de verificação. Tente novamente em instantes.');
         }
     }

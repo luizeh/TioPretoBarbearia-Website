@@ -107,6 +107,20 @@ class UsuariosSql
     }
 
     /**
+     * Promove um usuário a admin, registrando quem o promoveu (promovido_por).
+     * Só promove quem ainda não é admin. Retorna true se algo mudou.
+     */
+    public static function promover(int $id, int $promovidoPor): bool
+    {
+        $pdo  = Connection::getConnection();
+        $stmt = $pdo->prepare(
+            "UPDATE usuarios SET admin = 1, promovido_por = :por WHERE id = :id AND admin = 0"
+        );
+        $stmt->execute([':por' => $promovidoPor, ':id' => $id]);
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
      * Busca um usuário pelo e-mail (linha completa) — usado na recuperação de senha.
      */
     public static function buscarPorEmail(string $email): array|false

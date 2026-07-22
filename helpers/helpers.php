@@ -89,8 +89,27 @@ class helpers
             // Só marca Secure quando a requisição é HTTPS (não quebra o dev em HTTP).
             $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
                 || (int) ($_SERVER['SERVER_PORT'] ?? 0) === 443;
+
+            // Sessão longa (30 dias): mantém o login mesmo ao fechar o navegador
+            // ou após inatividade. O gc_maxlifetime é alinhado ao cookie para o
+            // servidor não coletar a sessão antes disso.
+            $lifetime = 60 * 60 * 24 * 30; // 30 dias
+            ini_set('session.gc_maxlifetime', (string) $lifetime);
+
+            // Persistência da sessão no banco (MySQL). O /tmp padrão é apagado a
+            // cada deploy no Railway, o que derrubava o login "do nada"; o banco
+            // é persistente. Se o banco estiver indisponível, cai no armazenamento
+            // padrão em arquivo (não quebra o login).
+            try {
+                require_once __DIR__ . '/DbSessionHandler.php';
+                Connection::getConnection(); // valida a conexão antes de trocar o handler
+                session_set_save_handler(new DbSessionHandler($lifetime), true);
+            } catch (Throwable $e) {
+                error_log('Sessao: banco indisponivel, usando arquivo. ' . $e->getMessage());
+            }
+
             session_set_cookie_params([
-                'lifetime' => 0,
+                'lifetime' => $lifetime,
                 'path'     => '/',
                 'httponly' => true,      // inacessível via document.cookie (mitiga roubo por XSS)
                 'secure'   => $secure,   // só trafega em HTTPS quando disponível

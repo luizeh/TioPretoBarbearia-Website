@@ -164,6 +164,12 @@
   border-collapse: collapse;
 }
 
+/* ID do usuário ao lado do nome, na tabela de logs */
+.log-user-id {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
 .dash-table thead th {
   font-family: var(--font-condensed);
   font-size: 0.72rem;
@@ -399,6 +405,15 @@
   gap: 12px;
 }
 
+/* No celular, as duas colunas viram uma só. Evita que rótulos longos
+   (ex.: "Confirmar Nova Senha") quebrem em 2 linhas e desalinhem os
+   campos (nova senha x confirmar senha). Vale para todos os modais. */
+@media (max-width: 560px) {
+  .modal-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .modal-field {
   display: flex;
   flex-direction: column;
@@ -621,6 +636,15 @@
 .btn-action--delete {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
+}
+
+.btn-action--promote {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.btn-action--promote:hover {
+  background: rgba(16, 185, 129, 0.24);
 }
 
 .btn-action--view:hover {

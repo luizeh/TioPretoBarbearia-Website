@@ -72,6 +72,23 @@ try {
     return;
 }
 
+// --- 1b) Migração idempotente: coluna usuarios.promovido_por --------------
+// O CREATE TABLE IF NOT EXISTS não altera tabelas existentes, e o MySQL 8 não
+// tem "ADD COLUMN IF NOT EXISTS" — então checamos o information_schema antes.
+try {
+    $existeCol = (int) $pdo->query(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios'
+           AND COLUMN_NAME = 'promovido_por'"
+    )->fetchColumn();
+    if ($existeCol === 0) {
+        $pdo->exec('ALTER TABLE usuarios ADD COLUMN promovido_por INT NULL AFTER admin');
+        boot_log('coluna promovido_por adicionada em usuarios.');
+    }
+} catch (Throwable $e) {
+    boot_log('erro na migração promovido_por: ' . $e->getMessage());
+}
+
 // --- 2) Admin inicial ------------------------------------------------------
 try {
     $temAdmin = (int) $pdo->query('SELECT COUNT(*) FROM usuarios WHERE admin = 1')->fetchColumn();

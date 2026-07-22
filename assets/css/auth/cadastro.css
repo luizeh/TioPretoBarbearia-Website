@@ -84,6 +84,44 @@
   margin-bottom: 22px;
 }
 
+/* Aviso p/ checar spam (o e-mail as vezes cai em Spam/Promocoes) */
+.verify-spam-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  font-family: "Barlow", sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #8a6520;
+  background: rgba(201, 150, 58, 0.1);
+  border: 1px solid rgba(201, 150, 58, 0.35);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0 0 22px;
+}
+
+.verify-spam-hint i {
+  margin-top: 2px;
+  color: #c9963a;
+}
+
+/* Formularios altos (cadastro, recuperacao, verificacao) precisam rolar
+   quando ficam mais altos que a tela — senao o botao fica inalcancavel no
+   celular. Estas paginas carregam este CSS depois do login.css. */
+body {
+  overflow-y: auto;
+}
+
+.login-section {
+  justify-content: flex-start;
+  overflow: visible;
+}
+
+.login-card {
+  margin-block: auto; /* centraliza quando cabe; encosta no topo e rola quando nao */
+}
+
 .verify-code-input {
   text-align: center;
   letter-spacing: 0.5em;

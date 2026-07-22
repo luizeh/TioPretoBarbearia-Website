@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     senha      VARCHAR(255)  NOT NULL,
     cidade     VARCHAR(255)  NOT NULL,
     admin      TINYINT(1)    NOT NULL DEFAULT 0,
+    promovido_por INT        NULL COMMENT 'id do admin que promoveu este usuário a admin (NULL = admin original)',
     email_verificado       TINYINT(1)   NOT NULL DEFAULT 0,
     email_verificado_em    DATETIME     NULL,
     telefone_verificado    TINYINT(1)   NOT NULL DEFAULT 0,
@@ -423,6 +424,20 @@ CREATE TABLE IF NOT EXISTS horarios_periodos (
 
     PRIMARY KEY (id),
     INDEX idx_periodos_datas (data_inicio, data_fim)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- 19. sessoes
+--     Armazenamento das sessões PHP no banco (ver helpers/DbSessionHandler.php).
+--     Evita que o login caia a cada deploy no Railway (o /tmp padrão é efêmero).
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS sessoes (
+    id            VARCHAR(128) NOT NULL,
+    payload       MEDIUMTEXT   NOT NULL,
+    ultimo_acesso INT          NOT NULL,
+
+    PRIMARY KEY (id),
+    INDEX idx_sessoes_acesso (ultimo_acesso)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

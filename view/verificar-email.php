@@ -48,6 +48,11 @@ include_once __DIR__ . '/partials/head_public.php';
             O código expira em <?= (int) VerificacaoSql::VALIDADE_MIN ?> minutos.
         </p>
 
+        <p class="verify-spam-hint">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Não encontrou o e-mail? Verifique a caixa de <strong>Spam</strong> ou <strong>Promoções</strong>.
+        </p>
+
         <form id="form-verificar" autocomplete="one-time-code">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>" />
 

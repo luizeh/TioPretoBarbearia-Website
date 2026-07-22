@@ -39,8 +39,8 @@ $notificacoesNaoLidas = count(array_filter($notificacoesHeader, static fn(array 
 
     <div class="header-actions">
         <?php if (!empty($_SESSION['usuario_admin'])): ?>
-            <a href="<?= $linkBase ?>admin/dashboard.php" class="btn-back-dashboard">
-                <i class="fa-solid fa-gauge-high"></i> Painel Admin
+            <a href="<?= $linkBase ?>admin/dashboard.php" class="btn-back-dashboard" title="Painel Admin">
+                <i class="fa-solid fa-gauge-high"></i> <span class="btn-back-dashboard__label">Painel Admin</span>
             </a>
         <?php endif; ?>
 

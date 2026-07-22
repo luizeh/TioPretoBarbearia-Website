@@ -65,6 +65,12 @@ html:has(body.landing-page)::-webkit-scrollbar {
   display: none;
 }
 
+/* Nenhuma rolagem lateral no site: reforça no html além do body (o body
+   sozinho não segura o scroll horizontal em nível de viewport). */
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: "Barlow", sans-serif;
   background: var(--white);

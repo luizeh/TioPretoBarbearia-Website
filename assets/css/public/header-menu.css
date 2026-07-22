@@ -207,6 +207,7 @@ nav a.nav-active::after {
     padding: 6px 0;
     max-height: calc(100vh - 76px);
     overflow-y: auto;
+    z-index: 120; /* acima dos botões de ação para os links não ficarem cobertos */
   }
 
   header.nav-open nav {
@@ -230,6 +231,22 @@ nav a.nav-active::after {
   /* Esconde o nome do usuário no mobile (mantém o avatar) para ganhar espaço */
   .user-menu__name {
     display: none;
+  }
+
+  /* Painel Admin vira só ícone no mobile: evita que o texto (~150px) empurre
+     os botões de carrinho/notificações para fora da tela e tampe o menu. */
+  .btn-back-dashboard__label {
+    display: none;
+  }
+  .btn-back-dashboard {
+    padding: 8px 11px;
+    letter-spacing: normal;
+  }
+
+  /* Permite que a barra de ações encolha e não force largura além da tela. */
+  .header-actions {
+    min-width: 0;
+    gap: 6px;
   }
 }
 

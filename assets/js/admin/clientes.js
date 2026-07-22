@@ -233,4 +233,56 @@
       }
     });
   });
+
+  // ─── Promover a admin ────────────────────────────────────────────
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-action-promover]");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    var nome = btn.dataset.nome || "este usuário";
+
+    SwalTP.fire({
+      icon: "warning",
+      title: "Promover a admin?",
+      html:
+        "<strong>" +
+        nome +
+        "</strong> passará a ter acesso total ao painel administrativo.<br>" +
+        "Um admin promovido não poderá alterar quem o promoveu.",
+      showCancelButton: true,
+      confirmButtonText: "Promover",
+      cancelButtonText: "Cancelar",
+      preConfirm: function () {
+        return fetch("../../api/admin/clientes.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "promover", id: btn.dataset.id }),
+        }).then(function (r) {
+          return r.json();
+        });
+      },
+    }).then(function (result) {
+      if (!result.isConfirmed) return;
+      if (result.value && result.value.success) {
+        SwalTP.fire({
+          icon: "success",
+          title: "Promovido!",
+          text: nome + " agora é administrador.",
+          timer: 1800,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        }).then(function () {
+          location.reload();
+        });
+      } else {
+        SwalTP.fire({
+          icon: "error",
+          title: "Erro",
+          text: (result.value && result.value.message) || "Erro ao promover.",
+        });
+      }
+    });
+  });
 })();

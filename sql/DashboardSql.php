@@ -14,7 +14,9 @@ class DashboardSql
                 sobrenome,
                 email,
                 telefone,
-                cidade
+                cidade,
+                admin,
+                promovido_por
             FROM usuarios
             WHERE id = :id
         ");
@@ -46,7 +48,8 @@ class DashboardSql
                 email,
                 telefone,
                 cidade,
-                admin
+                admin,
+                promovido_por
             FROM usuarios
             ORDER BY nome
             LIMIT :limite OFFSET :offset
