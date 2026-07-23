@@ -605,17 +605,18 @@
 .notifications-menu__empty { padding:22px 15px; color:var(--text-muted); font-size:.85rem; }
 nav a[href*="notificacoes"] { display:none; }
 
-/* No celular o painel de notificações é ancorado à viewport (fixed) e ocupa
-   quase toda a largura — antes vazava para fora da tela (ancorado ao botão,
-   right:0). Rolagem interna quando há muitas notificações; acima da nav mobile. */
-@media (max-width: 640px) {
+/* No celular o painel de notificações é ancorado à VIEWPORT (fixed) e
+   CENTRALIZADO na tela, independente do botão — antes vazava para fora da tela
+   (ancorado ao botão, right:0). Rolagem interna quando há muitas notificações. */
+@media (max-width: 768px) {
   .notifications-menu__dropdown {
     position: fixed;
     top: 84px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    max-width: none;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: calc(100vw - 24px);
+    max-width: 380px;
     max-height: calc(100vh - 100px);
     z-index: 210;
   }
