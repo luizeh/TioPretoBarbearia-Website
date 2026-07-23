@@ -7,12 +7,15 @@ html {
 }
 
 /* min-height em vez de height: o SweetAlert2 nunca toca min-height,
-   então mesmo com height:auto!important o body permanece com altura mínima de 100vh */
+   então mesmo com height:auto!important o body permanece com altura mínima de 100vh.
+   background escuro: o tokens.css deixa o body branco; sem isto, ao rolar um
+   formulário alto no celular aparecia uma faixa branca abaixo da área escura. */
 body {
   min-height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background: var(--dark);
 }
 
 /* Garante que scroll continue bloqueado quando modal está aberto */
@@ -49,10 +52,20 @@ body.swal2-shown {
   pointer-events: none;
 }
 
-/* Ornamento dourado de fundo */
+/* Ornamento dourado de fundo — tesoura do Font Awesome (a mesma do resto do site).
+   Antes era o caractere Unicode "✂" (U+2702): no iOS/iPhone ele vira EMOJI colorido
+   e ignora o `color`, destoando do site. O glyph do FA respeita a cor e nunca vira
+   emoji. Requer a fonte do Font Awesome, já carregada no <head>. */
 .login-section::after {
-  content: "✂";
-  position: absolute;
+  content: "\f0c4"; /* fa-scissors */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-style: normal;
+  /* fixed (não absolute): o ornamento fica preso à viewport e NÃO conta como
+     altura rolável. Com overflow:visible do cadastro, o overhang de 6rem abaixo
+     da seção criava ~96px de rolagem no desktop mesmo com o formulário cabendo.
+     Assim a página só rola quando o conteúdo realmente não cabe (celular). */
+  position: fixed;
   font-size: 28rem;
   color: rgba(201, 150, 58, 0.03);
   right: -4rem;

@@ -107,17 +107,20 @@ class UsuariosSql
     }
 
     /**
-     * Promove um usuário a admin, registrando quem o promoveu (promovido_por).
-     * Só promove quem ainda não é admin. Retorna true se algo mudou.
+     * Define o tipo do usuário (admin ou comum). Ao promover, registra quem
+     * promoveu (promovido_por); ao rebaixar, zera esse vínculo.
      */
-    public static function promover(int $id, int $promovidoPor): bool
+    public static function definirAdmin(int $id, bool $admin, ?int $promovidoPor): void
     {
         $pdo  = Connection::getConnection();
         $stmt = $pdo->prepare(
-            "UPDATE usuarios SET admin = 1, promovido_por = :por WHERE id = :id AND admin = 0"
+            "UPDATE usuarios SET admin = :admin, promovido_por = :por WHERE id = :id"
         );
-        $stmt->execute([':por' => $promovidoPor, ':id' => $id]);
-        return $stmt->rowCount() > 0;
+        $stmt->execute([
+            ':admin' => $admin ? 1 : 0,
+            ':por'   => $admin ? $promovidoPor : null,
+            ':id'    => $id,
+        ]);
     }
 
     /**

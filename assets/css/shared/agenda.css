@@ -506,6 +506,27 @@
   text-overflow: ellipsis;
 }
 
+/* Horário e status ficam ocultos no desktop (a coluna de horas e a cor da
+   borda já transmitem essa informação); aparecem no mobile, onde a coluna de
+   horas é ocultada e os cards precisam ser autoexplicativos. */
+.agenda-appt__time,
+.agenda-appt__status {
+  display: none;
+}
+
+.agenda-appt--confirmed .agenda-appt__status {
+  background: rgba(34, 197, 94, 0.18);
+  color: #15803d;
+}
+.agenda-appt--pending .agenda-appt__status {
+  background: rgba(234, 179, 8, 0.22);
+  color: #a16207;
+}
+.agenda-appt--cancelled .agenda-appt__status {
+  background: rgba(239, 68, 68, 0.18);
+  color: #b91c1c;
+}
+
 .agenda-appt__actions {
   display: none;
   gap: 4px;
@@ -525,6 +546,61 @@
 
 .btn-action--whatsapp:hover {
   background: rgba(37, 211, 102, 0.22);
+}
+
+/* Em telas de toque as ações do card não abrem por hover (inacessível): ficam
+   ocultas e o card abre uma "folha de ações" ao toque (ver agendamentos.js). */
+@media (hover: none) {
+  .agenda-appt:hover .agenda-appt__actions {
+    display: none;
+  }
+}
+
+/* Folha de ações (mobile/toque) para um agendamento da agenda admin. */
+.agenda-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.agenda-sheet__meta {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 4px;
+}
+.agenda-sheet__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--dark);
+  font-family: var(--font-condensed);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.agenda-sheet__btn i {
+  padding-top: 0;
+}
+.agenda-sheet__btn--primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--white);
+}
+.agenda-sheet__btn--whatsapp {
+  border-color: #25d366;
+  color: #178b43;
+}
+.agenda-sheet__btn--danger {
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 /* ── RESPONSIVO — agenda ── */
@@ -559,48 +635,73 @@
   }
 
   .agenda-scroll {
-    overflow-x: scroll;
+    overflow-x: auto;
     scrollbar-width: thin;
   }
 
+  /* No celular a coluna de horas (a "sidebar" que acompanhava a rolagem
+     horizontal) é ocultada: colapsa para largura 0, mas as células continuam
+     no fluxo — assim o auto-placement do grid e os overlays de dia fechado não
+     saem do lugar. O horário passa a aparecer no próprio card. Colunas de dia
+     mais largas e slots mais altos evitam o conteúdo espremido. */
   .agenda-grid {
-    /* No celular: colunas mais largas e slots mais altos, pra dar
-       respiro e o conteúdo não ficar espremido (rola lateralmente). */
-    --slot-h: 62px;
-    grid-template-columns: 58px repeat(7, 152px);
-    min-width: 1122px;
+    --slot-h: 72px;
+    grid-template-columns: 0 repeat(7, 160px);
+    min-width: 1120px;
   }
 
   .agenda-corner,
   .agenda-hour {
-    position: sticky;
-    left: 0;
-    z-index: 12;
-  }
-
-  .agenda-corner {
-    z-index: 14;
-  }
-
-  .agenda-hour {
-    background: #fafaf9;
+    overflow: hidden;
+    border: 0;
+    padding: 0;
+    min-height: 0;
   }
 
   .agenda-day-head {
-    min-width: 152px;
+    min-width: 160px;
   }
 
-  /* Mais respiro no card de agendamento no mobile */
+  /* Card do agendamento: mais respiro, hierarquia e separação visual. */
   .agenda-appt {
-    padding: 7px 10px;
-    gap: 3px;
+    padding: 8px 10px;
+    gap: 2px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   .agenda-appt__name {
-    font-size: 0.86rem;
+    font-size: 0.9rem;
   }
   .agenda-appt__service {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     white-space: normal;
+  }
+  .agenda-appt__time {
+    display: block;
+    font-family: var(--font-condensed);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--dark);
+  }
+  .agenda-appt__time i {
+    padding-top: 0;
+    margin-right: 2px;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+  }
+  .agenda-appt__status {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-family: var(--font-condensed);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 }
 
@@ -1046,7 +1147,7 @@
 
 @media (max-width: 640px) {
   .agenda-grid--cliente {
-    grid-template-columns: 58px repeat(var(--agenda-dias, 7), 152px);
-    min-width: calc(58px + var(--agenda-dias, 7) * 152px);
+    grid-template-columns: 0 repeat(var(--agenda-dias, 7), 160px);
+    min-width: calc(var(--agenda-dias, 7) * 160px);
   }
 }

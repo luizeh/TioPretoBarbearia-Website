@@ -36,23 +36,6 @@ if ($method === 'POST') {
         }
     };
 
-    if ($action === 'promover') {
-        $alvoId = (int) ($body['id'] ?? 0);
-        if ($alvoId <= 0) {
-            helpers::resposta_json(false, 'ID do usuário é obrigatório.', null, 400);
-        }
-        $alvo = DashboardSql::buscarUsuario($alvoId);
-        if (!$alvo) {
-            helpers::resposta_json(false, 'Usuário não encontrado.', null, 404);
-        }
-        if (!empty($alvo['admin'])) {
-            helpers::resposta_json(false, 'Este usuário já é administrador.', null, 409);
-        }
-        UsuariosSql::promover($alvoId, $adminAtualId);
-        LogsSql::registrar($adminAtualId, 'admin_promovido', "Usuário #{$alvoId} promovido a administrador.");
-        helpers::resposta_json(true, 'Usuário promovido a administrador.', null, 200);
-    }
-
     if ($action === 'criar') {
         $required = ['nome', 'sobrenome', 'email', 'telefone', 'cidade'];
         foreach ($required as $field) {
@@ -71,6 +54,27 @@ if ($method === 'POST') {
             helpers::resposta_json(false, 'ID do cliente é obrigatório.', null, 400);
         }
         $protegerPromotor((int) $body['id']);
+
+        // Troca de tipo (Usuário/Admin) feita pelo próprio formulário de edição.
+        if (array_key_exists('admin', $body)) {
+            $alvoId    = (int) $body['id'];
+            $novoAdmin = ((int) $body['admin']) === 1;
+            $alvo      = DashboardSql::buscarUsuario($alvoId);
+            $eraAdmin  = $alvo && !empty($alvo['admin']);
+            if ($alvo && $novoAdmin !== $eraAdmin) {
+                // Evita o admin se auto-rebaixar/promover e perder o acesso.
+                if ($alvoId === $adminAtualId) {
+                    helpers::resposta_json(false, 'Você não pode alterar o seu próprio tipo de usuário.', null, 403);
+                }
+                UsuariosSql::definirAdmin($alvoId, $novoAdmin, $adminAtualId);
+                LogsSql::registrar(
+                    $adminAtualId,
+                    $novoAdmin ? 'admin_promovido' : 'admin_rebaixado',
+                    "Usuário #{$alvoId} " . ($novoAdmin ? 'promovido a administrador.' : 'rebaixado para usuário.')
+                );
+            }
+        }
+
         $required = ['nome', 'sobrenome', 'email'];
         foreach ($required as $field) {
             if (empty($body[$field])) {

@@ -97,26 +97,18 @@ include __DIR__ . '/../partials/head.php';
                                                 data-sobrenome="<?= htmlspecialchars($u['sobrenome']) ?>"
                                                 data-email="<?= htmlspecialchars($u['email']) ?>"
                                                 data-telefone="<?= htmlspecialchars($u['telefone'] ?? '') ?>"
-                                                data-cidade="<?= htmlspecialchars($u['cidade'] ?? '') ?>">
+                                                data-cidade="<?= htmlspecialchars($u['cidade'] ?? '') ?>"
+                                                data-admin="<?= (int) $u['admin'] ?>">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                         <?php endif; ?>
                                         <?php if (!$ehAdmin): ?>
-                                            <button class="btn-action btn-action--promote" title="Promover a admin"
-                                                data-action-promover
-                                                data-id="<?= $u['id'] ?>"
-                                                data-nome="<?= htmlspecialchars($u['nome'] . ' ' . $u['sobrenome']) ?>">
-                                                <i class="fa-solid fa-user-shield"></i>
-                                            </button>
                                             <button class="btn-action btn-action--delete" title="Excluir"
                                                 data-modal="modal-cliente-excluir"
                                                 data-id="<?= $u['id'] ?>"
                                                 data-nome="<?= htmlspecialchars($u['nome'] . ' ' . $u['sobrenome']) ?>">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
-                                        <?php endif; ?>
-                                        <?php if ($ehPromotor): ?>
-                                            <span class="badge badge--admin" title="Foi quem promoveu você — não pode ser alterado">Seu promotor</span>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -150,8 +142,9 @@ $modal_id           = 'modal-cliente-editar';
 $modal_title        = 'Editar Cliente';
 $modal_confirm_text = 'Salvar';
 $modal_use_fields   = true;
+$modal_show_tipo    = true;
 include __DIR__ . '/../partials/modais/modal-cliente-form.php';
-unset($modal_id, $modal_title, $modal_confirm_text, $modal_use_fields);
+unset($modal_id, $modal_title, $modal_confirm_text, $modal_use_fields, $modal_show_tipo);
 
 $modal_id           = 'modal-cliente-excluir';
 $modal_title        = 'Excluir Cliente';

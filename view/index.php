@@ -1,9 +1,15 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+// iniciarSessao() usa o mesmo handler de sessão (banco) do restante do app —
+// necessário para reconhecer o usuário logado aqui (um session_start() cru lia
+// do arquivo e mostrava "Entrar/Criar conta" mesmo autenticado).
+require_once __DIR__ . '/../helpers/helpers.php';
+helpers::iniciarSessao();
 
 $logado = !empty($_SESSION['usuario_id']);
 
 $rootPath  = '../';
+$linkBase  = '';
+$activeNav = 'inicio';
 $pageTitle = 'Tio Preto Barbearia';
 $bodyClass = 'landing-page';
 
@@ -16,6 +22,7 @@ $lnd = static function (string $k, string $f) use ($_landing): string {
 
 include_once __DIR__ . '/partials/head_public.php';
 ?>
+
 
 <section class="hero hero--landing">
   <div class="hero-content">

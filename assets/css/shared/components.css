@@ -159,9 +159,16 @@
 
 .dash-table {
   width: 100%;
-  /* Garante rolagem horizontal em telas estreitas em vez de espremer/cortar colunas */
-  min-width: 640px;
   border-collapse: collapse;
+}
+
+/* Só no celular a tabela mantém largura mínima e rola lateralmente (para não
+   espremer/cortar as colunas). No desktop ela se ajusta à largura disponível e
+   nunca rola na horizontal — o conteúdo longo quebra (ver .dash-table td). */
+@media (max-width: 768px) {
+  .dash-table {
+    min-width: 640px;
+  }
 }
 
 /* ID do usuário ao lado do nome, na tabela de logs */
@@ -173,10 +180,10 @@
 .dash-table thead th {
   font-family: var(--font-condensed);
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 12px 24px;
+  padding: 12px 14px;
   text-align: left;
   background: #fafaf9;
   border-bottom: 1px solid var(--border);
@@ -210,7 +217,7 @@
 }
 
 .dash-table tbody td {
-  padding: 14px 24px;
+  padding: 14px 14px;
   font-family: var(--font-body);
   font-size: 0.88rem;
   color: var(--text);
@@ -230,6 +237,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 700;
+  white-space: nowrap; /* rótulo curto (ex.: "Usuário") nunca quebra em 2 linhas */
 }
 
 .badge--confirmed {
@@ -638,13 +646,11 @@
   color: #ef4444;
 }
 
-.btn-action--promote {
-  background: rgba(16, 185, 129, 0.12);
-  color: #059669;
-}
-
-.btn-action--promote:hover {
-  background: rgba(16, 185, 129, 0.24);
+/* Nenhuma célula quebra o texto: ID, telefone, cidade, e-mail… ficam sempre em
+   uma linha só. No desktop as tabelas normalmente cabem; se uma tabela larga
+   não couber, a rolagem fica contida no .table-wrapper (não na página). */
+.dash-table td {
+  white-space: nowrap;
 }
 
 .btn-action--view:hover {
@@ -977,6 +983,14 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
 }
 
+/* No celular, popups com largura fixa (ex.: width:'560px') não podem estourar
+   a viewport: ocupam a largura disponível e rolam internamente se forem altos. */
+@media (max-width: 600px) {
+  .swal-tp.swal2-popup {
+    width: 100% !important;
+  }
+}
+
 .swal-tp__title {
   font-family: var(--font-display) !important;
   font-size: 1.15rem !important;
@@ -1133,6 +1147,17 @@
 }
 
 .modal-field[hidden] {
+  display: none;
+}
+
+/* Botões cujo display é definido por classe (.btn-primary/.btn-secondary…)
+   ignoram o atributo HTML [hidden]: a regra de origem "autor" vence a do
+   user-agent ([hidden]{display:none}). Reforça o hidden para que botões como
+   "Cancelar edição" (horários) realmente fiquem ocultos quando não editando. */
+.btn-primary[hidden],
+.btn-secondary[hidden],
+.btn-modal-primary[hidden],
+.btn-modal-secondary[hidden] {
   display: none;
 }
 

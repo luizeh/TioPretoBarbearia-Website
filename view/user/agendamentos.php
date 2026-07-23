@@ -230,8 +230,11 @@ include_once __DIR__ . '/../partials/head_public.php';
                             } elseif ($ownAppointment) {
                                 $durationMinutes = (int) ($ownAppointment['duracao_minutos'] ?? 30);
                                 $slotsSpan = min(24, max(1, (int) ceil($durationMinutes / 30)));
+                                $_ini = ((int) substr($slotTime, 0, 2)) * 60 + (int) substr($slotTime, 3, 2);
+                                $_fim = sprintf('%02d:%02d', intdiv($_ini + $durationMinutes, 60), ($_ini + $durationMinutes) % 60);
                                 echo '<button class="agenda-appt agenda-appt--meu agenda-appt--slots-' . $slotsSpan . '" type="button" data-own-id="' . (int) $ownAppointment['id'] . '">';
                                 echo '<span class="agenda-appt__name">Seu agendamento</span>';
+                                echo '<span class="agenda-appt__time"><i class="fa-regular fa-clock"></i>' . $slotTime . '–' . $_fim . '</span>';
                                 echo '<span class="agenda-appt__service">' . htmlspecialchars($ownAppointment['servico']) . ' · ' . $durationMinutes . ' min</span>';
                                 echo '</button>';
                             } elseif ($continuaProprio) {

@@ -200,7 +200,8 @@
         } else if (!entrada.inicio) {
           cell.innerHTML = '<div class="agenda-cell__blocked" aria-hidden="true"></div>';
         } else if (entrada.ag.proprio) {
-          cell.innerHTML = '<button class="agenda-appt agenda-appt--meu ' + classeDeSlots(entrada.ag.duracao_minutos) + '" type="button" data-own-id="' + entrada.ag.id + '"><span class="agenda-appt__name">Seu agendamento</span><span class="agenda-appt__service">' + escapeHtml(entrada.ag.servico) + ' · ' + Number(entrada.ag.duracao_minutos || 30) + ' min</span></button>';
+          var fimProprio = somarMinutos(cell.dataset.time, Number(entrada.ag.duracao_minutos || 30));
+          cell.innerHTML = '<button class="agenda-appt agenda-appt--meu ' + classeDeSlots(entrada.ag.duracao_minutos) + '" type="button" data-own-id="' + entrada.ag.id + '"><span class="agenda-appt__name">Seu agendamento</span><span class="agenda-appt__time"><i class="fa-regular fa-clock"></i>' + cell.dataset.time + '–' + fimProprio + '</span><span class="agenda-appt__service">' + escapeHtml(entrada.ag.servico) + ' · ' + Number(entrada.ag.duracao_minutos || 30) + ' min</span></button>';
         } else {
           cell.innerHTML = '<div class="agenda-appt agenda-appt--ocupado ' + classeDeSlots(entrada.ag.duracao_minutos) + '"><span class="agenda-appt__name">Indisponível</span></div>';
         }

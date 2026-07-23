@@ -39,6 +39,11 @@
         userTrigger.addEventListener("click", function (event) {
           event.stopPropagation();
           userMenu.classList.toggle("open");
+          // Abrir um painel fecha os demais.
+          var cart = document.getElementById("headerCart");
+          if (cart) cart.classList.remove("open");
+          var notif = document.getElementById("headerNotifications");
+          if (notif) notif.classList.remove("open");
         });
       }
 
@@ -54,6 +59,11 @@
         notificationsTrigger.addEventListener("click", function (event) {
           event.stopPropagation();
           notificationsMenu.classList.toggle("open");
+          // Abrir um painel fecha os demais.
+          var cart = document.getElementById("headerCart");
+          if (cart) cart.classList.remove("open");
+          var user = document.getElementById("headerUserMenu");
+          if (user) user.classList.remove("open");
         });
       }
 
@@ -91,6 +101,15 @@
         notificationsMenu.classList.remove("open");
       });
     }
+
+    // Esc fecha os painéis abertos do header (carrinho, notificações, perfil).
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      ["headerCart", "headerNotifications", "headerUserMenu"].forEach(function (id) {
+        var panel = document.getElementById(id);
+        if (panel) panel.classList.remove("open");
+      });
+    });
 
     document.querySelectorAll("[data-hide-on-error]").forEach(function (image) {
       image.addEventListener("error", function () {

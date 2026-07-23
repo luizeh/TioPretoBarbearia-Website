@@ -1,6 +1,12 @@
 // clientes.js — CRUD de clientes via SweetAlert2 + API
 
 (function () {
+  function escapeHtml(value) {
+    var el = document.createElement("div");
+    el.textContent = value == null ? "" : value;
+    return el.innerHTML;
+  }
+
   // ─── Criar Cliente ──────────────────────────────────────────────
   document.addEventListener("click", function (e) {
     var btn = e.target.closest('[data-modal="modal-cliente-criar"]');
@@ -133,9 +139,15 @@
           telEl.value = btn.dataset.telefone || "";
           telEl.dispatchEvent(new Event("input"));
         }
+        // Tipo de usuário (Usuário/Admin)
+        var tipoEl = popup.querySelector('[data-field="admin"]');
+        if (tipoEl && typeof btn.dataset.admin !== "undefined") {
+          tipoEl.value = btn.dataset.admin;
+        }
       },
       preConfirm: function () {
         var popup = document.querySelector(".swal2-popup");
+        var tipoSel = popup.querySelector('[data-field="admin"]');
         var dados = {
           action: "editar",
           id: btn.dataset.id,
@@ -147,37 +159,83 @@
           telefone: popup.querySelector('[data-field="telefone"]').value.trim(),
           cidade: popup.querySelector('[data-field="cidade"]').value.trim(),
         };
+        if (tipoSel) dados.admin = tipoSel.value; // "0" ou "1"
         if (!dados.nome || !dados.email) {
           Swal.showValidationMessage("Nome e e-mail são obrigatórios.");
           return false;
         }
-        return fetch("../../api/admin/clientes.php", {
+        // Retorna os dados; o envio acontece no .then para permitir
+        // uma confirmação extra quando o tipo de usuário for alterado.
+        return dados;
+      },
+    }).then(function (result) {
+      if (!result.isConfirmed || !result.value) return;
+      var dados = result.value;
+      var nome =
+        ((btn.dataset.nome || "") + " " + (btn.dataset.sobrenome || "")).trim() ||
+        "este usuário";
+      var tipoOriginal =
+        typeof btn.dataset.admin !== "undefined" ? String(btn.dataset.admin) : null;
+      var mudouTipo =
+        typeof dados.admin !== "undefined" &&
+        tipoOriginal !== null &&
+        dados.admin !== tipoOriginal;
+
+      function salvar() {
+        fetch("../../api/admin/clientes.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dados),
-        }).then(function (r) {
-          return r.json();
-        });
-      },
-    }).then(function (result) {
-      if (!result.isConfirmed) return;
-      if (result.value && result.value.success) {
+        })
+          .then(function (r) {
+            return r.json();
+          })
+          .catch(function () {
+            return { success: false, message: "Erro de rede." };
+          })
+          .then(function (value) {
+            if (value && value.success) {
+              SwalTP.fire({
+                icon: "success",
+                title: "Salvo!",
+                text: "Cliente atualizado com sucesso.",
+                timer: 1800,
+                timerProgressBar: true,
+                showConfirmButton: false,
+              }).then(function () {
+                location.reload();
+              });
+            } else {
+              SwalTP.fire({
+                icon: "error",
+                title: "Erro",
+                text: (value && value.message) || "Erro ao salvar.",
+              });
+            }
+          });
+      }
+
+      // Alterar o tipo (Usuário ⇄ Admin) é sensível: pede confirmação explícita.
+      if (mudouTipo) {
+        var vaiVirarAdmin = dados.admin === "1";
         SwalTP.fire({
-          icon: "success",
-          title: "Salvo!",
-          text: "Cliente atualizado com sucesso.",
-          timer: 1800,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        }).then(function () {
-          location.reload();
+          icon: "warning",
+          title: vaiVirarAdmin ? "Promover a administrador?" : "Rebaixar para usuário?",
+          html:
+            "<strong>" +
+            escapeHtml(nome) +
+            "</strong> " +
+            (vaiVirarAdmin
+              ? "passará a ter acesso total ao painel administrativo.<br>Um admin promovido não poderá alterar quem o promoveu."
+              : "deixará de ter acesso ao painel administrativo."),
+          showCancelButton: true,
+          confirmButtonText: vaiVirarAdmin ? "Promover" : "Rebaixar",
+          cancelButtonText: "Voltar",
+        }).then(function (conf) {
+          if (conf.isConfirmed) salvar();
         });
       } else {
-        SwalTP.fire({
-          icon: "error",
-          title: "Erro",
-          text: (result.value && result.value.message) || "Erro ao salvar.",
-        });
+        salvar();
       }
     });
   });
@@ -229,58 +287,6 @@
           icon: "error",
           title: "Erro",
           text: (result.value && result.value.message) || "Erro ao excluir.",
-        });
-      }
-    });
-  });
-
-  // ─── Promover a admin ────────────────────────────────────────────
-  document.addEventListener("click", function (e) {
-    var btn = e.target.closest("[data-action-promover]");
-    if (!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    var nome = btn.dataset.nome || "este usuário";
-
-    SwalTP.fire({
-      icon: "warning",
-      title: "Promover a admin?",
-      html:
-        "<strong>" +
-        nome +
-        "</strong> passará a ter acesso total ao painel administrativo.<br>" +
-        "Um admin promovido não poderá alterar quem o promoveu.",
-      showCancelButton: true,
-      confirmButtonText: "Promover",
-      cancelButtonText: "Cancelar",
-      preConfirm: function () {
-        return fetch("../../api/admin/clientes.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "promover", id: btn.dataset.id }),
-        }).then(function (r) {
-          return r.json();
-        });
-      },
-    }).then(function (result) {
-      if (!result.isConfirmed) return;
-      if (result.value && result.value.success) {
-        SwalTP.fire({
-          icon: "success",
-          title: "Promovido!",
-          text: nome + " agora é administrador.",
-          timer: 1800,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        }).then(function () {
-          location.reload();
-        });
-      } else {
-        SwalTP.fire({
-          icon: "error",
-          title: "Erro",
-          text: (result.value && result.value.message) || "Erro ao promover.",
         });
       }
     });

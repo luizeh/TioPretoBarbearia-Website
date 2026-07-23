@@ -331,3 +331,22 @@
   text-align: right;
 }
 
+/* No celular o dropdown é ancorado à viewport (fixed) e ocupa quase toda a
+   largura — antes, ancorado ao botão (right:0), o conteúdo vazava para fora da
+   tela. Rolagem interna quando há muitos itens; fica acima da nav mobile. */
+@media (max-width: 640px) {
+  .cart-menu__dropdown {
+    position: fixed;
+    top: 84px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100vh - 100px);
+    z-index: 210;
+  }
+  .cart-menu__items {
+    max-height: 45vh;
+  }
+}
+

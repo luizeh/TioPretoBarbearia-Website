@@ -656,3 +656,68 @@
     if (input.value) window.location.href = "?data=" + input.value;
   });
 })();
+
+// ── Telas de toque: tocar no card da agenda abre uma folha de ações ──
+// No desktop as ações aparecem no hover do card; no celular/tablet de toque
+// não há hover, então o card inteiro (área de toque grande) abre um SweetAlert
+// com Editar / WhatsApp / Excluir, que reaproveitam os botões reais do card.
+(function () {
+  "use strict";
+
+  function escapeHtml(value) {
+    var el = document.createElement("div");
+    el.textContent = value == null ? "" : value;
+    return el.innerHTML;
+  }
+
+  document.addEventListener("click", function (e) {
+    if (!window.matchMedia("(hover: none)").matches) return; // só toque
+    var card = e.target.closest(".agenda-appt");
+    if (!card) return;
+    var actions = card.querySelector(".agenda-appt__actions");
+    if (!actions) return; // cards sem ações não abrem folha
+    if (e.target.closest(".agenda-appt__actions")) return; // deixa o botão real agir
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    var editBtn = actions.querySelector(".btn-action--edit");
+    var waBtn = actions.querySelector(".btn-action--whatsapp");
+    var delBtn = actions.querySelector(".btn-action--delete");
+    var nomeEl = card.querySelector(".agenda-appt__name");
+    var timeEl = card.querySelector(".agenda-appt__time");
+    var servEl = card.querySelector(".agenda-appt__service");
+    var nome = nomeEl ? nomeEl.textContent.trim() : "Agendamento";
+    var metaParts = [];
+    if (timeEl) metaParts.push(escapeHtml(timeEl.textContent.trim()));
+    if (servEl) metaParts.push(escapeHtml(servEl.textContent.trim()));
+
+    var html =
+      '<div class="agenda-sheet">' +
+      (metaParts.length ? '<p class="agenda-sheet__meta">' + metaParts.join(" · ") + "</p>" : "") +
+      (editBtn ? '<button type="button" class="agenda-sheet__btn agenda-sheet__btn--primary" data-sheet="edit"><i class="fa-solid fa-pen"></i> Editar</button>' : "") +
+      (waBtn ? '<button type="button" class="agenda-sheet__btn agenda-sheet__btn--whatsapp" data-sheet="wa"><i class="fa-brands fa-whatsapp"></i> Lembrete WhatsApp</button>' : "") +
+      (delBtn ? '<button type="button" class="agenda-sheet__btn agenda-sheet__btn--danger" data-sheet="del"><i class="fa-solid fa-trash"></i> Excluir</button>' : "") +
+      "</div>";
+
+    SwalTP.fire({
+      title: nome,
+      html: html,
+      showConfirmButton: false,
+      showCancelButton: true,
+      cancelButtonText: "Fechar",
+      didOpen: function (popup) {
+        popup.querySelectorAll("[data-sheet]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var which = b.dataset.sheet;
+            // Aciona o botão real do card — reaproveita toda a lógica existente.
+            // Ao disparar um novo SweetAlert, esta folha é substituída por ele.
+            if (which === "edit" && editBtn) editBtn.click();
+            else if (which === "wa" && waBtn) waBtn.click();
+            else if (which === "del" && delBtn) delBtn.click();
+          });
+        });
+      },
+    });
+  });
+})();

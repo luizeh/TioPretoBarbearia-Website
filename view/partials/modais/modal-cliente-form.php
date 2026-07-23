@@ -14,6 +14,7 @@ $modal_title        = $modal_title        ?? 'Cliente';
 $modal_confirm_text = $modal_confirm_text ?? 'Salvar';
 $modal_use_fields   = $modal_use_fields   ?? false;
 $modal_show_senha   = $modal_show_senha   ?? false;
+$modal_show_tipo    = $modal_show_tipo    ?? false;
 
 if (!function_exists('_df')) {
     function _df(string $field, bool $use): string
@@ -54,6 +55,15 @@ if (!function_exists('_df')) {
                         <input class="modal-input" type="text" <?= _df('cidade', $modal_use_fields) ?> placeholder="Cidade" />
                     </div>
                 </div>
+                <?php if ($modal_show_tipo): ?>
+                    <div class="modal-field">
+                        <label class="modal-label">Tipo de usuário</label>
+                        <select class="modal-input" <?= _df('admin', $modal_use_fields) ?>>
+                            <option value="0">Usuário</option>
+                            <option value="1">Admin</option>
+                        </select>
+                    </div>
+                <?php endif; ?>
                 <?php if ($modal_show_senha): ?>
                     <div class="modal-field" style="margin-top:8px">
                         <label class="modal-label">Senha de acesso</label>

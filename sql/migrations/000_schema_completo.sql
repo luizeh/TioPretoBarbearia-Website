@@ -24,6 +24,9 @@
 --      (a sintaxe ${{Serviço.VAR}} é a referência de variáveis do Railway)
 --
 -- Todas as tabelas usam IF NOT EXISTS — seguro de re-executar.
+-- Bancos JÁ existentes também são sincronizados: o bloco de MIGRAÇÕES
+-- IDEMPOTENTES no final adiciona colunas que faltarem (ex.: promovido_por),
+-- pois CREATE TABLE IF NOT EXISTS não altera tabelas já criadas.
 -- Ordem respeitando dependências de FK.
 -- ============================================================
 
@@ -439,6 +442,61 @@ CREATE TABLE IF NOT EXISTS sessoes (
     PRIMARY KEY (id),
     INDEX idx_sessoes_acesso (ultimo_acesso)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- 20. MIGRAÇÕES IDEMPOTENTES (sincroniza bancos JÁ existentes)
+--
+--     `CREATE TABLE IF NOT EXISTS` cria tabelas que faltam, mas NÃO adiciona
+--     colunas a tabelas que já existem. Um banco criado por uma versão antiga
+--     do schema fica sem as colunas acrescentadas depois (ex.: o erro
+--     "Unknown column 'promovido_por'"). Este bloco adiciona essas colunas de
+--     forma segura e repetível: só cria a coluna se ela ainda não existir.
+--
+--     Portável entre MySQL e MariaDB (usa information_schema; sem sintaxe
+--     exclusiva). Importe por um cliente que entenda DELIMITER — o `mysql` CLI
+--     e o phpMyAdmin (XAMPP) entendem. A procedure auxiliar é removida no fim.
+-- --------------------------------------------------------
+DROP PROCEDURE IF EXISTS _tp_add_column;
+DELIMITER $$
+CREATE PROCEDURE _tp_add_column(IN p_table VARCHAR(64), IN p_column VARCHAR(64), IN p_def TEXT)
+BEGIN
+    IF (SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME   = p_table
+          AND COLUMN_NAME  = p_column) = 0 THEN
+        SET @ddl = CONCAT('ALTER TABLE `', p_table, '` ADD COLUMN ', p_def);
+        PREPARE _stmt FROM @ddl;
+        EXECUTE _stmt;
+        DEALLOCATE PREPARE _stmt;
+    END IF;
+END$$
+DELIMITER ;
+
+-- usuarios: tipo/admin + auditoria de promoção + verificação/troca de contato
+CALL _tp_add_column('usuarios', 'admin',                  'admin TINYINT(1) NOT NULL DEFAULT 0 AFTER cidade');
+CALL _tp_add_column('usuarios', 'promovido_por',          'promovido_por INT NULL AFTER admin');
+CALL _tp_add_column('usuarios', 'email_verificado',       'email_verificado TINYINT(1) NOT NULL DEFAULT 0');
+CALL _tp_add_column('usuarios', 'email_verificado_em',    'email_verificado_em DATETIME NULL');
+CALL _tp_add_column('usuarios', 'telefone_verificado',    'telefone_verificado TINYINT(1) NOT NULL DEFAULT 0');
+CALL _tp_add_column('usuarios', 'telefone_verificado_em', 'telefone_verificado_em DATETIME NULL');
+CALL _tp_add_column('usuarios', 'email_pendente',         'email_pendente VARCHAR(320) NULL');
+CALL _tp_add_column('usuarios', 'telefone_pendente',      'telefone_pendente VARCHAR(20) NULL');
+CALL _tp_add_column('usuarios', 'updated_at',             'updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP');
+
+-- pedidos: endereço detalhado do checkout
+CALL _tp_add_column('pedidos', 'cep',              'cep VARCHAR(9) NULL');
+CALL _tp_add_column('pedidos', 'logradouro',       'logradouro VARCHAR(150) NULL');
+CALL _tp_add_column('pedidos', 'numero',           'numero VARCHAR(20) NULL');
+CALL _tp_add_column('pedidos', 'bairro',           'bairro VARCHAR(100) NULL');
+CALL _tp_add_column('pedidos', 'cidade',           'cidade VARCHAR(100) NULL');
+CALL _tp_add_column('pedidos', 'estado',           'estado CHAR(2) NULL');
+CALL _tp_add_column('pedidos', 'complemento',      'complemento VARCHAR(150) NULL');
+CALL _tp_add_column('pedidos', 'ponto_referencia', 'ponto_referencia VARCHAR(150) NULL');
+
+-- pedido_itens: snapshot do nome do produto no momento da compra
+CALL _tp_add_column('pedido_itens', 'produto_nome', 'produto_nome VARCHAR(150) NULL');
+
+DROP PROCEDURE IF EXISTS _tp_add_column;
 
 SET FOREIGN_KEY_CHECKS = 1;
 

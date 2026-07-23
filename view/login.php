@@ -63,10 +63,6 @@ include_once __DIR__ . '/partials/head_public.php';
   </div>
 </main>
 
-<!-- ══════════════ FOOTER SIMPLES ══════════════ -->
-<footer class="login-footer-simple">
-  <p>© 2026 Tio Preto Barbearia — Todos os direitos reservados. &nbsp;|&nbsp; Feito por <span>Luizeh</span></p>
-</footer>
 <script src="../assets/js/auth/login.js" defer></script>
 </body>
 

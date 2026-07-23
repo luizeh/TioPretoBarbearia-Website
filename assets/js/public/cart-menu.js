@@ -128,8 +128,11 @@
           event.stopPropagation();
           cartMenu.classList.toggle("open");
 
+          // Abrir um painel fecha os demais (evita sobreposição no celular).
           var userMenu = document.getElementById("headerUserMenu");
           if (userMenu) userMenu.classList.remove("open");
+          var notifMenu = document.getElementById("headerNotifications");
+          if (notifMenu) notifMenu.classList.remove("open");
           if (cartMenu.classList.contains("open")) fetchCart();
         });
       }
